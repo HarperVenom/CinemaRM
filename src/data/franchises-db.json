@@ -1,0 +1,98 @@
+{
+    "universes": [
+        {
+            "id": 0,
+            "title": "Marvel Cinematic Universe",
+            "branches": [
+                {
+                    "id": 0,
+                    "title": "Avengers",
+                    "titles": [
+                {
+                    "id": 0,
+                    "type": "movie",
+                    "title": "Iron Man",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2008-05-02",
+                    "storyDate": "2008-2009",
+                    "watchAfter": []
+                },
+                {
+                    "id": 1,
+                    "type": "movie",
+                    "title": "The Incredible Hulk",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2008-06-13",
+                    "storyDate": "2011",
+                    "watchAfter": []
+                },
+                {
+                    "id": 2,
+                    "type": "movie",
+                    "title": "Iron Man 2",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2010-05-07",
+                    "storyDate": "2010",
+                    "watchAfter": [0]
+                },
+                {
+                    "id": 3,
+                    "type": "movie",
+                    "title": "Thor",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2011-05-02",
+                    "storyDate": "2011",
+                    "watchAfter": []
+                },
+                {
+                    "id": 4,
+                    "type": "movie",
+                    "title": "Captain America: The First Avenger",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2011-07-19",
+                    "storyDate": "1942-1945",
+                    "watchAfter": []
+                },
+                {
+                    "id": 5,
+                    "type": "one-shot",
+                    "title": "The Consultant",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2011-09-13",
+                    "storyDate": "2011",
+                    "watchAfter": [3]
+                },
+                {
+                    "id": 6,
+                    "type": "one-shot",
+                    "title": "A Funny Thing Happened on the Way to Thor's Hammer",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2011-10-25",
+                    "storyDate": "2011",
+                    "watchAfter": [2,3]
+                },
+                {
+                    "id": 7,
+                    "type": "movie",
+                    "title": "The Avengers",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2012-05-04",
+                    "storyDate": "2012",
+                    "watchAfter": [1,4,5,6]
+                }
+                
+            ]
+                }
+            ]
+            
+        }
+    ]
+}
