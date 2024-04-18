@@ -1,6 +1,6 @@
 .map-frame {
   background-color: rgb(148, 148, 171);
-  width: 500px;
+  width: 100%;
   height: 500px;
   display: flex;
   flex-direction: column;
@@ -47,6 +47,8 @@
   box-sizing: border-box;
   background-color: black;
   z-index: 1;
+  cursor: pointer;
+  user-select: none;
 }
 
 .trails {
@@ -55,4 +57,12 @@
   width: 1px;
   height: 1px;
   overflow: visible;
+}
+
+.element.active {
+  border: 1px solid yellow;
+}
+
+.active {
+  stroke: yellow;
 }
