@@ -1,39 +1,54 @@
 import { useEffect, useState } from "react";
 
 const Map = ({ universe }) => {
-  const rowHeight = 50;
+  const elementWidth = 150;
+  const elementMarginRight = 100;
+  const elementHeight = 50;
+  const elementMarginBot = 40;
+  const [branchHeight, setBranchHeight] = useState(0);
+
   const branch = universe.branches[0];
-  const [xLevels, setXLevels] = useState([]);
-  const [yLevels, setYlevels] = useState(0);
+  const [titles, setTitles] = useState(branch.titles);
 
   useEffect(() => {
-    let xLevels = [];
-    branch.titles.forEach((title) => {
-      const lvl = getXLevel(title.id);
-      while (xLevels.length < lvl + 1) {
-        xLevels.push([]);
-      }
-      xLevels[lvl].push(title);
+    if (!titles) return;
+    let updatedTitles = titles.map((title) => {
+      title.xLevel = getXLevel(title.id);
+      return title;
     });
-    setXLevels(xLevels);
+
+    getXLevelsArrays().forEach((xLevel, index) => {
+      if (index === 0) {
+        xLevel = xLevel.map((title, index) => {
+          title.yLevel = index;
+          return;
+        });
+        setBranchHeight(xLevel.length * (elementHeight + elementMarginBot));
+        return;
+      }
+      xLevel = xLevel.map((title) => {
+        title.yLevel = getYLevel(title.id);
+        return;
+      });
+    });
+
+    setTitles(updatedTitles);
   }, []);
 
-  useEffect(() => {
-    if (!xLevels || xLevels.length === 0) return;
-    let updatedXLevels = xLevels;
-    console.log(updatedXLevels);
-    updatedXLevels[0] = updatedXLevels[0].map((element, index) => {
-      element.yLevel = index;
-      return element;
+  function getXLevelsArrays() {
+    let xLevels = [];
+    titles.forEach((title) => {
+      while (xLevels.length < title.xLevel + 1) {
+        xLevels.push([]);
+      }
+      xLevels[title.xLevel].push(title);
     });
-    setXLevels(updatedXLevels);
-  }, [xLevels]);
-
-  console.log(xLevels);
+    return xLevels;
+  }
 
   function getXLevel(id) {
     let level = 0;
-    let step = branch.titles[id];
+    let step = titles[id];
     while (step.watchAfter.length !== 0) {
       level++;
       let highestLevelIndex;
@@ -46,27 +61,19 @@ const Map = ({ universe }) => {
         )
           highestLevelIndex = i;
       }
-      step = branch.titles[step.watchAfter[highestLevelIndex]];
+      step = titles[step.watchAfter[highestLevelIndex]];
     }
     return level;
   }
 
   function getYLevel(id) {
-    const level = 0;
-    const element = branch.titles[id];
-    if (element.watchAfter.length === 0) {
-      level = yLevels;
-      setYlevels((prev) => prev++);
-      return level;
-    }
-  }
+    let level = 0;
+    const element = titles[id];
 
-  function getChildren(id) {
-    const filteredChildren = children.filter((child) =>
-      child.watchAfter.includes(id)
-    );
-    console.log(filteredChildren);
-    return filteredChildren;
+    element.watchAfter.forEach((parentId) => {
+      level += titles[parentId].yLevel;
+    });
+    return level / element.watchAfter.length;
   }
 
   return (
@@ -74,8 +81,23 @@ const Map = ({ universe }) => {
       <div className="header">{universe.title}</div>
       <div className="map-container">
         <div className="map">
-          {xLevels &&
-            xLevels.map((level, index) => <Level key={index} items={level} />)}
+          <div className="level">
+            {titles &&
+              titles.map((title) => (
+                <Element
+                  key={title.id}
+                  item={title}
+                  style={{
+                    width: elementWidth,
+                    height: elementHeight,
+                    marginRight: elementMarginRight,
+                    marginBot: elementMarginBot,
+                    branchHeight: branchHeight,
+                  }}
+                />
+              ))}
+            <svg className="trails"></svg>
+          </div>
         </div>
       </div>
     </div>
@@ -84,88 +106,77 @@ const Map = ({ universe }) => {
 
 export default Map;
 
-const Level = ({ items }) => {
+const Level = ({ items, elementStyle }) => {
   return (
     <div className="level">
       {items.map((item) => (
-        <Element key={item.id} item={item} />
+        <Element key={item.id} item={item} style={elementStyle} />
       ))}
     </div>
   );
 };
 
-const Element = ({ item }) => {
+const Element = ({ item, style }) => {
+  const [location, setLocation] = useState(null);
+  const [parentsLocations, setParentsLocations] = useState([]);
+
+  useEffect(() => {
+    if (style.branchHeight === 0) return;
+    setLocation({
+      left: `${(style.width + style.marginRight) * item.xLevel}px`,
+      top: `${
+        (style.height + style.marginBot) * item.yLevel - style.branchHeight / 2
+      }px`,
+    });
+
+    const parentsIds = item.watchAfter;
+    if (parentsIds.length === 0) return;
+    const parentsLocations = parentsIds.map((id) => {
+      const element = document.getElementById(id);
+      // console.log(element);
+      return { left: element.style.left, top: element.style.top };
+    });
+    // console.log(parentsLocations);
+    setParentsLocations(parentsLocations);
+  }, [item, style]);
+
+  useEffect(() => {
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const container = document.querySelector(".trails");
+    parentsLocations.forEach((parentLocation) => {
+      if (!parentLocation.left || !parentLocation.top) return;
+      // console.log(parentLocation);
+      console.log(parseInt(location.top));
+      const line = document.createElementNS(SVG_NS, "line");
+      line.setAttribute("x1", parseInt(location.left) + 10);
+      line.setAttribute("y1", parseInt(location.top) + style.height / 2);
+      line.setAttribute("x2", parseInt(parentLocation.left) + style.width);
+      line.setAttribute("y2", parseInt(parentLocation.top) + style.height / 2);
+      line.setAttribute("stroke", "white");
+
+      container.appendChild(line);
+    });
+  }, [parentsLocations]);
+
   return (
     <div
       id={item.id}
       className="element"
-      style={item.yLevel ? { top: `${60 * item.yLevel}px` } : null}
+      style={
+        item.yLevel != undefined && location
+          ? {
+              left: location.left,
+              top: location.top,
+              width: style.width,
+              height: `${style.height}px`,
+            }
+          : null
+      }
+      onClick={() => {
+        console.log(location.left, location.top);
+      }}
     >
       <p className="title">{item.title}</p>
     </div>
   );
 };
-
-// const Branch = ({ element, children }) => {
-//   const [firstChildren, setChildren] = useState(null);
-
-//   useState(() => {
-//     //console.log(branch.titles);
-//     let filteredChildren = children.filter(
-//       (child) => child.watchAfter.length === 0
-//     );
-
-//     filteredChildren = (filteredChildren.length > 0 ? filteredChildren : children).map((child) => {
-//       child.children = getChildren(child.id);
-//       return child;
-//     });
-
-//     setChildren(filteredChildren);
-//     console.log(filteredChildren);
-//   }, []);
-
-//   function getChildren(id) {
-//     const filteredChildren = children.filter((child) =>
-//       child.watchAfter.includes(id)
-//     );
-//     console.log(filteredChildren);
-//     // console.log("Children for  " + id + "  : " + children);
-//     return filteredChildren;
-//   }
-
-//   return (
-//     <div className="branch">
-//       {firstChildren && <Pack items={firstChildren}></Pack>}
-//     </div>
-//   );
-// };
-
-// const Pack = ({ items }) => {
-//   return (
-//     <div className="pack">
-//       {items && items.map((item) => <Branch key={item.id} children={item.children} />)}
-//     </div>
-//   );
-// };
-
-// const Element = ({ item, children }) => {
-//   return (
-//     <div id={item.id} className="element">
-//       <p className="title">{item.title}</p>
-//       {item.children && <Pack items={item.children}></Pack>}
-//     </div>
-//   );
-// };
-
-// const Row = ({ children, height }) => {
-//   return (
-//     <div className="row" style={{ height: height }}>
-//       {children}
-//       <div className="top-line"></div>
-//       <div className="bot-line"></div>
-//     </div>
-//   );
-// };
-// const Fragment = () => {
-//   return <div className="fragment"></div>;
-// };

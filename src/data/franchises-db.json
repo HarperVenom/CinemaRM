@@ -76,7 +76,7 @@
                     "description": "",
                     "release": "2011-10-25",
                     "storyDate": "2011",
-                    "watchAfter": [2,3]
+                    "watchAfter": [2,5]
                 },
                 {
                     "id": 7,
@@ -86,7 +86,7 @@
                     "description": "",
                     "release": "2012-05-04",
                     "storyDate": "2012",
-                    "watchAfter": [1,4,5,6]
+                    "watchAfter": [1,4,6]
                 }
                 
             ]
