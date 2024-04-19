@@ -27,8 +27,38 @@ const Map = ({ universe }) => {
         return;
       }
       xLevel = xLevel.map((title) => {
-        title.yLevel = getYLevel(title.id);
-        return;
+        const yLevel = getYLevel(title.id);
+
+        title.yLevel = yLevel;
+        return title;
+      });
+      let currentYLevels = [];
+      xLevel.forEach((title) => {
+        currentYLevels.push(title.yLevel);
+      });
+      let bunches = [];
+      // while ()
+
+      const bunch = elementsIntersect(xLevel);
+      if (bunch) {
+        bunches.push(bunch);
+      }
+
+      console.log(bunches.length > 0 ? bunches : null);
+
+      bunches.forEach((bunch) => {
+        const bunchHeight = bunch.length * (elementHeight + elementMarginBot);
+        const midPoint =
+          bunch.reduce((acc, title) => (acc += title.yLevel), 0.0) /
+          bunch.length;
+        console.log(Math.floor(bunch.length / 2));
+        console.log("midpoint " + midPoint);
+        let startingPoint = midPoint - Math.floor(bunch.length / 2);
+        bunch.forEach((title) => {
+          title.yLevel = startingPoint;
+          console.log(title.yLevel);
+          startingPoint++;
+        });
       });
 
       const container = document.querySelector(".trails");
@@ -37,6 +67,28 @@ const Map = ({ universe }) => {
 
     setTitles(updatedTitles);
   }, []);
+
+  function elementsIntersect(xLevel) {
+    for (let i = 0; i < xLevel.length; i++) {
+      const currentYLevel = xLevel[i];
+      // console.log(currentYLevel);
+      const bunch = [
+        currentYLevel,
+        ...xLevel.filter((title, index) => {
+          if (index === i) return false;
+          const rangeStart = currentYLevel.yLevel;
+          const rangeEnd = currentYLevel.yLevel + 1;
+          if (title.yLevel >= rangeStart && title.yLevel < rangeEnd)
+            return true;
+        }),
+      ];
+
+      if (bunch.length > 1) {
+        return bunch;
+      }
+    }
+    return false;
+  }
 
   function getXLevelsArrays() {
     let xLevels = [];
@@ -137,61 +189,25 @@ const Element = ({ item, style, active }) => {
   useEffect(() => {
     const SVG_NS = "http://www.w3.org/2000/svg";
     const container = document.querySelector(".trails");
-    // container.innerHTML = "";
     parents
       .map((parent) => {
         return { left: parent.style.left, top: parent.style.top };
       })
       .forEach((parentLocation) => {
         if (!parentLocation.left || !parentLocation.top) return;
-        //<path id="lineAC" d="M 100 350 q -50 -100 100 -100"
-        //stroke="blue" fill="none" stroke-width="4"/>
         const path = document.createElementNS(SVG_NS, "path");
         const start = {
           x: parseInt(location.left) + 10,
           y: parseInt(location.top) + style.height / 2,
         };
         const end = {
-          x: parseInt(parentLocation.left) + style.width,
+          x: parseInt(parentLocation.left) + style.width - 10,
           y: parseInt(parentLocation.top) + style.height / 2,
         };
         const relativeEnd = {
           x: end.x - start.x,
           y: end.y - start.y,
         };
-
-        // const points = [
-        //   { x: start.x, y: start.y },
-        //   { x: start.x - 30, y: start.y },
-        //   { x: start.x - 40, y: start.y - 10 },
-        //   { x: end.x, y: end.y },
-        // ];
-
-        // const pathString = points.reduce((acc, point, index, arr) => {
-        //   if (index === 0) {
-        //     return `M ${point.x} ${point.y}`;
-        //   } else if (index === 1) {
-        //     // First control point
-        //     const cx1 = arr[index - 1].x + (point.x - arr[index - 1].x) / 3;
-        //     const cy1 = arr[index - 1].y + (point.y - arr[index - 1].y) / 3;
-        //     // Second control point
-        //     const cx2 = point.x - (arr[index + 1].x - point.x) / 3;
-        //     const cy2 = point.y - (arr[index + 1].y - point.y) / 3;
-        //     return `${acc} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${point.x} ${point.y}`;
-        //   } else if (index === arr.length - 1) {
-        //     // Last point, no need for control points
-        //     return `${acc} L ${point.x} ${point.y}`;
-        //   } else {
-        //     // Calculate control points based on previous and next points
-        //     const cx1 = arr[index - 1].x + (point.x - arr[index - 1].x) / 3;
-        //     const cy1 = arr[index - 1].y + (point.y - arr[index - 1].y) / 3;
-        //     const cx2 = point.x - (arr[index + 1].x - point.x) / 3;
-        //     const cy2 = point.y - (arr[index + 1].y - point.y) / 3;
-        //     return `${acc} S ${cx1} ${cy1}, ${point.x} ${point.y}`;
-        //   }
-        // }, "");
-
-        // path.setAttribute("d", pathString);
 
         path.setAttribute(
           "d",
@@ -204,17 +220,6 @@ const Element = ({ item, style, active }) => {
         path.setAttribute("stroke-width", "3px");
         path.setAttribute("fill", "none");
 
-        // const line = document.createElementNS(SVG_NS, "line");
-        // line.setAttribute("x1", parseInt(location.left) + 10);
-        // line.setAttribute("y1", parseInt(location.top) + style.height / 2);
-        // line.setAttribute("x2", parseInt(parentLocation.left) + style.width);
-        // line.setAttribute(
-        //   "y2",
-        //   parseInt(parentLocation.top) + style.height / 2
-        // );
-        // line.setAttribute("stroke", "white");
-
-        // setTrails((prev) => [...prev, line]);
         setTrails((prev) => [...prev, path]);
 
         container.appendChild(path);

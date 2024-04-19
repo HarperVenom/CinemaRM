@@ -87,6 +87,46 @@
                     "release": "2012-05-04",
                     "storyDate": "2012",
                     "watchAfter": [1,4,6]
+                },
+                {
+                    "id": 8,
+                    "type": "one-shot",
+                    "title": "Item 47",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2012-09-25",
+                    "storyDate": "2012",
+                    "watchAfter": [7]
+                },
+                {
+                    "id": 9,
+                    "type": "movie",
+                    "title": "Iron Man 3",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2013-04-24",
+                    "storyDate": "2013",
+                    "watchAfter": [7]
+                },
+                {
+                    "id": 10,
+                    "type": "one-shot",
+                    "title": "Agent Carter",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2013-09-24",
+                    "storyDate": "1946",
+                    "watchAfter": [9]
+                },
+                {
+                    "id": 11,
+                    "type": "series",
+                    "title": "Agents of SHIELD season 1",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2013-09-24",
+                    "storyDate": "2013",
+                    "watchAfter": [7]
                 }
                 
             ]
