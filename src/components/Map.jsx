@@ -6,6 +6,7 @@ const Map = ({ universe }) => {
   const elementHeight = 50;
   const elementMarginBot = 50;
   const [branchHeight, setBranchHeight] = useState(0);
+  const [firstXLevelHeight, setfirstXLevelHeight] = useState(0);
 
   const branch = universe.branches[0];
   const [titles, setTitles] = useState(branch.titles);
@@ -17,13 +18,15 @@ const Map = ({ universe }) => {
       return title;
     });
 
+    let branchHeight = 0;
     getXLevelsArrays().forEach((xLevel, index) => {
       if (index === 0) {
         xLevel = xLevel.map((title, index) => {
           title.yLevel = index;
           return;
         });
-        setBranchHeight(xLevel.length * (elementHeight + elementMarginBot));
+        branchHeight = xLevel.length * (elementHeight + elementMarginBot);
+        setfirstXLevelHeight(branchHeight);
         return;
       }
       xLevel = xLevel.map((title) => {
@@ -32,31 +35,45 @@ const Map = ({ universe }) => {
         title.yLevel = yLevel;
         return title;
       });
+
+      const newBranchHeight =
+        xLevel.length * (elementHeight + elementMarginBot);
+      branchHeight =
+        newBranchHeight > branchHeight ? newBranchHeight : branchHeight;
+
       let currentYLevels = [];
       xLevel.forEach((title) => {
         currentYLevels.push(title.yLevel);
       });
       let bunches = [];
-      // while ()
 
-      const bunch = elementsIntersect(xLevel);
-      if (bunch) {
-        bunches.push(bunch);
+      //Groups elements that are too close to each other into separate bunches
+      let currentXLevelBunches = elementsIntersect(xLevel);
+
+      //Sorts elements in bunches by its initial Y level to arrange properly
+      if (currentXLevelBunches) {
+        currentXLevelBunches.forEach((bunch) => {
+          let sortedByLevel = [];
+          while (bunch.length > 0) {
+            let highest = 0;
+            for (let i = 1; i < bunch.length; i++) {
+              if (bunch[i].yLevel < bunch[highest].yLevel) highest = i;
+            }
+            sortedByLevel.push(bunch[highest]);
+            bunch = bunch.filter((_, index) => index !== highest);
+          }
+
+          bunches.push(sortedByLevel);
+        });
       }
-
-      console.log(bunches.length > 0 ? bunches : null);
-
+      //Assigns new corrected Y levels to all elements in bunches
       bunches.forEach((bunch) => {
-        const bunchHeight = bunch.length * (elementHeight + elementMarginBot);
         const midPoint =
           bunch.reduce((acc, title) => (acc += title.yLevel), 0.0) /
           bunch.length;
-        console.log(Math.floor(bunch.length / 2));
-        console.log("midpoint " + midPoint);
-        let startingPoint = midPoint - Math.floor(bunch.length / 2);
+        let startingPoint = midPoint - bunch.length / 2 + 0.5;
         bunch.forEach((title) => {
           title.yLevel = startingPoint;
-          console.log(title.yLevel);
           startingPoint++;
         });
       });
@@ -64,28 +81,45 @@ const Map = ({ universe }) => {
       const container = document.querySelector(".trails");
       container.innerHTML = "";
     });
-
+    setBranchHeight(branchHeight);
     setTitles(updatedTitles);
   }, []);
 
   function elementsIntersect(xLevel) {
+    let bunches = [];
     for (let i = 0; i < xLevel.length; i++) {
       const currentYLevel = xLevel[i];
-      // console.log(currentYLevel);
+      let canContinue = true;
+      bunches.forEach((bunch) => {
+        if (bunch.includes(currentYLevel)) canContinue = false;
+      });
+      if (!canContinue) continue;
+      let increaseRange = false;
+
       const bunch = [
         currentYLevel,
         ...xLevel.filter((title, index) => {
           if (index === i) return false;
-          const rangeStart = currentYLevel.yLevel;
-          const rangeEnd = currentYLevel.yLevel + 1;
-          if (title.yLevel >= rangeStart && title.yLevel < rangeEnd)
+          const rangeStart = increaseRange
+            ? currentYLevel.yLevel - 1
+            : currentYLevel.yLevel;
+          const rangeEnd = increaseRange
+            ? currentYLevel.yLevel + 2
+            : currentYLevel.yLevel + 1;
+          if (title.yLevel >= rangeStart && title.yLevel < rangeEnd) {
+            increaseRange = true;
             return true;
+          }
         }),
       ];
 
       if (bunch.length > 1) {
-        return bunch;
+        bunches.push(bunch);
       }
+    }
+    if (bunches.length > 0) {
+      console.log(bunches);
+      return bunches;
     }
     return false;
   }
@@ -131,6 +165,11 @@ const Map = ({ universe }) => {
     return level / element.watchAfter.length;
   }
 
+  useEffect(() => {
+    if (branchHeight === 0) return;
+    document.querySelector(".map").style.minHeight = branchHeight + "px";
+  }, [branchHeight]);
+
   return (
     <div className="map-frame">
       <div className="header">{universe.title}</div>
@@ -147,7 +186,7 @@ const Map = ({ universe }) => {
                     height: elementHeight,
                     marginRight: elementMarginRight,
                     marginBot: elementMarginBot,
-                    branchHeight: branchHeight,
+                    branchHeight: firstXLevelHeight,
                   }}
                 />
               ))}
@@ -209,12 +248,18 @@ const Element = ({ item, style, active }) => {
           y: end.y - start.y,
         };
 
+        const xDistance = start.x - end.x;
+
+        const shiftStart =
+          Math.sign(start.y - end.y) *
+          Math.min(Math.abs(0.05 * (start.y - end.y)), 0.18 * style.height);
+
         path.setAttribute(
           "d",
           `M ${start.x}
-          ${start.y} c ${-style.marginRight / 2} ${0} ${
-            relativeEnd.x + style.marginRight / 2
-          } ${relativeEnd.y} ${relativeEnd.x} ${relativeEnd.y}`
+          ${start.y - shiftStart} c ${-xDistance / 4} ${0} ${
+            relativeEnd.x + xDistance / 4
+          } ${relativeEnd.y} ${relativeEnd.x} ${relativeEnd.y + 2 * shiftStart}`
         );
         path.setAttribute("stroke", "rgba(255, 255, 255, 0.2)");
         path.setAttribute("stroke-width", "3px");

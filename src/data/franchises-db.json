@@ -116,7 +116,7 @@
                     "description": "",
                     "release": "2013-09-24",
                     "storyDate": "1946",
-                    "watchAfter": [9]
+                    "watchAfter": [7]
                 },
                 {
                     "id": 11,
@@ -127,6 +127,76 @@
                     "release": "2013-09-24",
                     "storyDate": "2013",
                     "watchAfter": [7]
+                },
+                {
+                    "id": 12,
+                    "type": "movie",
+                    "title": "Thor: The Dark World",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2013-11-8",
+                    "storyDate": "2013",
+                    "watchAfter": [7]
+                },
+                {
+                    "id": 13,
+                    "type": "one-shot",
+                    "title": "All Hail the King",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2013-11-8",
+                    "storyDate": "2014",
+                    "watchAfter": [9]
+                },
+                {
+                    "id": 14,
+                    "type": "movie",
+                    "title": "Captain America: The Winter Soldier",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2014-04-04",
+                    "storyDate": "2014",
+                    "watchAfter": [7]
+                },
+                {
+                    "id": 15,
+                    "type": "movie",
+                    "title": "RWTHRB",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2014-04-04",
+                    "storyDate": "2014",
+                    "watchAfter": [9,10,4]
+                },
+                {
+                    "id": 16,
+                    "type": "movie",
+                    "title": "IOLIKI",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2014-04-04",
+                    "storyDate": "2014",
+                    "watchAfter": [8,9]
+                },
+                {
+                    "id": 17,
+                    "type": "movie",
+                    "title": "rtnwwwrrI",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2014-04-04",
+                    "storyDate": "2014",
+                    "watchAfter": [11,14]
+                },
+                {
+                    "id": 18,
+                    "type": "movie",
+                    "title": "jjjjjjj",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2014-04-04",
+                    "storyDate": "2014",
+                    "watchAfter": [14,12]
                 }
                 
             ]
