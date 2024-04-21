@@ -16,7 +16,8 @@
                     "description": "",
                     "release": "2008-05-02",
                     "storyDate": "2008-2009",
-                    "watchAfter": []
+                    "watchAfter": [],
+                    "standAlone": true
                 },
                 {
                     "id": 1,
@@ -26,7 +27,8 @@
                     "description": "",
                     "release": "2008-06-13",
                     "storyDate": "2011",
-                    "watchAfter": []
+                    "watchAfter": [],
+                    "standAlone": true
                 },
                 {
                     "id": 2,
@@ -36,7 +38,8 @@
                     "description": "",
                     "release": "2010-05-07",
                     "storyDate": "2010",
-                    "watchAfter": [0]
+                    "watchAfter": [0],
+                    "standAlone": false
                 },
                 {
                     "id": 3,
@@ -46,7 +49,8 @@
                     "description": "",
                     "release": "2011-05-02",
                     "storyDate": "2011",
-                    "watchAfter": []
+                    "watchAfter": [],
+                    "standAlone": true
                 },
                 {
                     "id": 4,
@@ -56,7 +60,8 @@
                     "description": "",
                     "release": "2011-07-19",
                     "storyDate": "1942-1945",
-                    "watchAfter": []
+                    "watchAfter": [],
+                    "standAlone": true
                 },
                 {
                     "id": 5,
@@ -66,7 +71,8 @@
                     "description": "",
                     "release": "2011-09-13",
                     "storyDate": "2011",
-                    "watchAfter": [3]
+                    "watchAfter": [3],
+                    "standAlone": false
                 },
                 {
                     "id": 6,
@@ -76,7 +82,8 @@
                     "description": "",
                     "release": "2011-10-25",
                     "storyDate": "2011",
-                    "watchAfter": [2,5]
+                    "watchAfter": [2,5],
+                    "standAlone": false
                 },
                 {
                     "id": 7,
@@ -86,7 +93,8 @@
                     "description": "",
                     "release": "2012-05-04",
                     "storyDate": "2012",
-                    "watchAfter": [1,4,6]
+                    "watchAfter": [1,4,6],
+                    "standAlone": false
                 },
                 {
                     "id": 8,
@@ -96,7 +104,8 @@
                     "description": "",
                     "release": "2012-09-25",
                     "storyDate": "2012",
-                    "watchAfter": [7]
+                    "watchAfter": [7],
+                    "standAlone": false
                 },
                 {
                     "id": 9,
@@ -106,7 +115,8 @@
                     "description": "",
                     "release": "2013-04-24",
                     "storyDate": "2013",
-                    "watchAfter": [7]
+                    "watchAfter": [7],
+                    "standAlone": false
                 },
                 {
                     "id": 10,
@@ -116,7 +126,8 @@
                     "description": "",
                     "release": "2013-09-24",
                     "storyDate": "1946",
-                    "watchAfter": [7]
+                    "watchAfter": [4],
+                    "standAlone": false
                 },
                 {
                     "id": 11,
@@ -126,7 +137,8 @@
                     "description": "",
                     "release": "2013-09-24",
                     "storyDate": "2013",
-                    "watchAfter": [7]
+                    "watchAfter": [7],
+                    "standAlone": false
                 },
                 {
                     "id": 12,
@@ -134,9 +146,10 @@
                     "title": "Thor: The Dark World",
                     "img_url": "",
                     "description": "",
-                    "release": "2013-11-8",
+                    "release": "2013-11-08",
                     "storyDate": "2013",
-                    "watchAfter": [7]
+                    "watchAfter": [7],
+                    "standAlone": false
                 },
                 {
                     "id": 13,
@@ -144,9 +157,10 @@
                     "title": "All Hail the King",
                     "img_url": "",
                     "description": "",
-                    "release": "2013-11-8",
+                    "release": "2014-02-04",
                     "storyDate": "2014",
-                    "watchAfter": [9]
+                    "watchAfter": [9],
+                    "standAlone": false
                 },
                 {
                     "id": 14,
@@ -156,47 +170,52 @@
                     "description": "",
                     "release": "2014-04-04",
                     "storyDate": "2014",
-                    "watchAfter": [7]
+                    "watchAfter": [7],
+                    "standAlone": false
                 },
                 {
                     "id": 15,
                     "type": "movie",
-                    "title": "RWTHRB",
+                    "title": "Guardians of the Galaxy",
                     "img_url": "",
                     "description": "",
-                    "release": "2014-04-04",
+                    "release": "2014-08-01",
                     "storyDate": "2014",
-                    "watchAfter": [9,10,4]
+                    "watchAfter": [7],
+                    "standAlone": true
                 },
                 {
                     "id": 16,
-                    "type": "movie",
-                    "title": "IOLIKI",
+                    "type": "series",
+                    "title": "Agents of SHIELD season 2",
                     "img_url": "",
                     "description": "",
-                    "release": "2014-04-04",
+                    "release": "2014-09-23",
                     "storyDate": "2014",
-                    "watchAfter": [8,9]
+                    "watchAfter": [11,12,14],
+                    "standAlone": false
                 },
                 {
                     "id": 17,
-                    "type": "movie",
-                    "title": "rtnwwwrrI",
+                    "type": "series",
+                    "title": "Agent Carter season 1",
                     "img_url": "",
                     "description": "",
-                    "release": "2014-04-04",
-                    "storyDate": "2014",
-                    "watchAfter": [11,14]
+                    "release": "2015-01-06",
+                    "storyDate": "1946",
+                    "watchAfter": [4],
+                    "standAlone": false
                 },
                 {
                     "id": 18,
-                    "type": "movie",
-                    "title": "jjjjjjj",
+                    "type": "series",
+                    "title": "Daredevil season 1",
                     "img_url": "",
                     "description": "",
-                    "release": "2014-04-04",
-                    "storyDate": "2014",
-                    "watchAfter": [14,12]
+                    "release": "2015-04-10",
+                    "storyDate": "2015",
+                    "watchAfter": [7],
+                    "standAlone": false
                 }
                 
             ]
