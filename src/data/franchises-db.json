@@ -192,7 +192,7 @@
                     "description": "",
                     "release": "2014-09-23",
                     "storyDate": "2014",
-                    "watchAfter": [11,12,14],
+                    "watchAfter": [11,14],
                     "standAlone": false
                 },
                 {
@@ -215,6 +215,83 @@
                     "release": "2015-04-10",
                     "storyDate": "2015",
                     "watchAfter": [7],
+                    "standAlone": true
+                },
+                {
+                    "id": 19,
+                    "type": "movie",
+                    "title": "Avengers: Age of Ultron",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2015-05-01",
+                    "storyDate": "2015",
+                    "watchAfter": [9,12,14],
+                    "standAlone": false
+                },
+                {
+                    "id": 20,
+                    "type": "movie",
+                    "title": "Ant-Man",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2015-06-15",
+                    "storyDate": "2015",
+                    "watchAfter": [19],
+                    "standAlone": true
+                },
+                {
+                    "id": 21,
+                    "type": "series",
+                    "title": "Agents of SHIELD season 3",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2015-09-29",
+                    "storyDate": "2015",
+                    "watchAfter": [16],
+                    "standAlone": false
+                },
+                {
+                    "id": 22,
+                    "type": "series",
+                    "title": "Jessica Jones season 1",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2015-11-20",
+                    "storyDate": "2015",
+                    "watchAfter": [18,19],
+                    "standAlone": true
+                },
+                {
+                    "id": 23,
+                    "type": "series",
+                    "title": "Agent Carter season 2",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2016-01-19",
+                    "storyDate": "1947",
+                    "watchAfter": [17],
+                    "standAlone": false
+                },
+                {
+                    "id": 24,
+                    "type": "series",
+                    "title": "Daredevil season 2",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2016-03-18",
+                    "storyDate": "2016",
+                    "watchAfter": [18],
+                    "standAlone": false
+                },
+                {
+                    "id": 25,
+                    "type": "movie",
+                    "title": "Captain America: Civil War",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2016-05-06",
+                    "storyDate": "2016",
+                    "watchAfter": [19,20,21],
                     "standAlone": false
                 }
                 

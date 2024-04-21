@@ -86,41 +86,69 @@ const Map = ({ universe }) => {
 
           //Shift elements that are single on an x level but are not the only children of its parents.
           titles.forEach((title) => {
-            const children = getChildren(title.id);
-            const closestChildren = children.filter(
-              (child) => child.xLevel === title.xLevel + 1
+            const parents = title.watchAfter.map(
+              (parentId) => titles[parentId]
             );
 
-            if (
-              closestChildren.length === 0 ||
-              closestChildren.length === children.length
-            )
-              return;
+            if (parents.length === 0) return;
+            parents.forEach((parent) => {
+              const children = getChildren(parent.id).filter((child) => {
+                return !isNaN(child.yLevel);
+              });
 
-            let averageClosestChildrenY =
-              closestChildren.reduce((acc, child) => (acc += child.yLevel), 0) /
-              closestChildren.length;
+              const closestChildren = children.filter(
+                (child) => child.xLevel === parent.xLevel + 1
+              );
+              if (
+                closestChildren.length === 0 ||
+                closestChildren.length === children.length
+              )
+                return;
 
-            let otherChildren = children.filter(
-              (child) => !closestChildren.includes(child)
-            );
+              let otherChildren = children.filter(
+                (child) => !closestChildren.includes(child)
+              );
 
-            let averageOtherChildrenY =
-              otherChildren.reduce((acc, child) => (acc += child.yLevel), 0) /
-              otherChildren.length;
+              let averageClosestChildrenY =
+                closestChildren.reduce((acc, child) => {
+                  return (acc += child.yLevel);
+                }, 0) / closestChildren.length;
 
-            const distance = Math.abs(
-              averageClosestChildrenY - averageOtherChildrenY
-            );
+              let averageOtherChildrenY =
+                otherChildren.reduce((acc, child) => (acc += child.yLevel), 0) /
+                otherChildren.length;
 
-            if (distance > 1.5) return;
+              if (
+                isNaN(averageClosestChildrenY) ||
+                isNaN(averageOtherChildrenY)
+              )
+                return;
 
-            closestChildren.forEach((child) => {
-              if (averageClosestChildrenY < averageOtherChildrenY) {
-                child.yLevel -= 0.7 * distance;
-              } else {
-                child.yLevel += 0.7 * distance;
-              }
+              const distance = Math.abs(
+                averageClosestChildrenY - averageOtherChildrenY
+              );
+              if (distance > 1.5) return;
+
+              closestChildren.forEach((child) => {
+                const highestPoint =
+                  parent.yLevel < averageOtherChildrenY
+                    ? parent.yLevel
+                    : averageOtherChildrenY;
+
+                const difference = Math.abs(
+                  parent.yLevel - averageOtherChildrenY
+                );
+                if (
+                  child.yLevel + 1 > highestPoint &&
+                  child.yLevel < highestPoint + difference
+                ) {
+                  if (child.yLevel < averageOtherChildrenY) {
+                    child.yLevel -= distance;
+                  } else {
+                    child.yLevel += distance;
+                  }
+                }
+              });
             });
           });
         });
@@ -139,7 +167,6 @@ const Map = ({ universe }) => {
       const date = new Date(title.release);
       return date.getFullYear();
     });
-    const firstYear = Math.min(...years);
     const date = new Date(element.release);
 
     let xShift = 0;
@@ -160,13 +187,6 @@ const Map = ({ universe }) => {
       )
         xShift++;
     });
-
-    // const xShift =
-    //   0.1 * (date.getFullYear() - firstYear + 0.08 * date.getMonth());
-    //  +
-    // 0.1 * date.getMonth() +
-    // 0.01 * date.getDate();
-    // console.log(titles[id].title, xShift);
     return xShift - skips;
   }
 
@@ -245,15 +265,6 @@ const Map = ({ universe }) => {
       }
       step = titles[step.watchAfter[highestLevelIndex]];
     }
-    // const element = titles[id];
-    // const years = titles.map((title) => {
-    //   const date = new Date(title.release);
-    //   return date.getFullYear();
-    // });
-    // const firstYear = Math.min(...years);
-    // const date = new Date(element.release);
-    // level = date.getFullYear() - firstYear;
-    // console.log(level);
     return level;
   }
 
