@@ -10,12 +10,10 @@ export default Element = ({ item, style, active }) => {
     if (style.branchHeight === 0) return;
     setLocation({
       left: `${
-        (style.width + style.marginRight) * item.xLevel + 10 * item.x
-        // (style.width + style.marginRight) * item.x
+        (style.width + style.marginRight) * item.xLevel
+        //+ 10 * item.x
       }px`,
-      top: `${
-        (style.height + style.marginBot) * item.yLevel - style.branchHeight / 2
-      }px`,
+      top: `${(style.height + style.marginBot) * item.yLevel}px`,
     });
 
     const parentsIds = item.watchAfter;
@@ -34,26 +32,29 @@ export default Element = ({ item, style, active }) => {
 
     if (trails.length === item.watchAfter.length || item.standAlone) return;
     parents
+      .filter((parent) => parent !== null)
       .map((parent) => {
-        return { left: parent.style.left, top: parent.style.top };
+        return {
+          left: parent.style.left,
+          top: parent.style.top,
+          type: parent.classList.contains("filler") ? "filler" : "element",
+        };
       })
       .forEach((parentLocation) => {
         if (!parentLocation.left || !parentLocation.top) return;
         const path = document.createElementNS(SVG_NS, "path");
         const start = {
-          x: parseInt(location.left) + 10,
+          x: parseInt(location.left),
           y: parseInt(location.top) + style.height / 2,
         };
         const end = {
-          x: parseInt(parentLocation.left) + style.width - 10,
+          x: parseInt(parentLocation.left) + style.width,
           y: parseInt(parentLocation.top) + style.height / 2,
         };
         const relativeEnd = {
           x: end.x - start.x,
           y: end.y - start.y,
         };
-
-        const xDistance = start.x - end.x;
 
         const shiftStart =
           Math.sign(start.y - end.y) *
@@ -62,17 +63,50 @@ export default Element = ({ item, style, active }) => {
         path.setAttribute(
           "d",
           `M ${start.x}
-          ${start.y - shiftStart} c ${-xDistance / 4} ${0} ${
-            relativeEnd.x + xDistance / 4
-          } ${relativeEnd.y} ${relativeEnd.x} ${relativeEnd.y + 2 * shiftStart}`
+          ${item.type === "line-filler" ? start.y : start.y - shiftStart} c 
+
+          ${-0.5 * style.width} 
+          ${0} 
+          
+          ${relativeEnd.x + 0.5 * style.width} 
+          ${
+            item.type === "line-filler"
+              ? parentLocation.type === "filler"
+                ? relativeEnd.y
+                : relativeEnd.y + shiftStart
+              : parentLocation.type === "filler"
+              ? relativeEnd.y + shiftStart
+              : relativeEnd.y + 2 * shiftStart
+          } 
+
+          ${relativeEnd.x} 
+          ${
+            item.type === "line-filler"
+              ? parentLocation.type === "filler"
+                ? relativeEnd.y
+                : relativeEnd.y + shiftStart
+              : parentLocation.type === "filler"
+              ? relativeEnd.y + shiftStart
+              : relativeEnd.y + 2 * shiftStart
+          }`
         );
-        path.setAttribute("stroke", "rgba(255, 255, 255, 0.2)");
+        path.setAttribute("stroke", "rgba(255, 255, 255, 0.5)");
         path.setAttribute("stroke-width", "3px");
         path.setAttribute("fill", "none");
 
         setTrails((prev) => [...prev, path]);
         container.appendChild(path);
       });
+    if (!location) return;
+    const path = document.createElementNS(SVG_NS, "line");
+    path.setAttribute("x1", parseInt(location.left));
+    path.setAttribute("y1", parseInt(location.top) + style.height / 2);
+    path.setAttribute("x2", parseInt(location.left) + style.width);
+    path.setAttribute("y2", parseInt(location.top) + style.height / 2);
+
+    path.setAttribute("stroke", "rgba(255, 255, 255, 0.5)");
+    path.setAttribute("stroke-width", "3px");
+    container.appendChild(path);
   }, [parents]);
 
   useEffect(() => {
@@ -87,7 +121,7 @@ export default Element = ({ item, style, active }) => {
   return (
     <div
       id={item.id}
-      className="element"
+      className={"element " + (item.type === "line-filler" ? "filler" : "")}
       style={
         item.yLevel != undefined && location
           ? {
@@ -99,13 +133,10 @@ export default Element = ({ item, style, active }) => {
           : null
       }
       onClick={() => {
-        // setActive((prev) => !prev);
-        // console.log(location.left, location.top);
-        // console.log(trails);
-        // console.log(parents);
-        parents.forEach((parent) => {
-          parent.click();
-        });
+        console.log(item.yLevel);
+        // parents.forEach((parent) => {
+        //   parent.click();
+        // });
       }}
     >
       <p className="title">{item.title}</p>

@@ -258,7 +258,7 @@
                     "description": "",
                     "release": "2015-11-20",
                     "storyDate": "2015",
-                    "watchAfter": [18,19],
+                    "watchAfter": [18],
                     "standAlone": true
                 },
                 {
@@ -292,6 +292,149 @@
                     "release": "2016-05-06",
                     "storyDate": "2016",
                     "watchAfter": [19,20,21],
+                    "standAlone": false
+                },
+                {
+                    "id": 26,
+                    "type": "series",
+                    "title": "Agents of SHIELD season 4",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2016-09-20",
+                    "storyDate": "2016",
+                    "watchAfter": [25],
+                    "standAlone": false
+                },
+                {
+                    "id": 27,
+                    "type": "series",
+                    "title": "Luke Cage season 1",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2016-09-30",
+                    "storyDate": "2016",
+                    "watchAfter": [18],
+                    "standAlone": true
+                },
+                {
+                    "id": 28,
+                    "type": "movie",
+                    "title": "Doctor Strange",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2016-11-04",
+                    "storyDate": "2016",
+                    "watchAfter": [25],
+                    "standAlone": true
+                },
+                {
+                    "id": 29,
+                    "type": "series",
+                    "title": "Iron Fist season 1",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2017-03-17",
+                    "storyDate": "2017",
+                    "watchAfter": [18],
+                    "standAlone": true
+                },
+                {
+                    "id": 30,
+                    "type": "movie",
+                    "title": "Guardians of the Galaxy Vol 2",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2017-05-05",
+                    "storyDate": "2017",
+                    "watchAfter": [15],
+                    "standAlone": false
+                },
+                {
+                    "id": 31,
+                    "type": "movie",
+                    "title": "Spider-Man: Homecoming",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2017-07-07",
+                    "storyDate": "2017",
+                    "watchAfter": [25],
+                    "standAlone": false
+                },
+                {
+                    "id": 32,
+                    "type": "series",
+                    "title": "The Defenders season 1",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2017-08-18",
+                    "storyDate": "2017",
+                    "watchAfter": [22,24,27,29],
+                    "standAlone": false
+                },
+                {
+                    "id": 33,
+                    "type": "movie",
+                    "title": "Thor: Ragnarok",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2017-11-03",
+                    "storyDate": "2017",
+                    "watchAfter": [19,28],
+                    "standAlone": false
+                },
+                {
+                    "id": 34,
+                    "type": "series",
+                    "title": "The Punisher season 1",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2017-11-17",
+                    "storyDate": "2017",
+                    "watchAfter": [32],
+                    "standAlone": true
+                },
+                {
+                    "id": 35,
+                    "type": "series",
+                    "title": "Agents of SHIELD season 5",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2017-12-01",
+                    "storyDate": "2017",
+                    "watchAfter": [26],
+                    "standAlone": false
+                },
+                {
+                    "id": 36,
+                    "type": "movie",
+                    "title": "Black Panther",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2018-02-16",
+                    "storyDate": "2018",
+                    "watchAfter": [25],
+                    "standAlone": false
+                },
+                {
+                    "id": 37,
+                    "type": "series",
+                    "title": "Jessica Jones season 2",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2018-03-08",
+                    "storyDate": "2018",
+                    "watchAfter": [32],
+                    "standAlone": false
+                },
+                {
+                    "id": 38,
+                    "type": "series",
+                    "title": "Avengers: Infinity War",
+                    "img_url": "",
+                    "description": "",
+                    "release": "2018-04-27",
+                    "storyDate": "2018",
+                    "watchAfter": [30,31,33,36],
                     "standAlone": false
                 }
                 
