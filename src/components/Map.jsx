@@ -1,24 +1,33 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Element from "./Element";
 
 const Map = ({ universe }) => {
   const scale = 1;
-  const elementWidth = 150 * scale;
+  const elementWidth = 170 * scale;
   const elementMarginRight = 200 * scale;
   const elementHeight = 50 * scale;
   const elementMarginBot = 60 * scale;
-  const [branchHeight, setBranchHeight] = useState(0);
-  const [firstXLevelHeight, setfirstXLevelHeight] = useState(0);
+  const [branchDimensions, setBranchDimensions] = useState(null);
+
+  const containerRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startCoords, setStartCoords] = useState({});
+  const [scrollCoords, setScrollCoords] = useState({});
 
   const branch = universe.branches[0];
-  const titles = branch.titles;
-  const [elements, setElements] = useState(
-    []
-    // branch.titles
-  );
+  const titles = [
+    { title: universe.title, id: -1, watchAfter: [] },
+    ...branch.titles,
+  ];
+  const [elements, setElements] = useState([]);
 
   useEffect(() => {
     if (!titles) return;
+
+    titles.forEach((title, index) => {
+      if (title.watchAfter.length === 0 && index !== 0)
+        title.watchAfter = [titles[0].id];
+    });
 
     titles.forEach((title) => {
       if (title.xLevel) return title;
@@ -82,12 +91,9 @@ const Map = ({ universe }) => {
       });
     });
 
-    setfirstXLevelHeight(
-      getXLevelsArrays()[0].length * (elementHeight + elementMarginBot)
-    );
-
     let highestTitle;
     let lowestTitle;
+    let rightTitle;
     titles.forEach((title) => {
       if (!highestTitle) {
         highestTitle = title;
@@ -98,14 +104,32 @@ const Map = ({ universe }) => {
         return;
       }
 
+      if (!rightTitle) {
+        rightTitle = title;
+      }
+
       if (title.yLevel < highestTitle.yLevel) highestTitle = title;
       else if (title.yLevel > lowestTitle.yLevel) {
         lowestTitle = title;
       }
+      if (title.xLevel > rightTitle.xLevel) {
+        rightTitle = title;
+      }
     });
-    const mapHeight = lowestTitle.yLevel - highestTitle.yLevel;
 
-    setBranchHeight(mapHeight * (elementHeight + elementMarginBot));
+    const mapHeight =
+      (lowestTitle.yLevel - highestTitle.yLevel) *
+        (elementHeight + elementMarginBot) +
+      elementHeight;
+    const paddingTop =
+      Math.abs(highestTitle.yLevel) * (elementHeight + elementMarginBot);
+    const mapWidth =
+      rightTitle.xLevel * (elementWidth + elementMarginRight) + elementWidth;
+    setBranchDimensions({
+      width: mapWidth,
+      height: mapHeight,
+      paddingTop: paddingTop,
+    });
 
     setElements(titles);
   }, []);
@@ -202,20 +226,64 @@ const Map = ({ universe }) => {
         )
           highestLevelIndex = i;
       }
-      step = titles[step.watchAfter[highestLevelIndex]];
+      step = titles.find(
+        (title) => title.id === step.watchAfter[highestLevelIndex]
+      );
     }
     return level;
   }
 
   useEffect(() => {
-    if (branchHeight === 0) return;
-    document.querySelector(".map").style.minHeight = branchHeight + "px";
-  }, [branchHeight]);
+    if (!branchDimensions) return;
+    const map = document.querySelector(".map");
+    map.style.width = branchDimensions.width + "px";
+    map.style.minHeight = branchDimensions.height + "px";
+    map.style.paddingTop = branchDimensions.paddingTop + "px";
+  }, [branchDimensions]);
+
+  function handleMouseDown(e) {
+    setIsDragging(true);
+    const startX = e.pageX - containerRef.current.offsetLeft;
+    const startY = e.pageY - containerRef.current.offsetTop;
+    setStartCoords({ x: startX, y: startY });
+    setScrollCoords({
+      left: containerRef.current.scrollLeft,
+      top: containerRef.current.scrollTop,
+    });
+    containerRef.current.style.cursor = "move";
+  }
+  function handleMouseMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef.current.offsetLeft;
+    const y = e.pageY - containerRef.current.offsetTop;
+
+    const walkX = x - startCoords.x;
+    const walkY = y - startCoords.y;
+
+    containerRef.current.scrollLeft = scrollCoords.left - walkX;
+    containerRef.current.scrollTop = scrollCoords.top - walkY;
+  }
+  function handleMouseUp() {
+    setIsDragging(false);
+    containerRef.current.style.cursor = "unset";
+  }
+  function handleMouseLeave() {
+    setIsDragging(false);
+    containerRef.current.style.cursor = "unset";
+  }
 
   return (
     <div className="map-frame">
       <div className="header">{universe.title}</div>
-      <div className="map-container">
+      <div
+        className="map-container"
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="map">
           <div className="level">
             {elements &&
@@ -228,7 +296,7 @@ const Map = ({ universe }) => {
                     height: elementHeight,
                     marginRight: elementMarginRight,
                     marginBot: elementMarginBot,
-                    branchHeight: firstXLevelHeight,
+                    branchHeight: branchDimensions,
                   }}
                 />
               ))}

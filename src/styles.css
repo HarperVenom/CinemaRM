@@ -6,6 +6,7 @@
   flex-direction: column;
   padding: 1rem;
   overflow: hidden;
+  box-sizing: border-box;
 }
 .map-container {
   background-color: rgb(34, 23, 78);
@@ -15,18 +16,22 @@
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 200px;
+  /* justify-content: center; */
+  padding: 100px;
   box-sizing: border-box;
+  /* cursor: move; */
 }
 .map {
   color: white;
+  background-color: black;
   position: relative;
-  width: min-content;
-  min-height: 100%;
-  display: flex;
-  align-items: center;
-  /* padding: 200px; */
+
+  /* min-width: 100%; */
+  /* display: flex; */
+  /* align-items: center; */
+  overflow-x: visible;
+  overflow-y: visible;
+  box-sizing: border-box;
 }
 
 .level {
@@ -50,8 +55,11 @@
   z-index: 1;
   cursor: pointer;
   user-select: none;
+  border-radius: 75px;
+  scale: 1.05;
 }
 .filler {
+  cursor: unset;
   border: none;
   outline: none;
   background-color: rgba(255, 255, 255, 0);
@@ -63,6 +71,7 @@
   width: 1px;
   height: 1px;
   overflow: visible;
+  mix-blend-mode: difference;
 }
 
 .element.active {

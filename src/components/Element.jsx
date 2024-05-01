@@ -65,7 +65,10 @@ export default Element = ({ item, style, active }) => {
           `M ${start.x}
           ${item.type === "line-filler" ? start.y : start.y - shiftStart} c 
 
-          ${-0.5 * style.width} 
+          ${
+            -0.5 * style.width
+            // 0
+          } 
           ${0} 
           
           ${relativeEnd.x + 0.5 * style.width} 

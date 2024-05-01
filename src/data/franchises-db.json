@@ -17,7 +17,7 @@
                     "release": "2008-05-02",
                     "storyDate": "2008-2009",
                     "watchAfter": [],
-                    "standAlone": true
+                    "standAlone": false
                 },
                 {
                     "id": 1,
@@ -28,7 +28,7 @@
                     "release": "2008-06-13",
                     "storyDate": "2011",
                     "watchAfter": [],
-                    "standAlone": true
+                    "standAlone": false
                 },
                 {
                     "id": 2,
@@ -50,7 +50,7 @@
                     "release": "2011-05-02",
                     "storyDate": "2011",
                     "watchAfter": [],
-                    "standAlone": true
+                    "standAlone": false
                 },
                 {
                     "id": 4,
@@ -61,7 +61,7 @@
                     "release": "2011-07-19",
                     "storyDate": "1942-1945",
                     "watchAfter": [],
-                    "standAlone": true
+                    "standAlone": false
                 },
                 {
                     "id": 5,
