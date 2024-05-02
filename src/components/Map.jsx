@@ -1,18 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import Element from "./Element";
+import MapHeading from "./MapHeading";
 
 const Map = ({ universe }) => {
   const scale = 1;
   const elementWidth = 170 * scale;
   const elementMarginRight = 200 * scale;
-  const elementHeight = 50 * scale;
+  const elementHeight = 45 * scale;
   const elementMarginBot = 60 * scale;
   const [branchDimensions, setBranchDimensions] = useState(null);
+  const [elementStyle, setElementStyle] = useState(null);
 
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startCoords, setStartCoords] = useState({});
   const [scrollCoords, setScrollCoords] = useState({});
+
+  const [selected, setSelected] = useState(null);
 
   const branch = universe.branches[0];
   const titles = [
@@ -97,11 +101,9 @@ const Map = ({ universe }) => {
     titles.forEach((title) => {
       if (!highestTitle) {
         highestTitle = title;
-        return;
       }
       if (!lowestTitle) {
         lowestTitle = title;
-        return;
       }
 
       if (!rightTitle) {
@@ -239,6 +241,13 @@ const Map = ({ universe }) => {
     map.style.width = branchDimensions.width + "px";
     map.style.minHeight = branchDimensions.height + "px";
     map.style.paddingTop = branchDimensions.paddingTop + "px";
+    setElementStyle({
+      width: elementWidth,
+      height: elementHeight,
+      marginRight: elementMarginRight,
+      marginBot: elementMarginBot,
+      branchHeight: branchDimensions,
+    });
   }, [branchDimensions]);
 
   function handleMouseDown(e) {
@@ -264,18 +273,61 @@ const Map = ({ universe }) => {
     containerRef.current.scrollLeft = scrollCoords.left - walkX;
     containerRef.current.scrollTop = scrollCoords.top - walkY;
   }
+
   function handleMouseUp() {
+    // setTimeout(() => setIsDragging(false), 1);
     setIsDragging(false);
     containerRef.current.style.cursor = "unset";
   }
+
   function handleMouseLeave() {
     setIsDragging(false);
     containerRef.current.style.cursor = "unset";
   }
 
+  function handleElementClick(selectedTitle) {
+    if (selectedTitle.id === -1) return;
+    if (selectedTitle.type === "line-filler") return;
+    setSelected(selectedTitle);
+  }
+
+  useEffect(() => {
+    if (!selected) return;
+
+    let ids = [selected.id, ...getAllParentsIds(selected)];
+
+    function getAllParentsIds(element) {
+      let ids = [];
+      if (element.watchAfter.length < 1 || element.standAlone) return ids;
+      ids = [...ids, ...element.watchAfter];
+      element.watchAfter.forEach((parentId) => {
+        const parent = elements.find((element) => element.id === parentId);
+        ids = [
+          ...ids,
+          ...getAllParentsIds(parent).filter((id) => !ids.includes(id)),
+        ];
+      });
+      return ids;
+    }
+
+    const updatedElements = elements.map((element) => {
+      if (ids.includes(element.id)) {
+        element.active = true;
+        return element;
+      }
+      element.active = false;
+      return element;
+    });
+
+    setElements(updatedElements);
+  }, [selected]);
+
+  useEffect(() => {}, [elements]);
+
   return (
     <div className="map-frame">
       <div className="header">{universe.title}</div>
+      <MapHeading title={selected} />
       <div
         className="map-container"
         ref={containerRef}
@@ -291,13 +343,8 @@ const Map = ({ universe }) => {
                 <Element
                   key={title.id}
                   item={title}
-                  style={{
-                    width: elementWidth,
-                    height: elementHeight,
-                    marginRight: elementMarginRight,
-                    marginBot: elementMarginBot,
-                    branchHeight: branchDimensions,
-                  }}
+                  style={elementStyle}
+                  onClick={handleElementClick}
                 />
               ))}
             <svg className="trails"></svg>

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 
-export default Element = ({ item, style, active }) => {
+export default Element = ({ item, style, onClick }) => {
   const [location, setLocation] = useState(null);
   const [parents, setParents] = useState([]);
   const [trails, setTrails] = useState([]);
-  // const [active, setActive] = useState(false);
 
   useEffect(() => {
-    if (style.branchHeight === 0) return;
+    if (!style || !style.branchHeight || style.branchHeight === 0) return;
     setLocation({
       left: `${
         (style.width + style.marginRight) * item.xLevel
@@ -65,10 +64,7 @@ export default Element = ({ item, style, active }) => {
           `M ${start.x}
           ${item.type === "line-filler" ? start.y : start.y - shiftStart} c 
 
-          ${
-            -0.5 * style.width
-            // 0
-          } 
+          ${-0.5 * style.width} 
           ${0} 
           
           ${relativeEnd.x + 0.5 * style.width} 
@@ -109,22 +105,27 @@ export default Element = ({ item, style, active }) => {
 
     path.setAttribute("stroke", "rgba(255, 255, 255, 0.5)");
     path.setAttribute("stroke-width", "3px");
+    setTrails((prev) => [...prev, path]);
     container.appendChild(path);
   }, [parents]);
 
   useEffect(() => {
-    // onClick();
-    // console.log("hey " + item.id);
-    trails.forEach((trail) => {
-      if (active) trail.classList.add("active");
-      else trail.classList.remove("active");
-    });
-  }, [active]);
+    if (item.active) {
+      trails.forEach((trail) => trail.classList.add("active"));
+    } else {
+      trails.forEach((trail) => trail.classList.remove("active"));
+    }
+  }, [item.active]);
 
   return (
     <div
       id={item.id}
-      className={"element " + (item.type === "line-filler" ? "filler" : "")}
+      className={`element ${item.type === "line-filler" ? "filler" : ""} 
+        ${item.active ? "active" : ""} 
+        ${item.type === "series" ? "series" : ""} ${
+        item.id === -1 ? "universe" : ""
+      }
+      `}
       style={
         item.yLevel != undefined && location
           ? {
@@ -136,10 +137,7 @@ export default Element = ({ item, style, active }) => {
           : null
       }
       onClick={() => {
-        console.log(item.yLevel);
-        // parents.forEach((parent) => {
-        //   parent.click();
-        // });
+        onClick(item);
       }}
     >
       <p className="title">{item.title}</p>
