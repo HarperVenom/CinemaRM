@@ -28,7 +28,7 @@ export default Element = ({ item, style, onClick }) => {
   useEffect(() => {
     const SVG_NS = "http://www.w3.org/2000/svg";
     const container = document.querySelector(".trails");
-
+    // container.innerHTML = "";
     if (trails.length === item.watchAfter.length || item.standAlone) return;
     parents
       .filter((parent) => parent !== null)
@@ -89,9 +89,7 @@ export default Element = ({ item, style, onClick }) => {
               : relativeEnd.y + 2 * shiftStart
           }`
         );
-        path.setAttribute("stroke", "rgba(255, 255, 255, 0.5)");
-        path.setAttribute("stroke-width", "3px");
-        path.setAttribute("fill", "none");
+        styleTrail(path);
 
         setTrails((prev) => [...prev, path]);
         container.appendChild(path);
@@ -103,11 +101,18 @@ export default Element = ({ item, style, onClick }) => {
     path.setAttribute("x2", parseInt(location.left) + style.width);
     path.setAttribute("y2", parseInt(location.top) + style.height / 2);
 
-    path.setAttribute("stroke", "rgba(255, 255, 255, 0.5)");
-    path.setAttribute("stroke-width", "3px");
+    styleTrail(path);
+
     setTrails((prev) => [...prev, path]);
     container.appendChild(path);
   }, [parents]);
+
+  function styleTrail(path) {
+    path.setAttribute("stroke", "rgba(255, 255, 255, 0.5)");
+    path.setAttribute("stroke-width", "2px");
+    path.setAttribute("fill", "none");
+    path.classList.add("trail");
+  }
 
   useEffect(() => {
     if (item.active) {
@@ -133,6 +138,7 @@ export default Element = ({ item, style, onClick }) => {
               top: location.top,
               width: style.width,
               height: `${style.height}px`,
+              fontSize: style.height / 2.5,
             }
           : null
       }

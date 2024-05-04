@@ -1,9 +1,17 @@
 :root {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+  --back: #030319;
+  --border: rgb(201, 204, 255);
+  --element: #333363;
+  --active: rgb(255, 255, 65);
+}
+body {
+  margin: 0;
 }
 
 .map-frame {
-  background-color: rgb(148, 148, 171);
+  background-color: gray;
   width: 100%;
   height: 100vh;
   display: flex;
@@ -12,27 +20,46 @@
   overflow: hidden;
   box-sizing: border-box;
 }
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  flex-grow: 1;
+  /* min-height: 100vh; */
+}
 .map-container {
   position: relative;
-  background-color: rgb(34, 23, 78);
-  width: 100%;
+  background-color: var(--back);
+  max-width: 100%;
   height: 100%;
   overflow: auto;
 
   display: flex;
   flex-direction: column;
 
-  padding: 30vh;
+  /* padding: 50vmax; */
   box-sizing: border-box;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.map-container::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
 }
 .map {
+  scale: 1;
   color: white;
-  /* background-color: black; */
+  background-color: black;
   position: relative;
 
   overflow-x: visible;
   overflow-y: visible;
   box-sizing: border-box;
+  /* padding: auto; */
+  /* margin: 50vh 50vw; */
+  /* transition: transform 0.1s ease; */
 }
 
 .level {
@@ -45,19 +72,28 @@
 .element {
   left: 0;
   position: absolute;
-  width: 100px;
+  /* width: 100px; */
   overflow: hidden;
   display: flex;
   text-align: center;
-  padding: 0 1rem;
-  outline: 1px solid white;
+  /* padding: 0 100%; */
+  outline: 2px solid var(--border);
   box-sizing: border-box;
-  background-color: black;
+  background-color: var(--element);
   z-index: 1;
   cursor: pointer;
   user-select: none;
   border-radius: 75px;
   scale: 1.05;
+
+  display: flex;
+  align-items: center;
+}
+.element p {
+  color: var(--border);
+  margin: 0;
+  /* font-size: 10px; */
+  text-wrap: nowrap;
 }
 .element.filler {
   cursor: unset;
@@ -76,15 +112,20 @@
   width: 1px;
   height: 1px;
   overflow: visible;
-  mix-blend-mode: difference;
+  mix-blend-mode: normal;
+  /* stroke: black; */
+}
+
+.trail {
+  stroke: var(--border);
 }
 
 .element.active {
-  outline: 1px solid yellow;
+  outline: 2px solid var(--active);
 }
 
 .active {
-  stroke: rgb(255, 255, 0);
+  stroke: var(--active);
 }
 .filler.active {
   outline: none;
@@ -97,25 +138,37 @@
 }
 
 .map-frame .heading {
-  padding: 1rem;
-  left: 0;
-  top: 0;
-  background-color: aqua;
-  width: 100%;
+  /* position: fixed; */
+  position: absolute;
+  /* padding: 2rem 1rem; */
+  height: 100%;
   box-sizing: border-box;
-  height: 300px;
+  width: 40vw;
+  min-width: 200px;
+  max-width: 300px;
 
-  /* background-image: url(https://i.ebayimg.com/images/g/i~cAAOSwS6phZO9h/s-l1200.webp); */
-  background-color: rgb(18, 18, 36);
+  background-color: rgba(18, 15, 39, 0.8);
   display: flex;
+  flex-direction: column;
+  z-index: 2;
 }
 
 .map-frame .heading img {
-  height: 100%;
+  position: relative;
+  /* opacity: 0.9; */
+}
+.heading .info {
+  color: var(--border);
+  padding: 0 1.5rem;
 }
 
 .heading .title {
   text-align: center;
-  color: white;
-  font-size: 3rem;
+
+  font-size: 2rem;
+  margin: 1rem 0;
+  font-weight: 700;
+}
+.heading .description {
+  opacity: 0.9;
 }

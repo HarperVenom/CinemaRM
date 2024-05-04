@@ -1,17 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Element from "./Element";
 import MapHeading from "./MapHeading";
 
 const Map = ({ universe }) => {
-  const scale = 1;
-  const elementWidth = 170 * scale;
-  const elementMarginRight = 200 * scale;
-  const elementHeight = 45 * scale;
-  const elementMarginBot = 60 * scale;
+  const initialScale = 1;
+  const [scale, setScale] = useState(initialScale);
+  const elementWidth = 200 * initialScale;
+  const elementMarginRight = 200 * initialScale;
+  const elementHeight = 50 * initialScale;
+  const elementMarginBot = 60 * initialScale;
+
   const [branchDimensions, setBranchDimensions] = useState(null);
   const [elementStyle, setElementStyle] = useState(null);
 
-  const containerRef = useRef(null);
+  const mapContainerRef = useRef(null);
+  const mapWrapperRef = useRef(null);
+  const mapRef = useRef(null);
+  const headingRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startCoords, setStartCoords] = useState({});
   const [scrollCoords, setScrollCoords] = useState({});
@@ -24,6 +29,7 @@ const Map = ({ universe }) => {
     ...branch.titles,
   ];
   const [elements, setElements] = useState([]);
+  const mapFrameRef = useRef();
 
   useEffect(() => {
     if (!titles) return;
@@ -77,7 +83,7 @@ const Map = ({ universe }) => {
       });
     });
 
-    getXLevelsArrays().forEach((level, index) => {
+    getElementsByXLevel().forEach((level, index) => {
       let levelHeight = getLevelHeight(level);
       if (index === 0) {
         level.forEach((title, index) => {
@@ -85,7 +91,7 @@ const Map = ({ universe }) => {
         });
         return;
       }
-      const previousLevel = getXLevelsArrays()[index - 1];
+      const previousLevel = getElementsByXLevel()[index - 1];
       const previousHeight = getLevelHeight(previousLevel);
 
       const sortedLevel = sortTitles(level);
@@ -95,10 +101,21 @@ const Map = ({ universe }) => {
       });
     });
 
+    setElements(titles);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", updateBracnhDimensions);
+    return () => {
+      window.removeEventListener("resize", updateBracnhDimensions);
+    };
+  });
+
+  function updateBracnhDimensions() {
     let highestTitle;
     let lowestTitle;
     let rightTitle;
-    titles.forEach((title) => {
+    elements.forEach((title) => {
       if (!highestTitle) {
         highestTitle = title;
       }
@@ -127,14 +144,13 @@ const Map = ({ universe }) => {
       Math.abs(highestTitle.yLevel) * (elementHeight + elementMarginBot);
     const mapWidth =
       rightTitle.xLevel * (elementWidth + elementMarginRight) + elementWidth;
+
     setBranchDimensions({
       width: mapWidth,
       height: mapHeight,
       paddingTop: paddingTop,
     });
-
-    setElements(titles);
-  }, []);
+  }
 
   function sortTitles(level) {
     let initialArray = level;
@@ -200,7 +216,7 @@ const Map = ({ universe }) => {
     return height;
   }
 
-  function getXLevelsArrays() {
+  function getElementsByXLevel() {
     let xLevels = [];
     titles.forEach((title) => {
       while (xLevels.length < title.xLevel + 1) {
@@ -236,11 +252,26 @@ const Map = ({ universe }) => {
   }
 
   useEffect(() => {
+    if (elements.length < 1) return;
+    updateBracnhDimensions(elements);
+  }, [elements, scale]);
+
+  useEffect(() => {
     if (!branchDimensions) return;
-    const map = document.querySelector(".map");
-    map.style.width = branchDimensions.width + "px";
-    map.style.minHeight = branchDimensions.height + "px";
-    map.style.paddingTop = branchDimensions.paddingTop + "px";
+
+    const mapSize = mapRef.current.getBoundingClientRect();
+    const mapContainerSize = mapContainerRef.current.getBoundingClientRect();
+
+    mapRef.current.style.width = branchDimensions.width + "px";
+    mapRef.current.style.minHeight = branchDimensions.height + "px";
+    mapRef.current.style.paddingTop = branchDimensions.paddingTop + "px";
+
+    const marginVertical =
+      mapContainerSize.height / 2 + (branchDimensions.height * (scale - 1)) / 2;
+    const marginHorizontal =
+      mapContainerSize.width / 2 + (branchDimensions.width * (scale - 1)) / 2;
+
+    mapRef.current.style.margin = `${marginVertical}px ${marginHorizontal}px`;
     setElementStyle({
       width: elementWidth,
       height: elementHeight,
@@ -248,42 +279,86 @@ const Map = ({ universe }) => {
       marginBot: elementMarginBot,
       branchHeight: branchDimensions,
     });
+
+    const trails = document.querySelector(".trails");
+    trails.innerHTML = "";
   }, [branchDimensions]);
 
   function handleMouseDown(e) {
+    if (headingRef.current !== null) {
+      const bounds = headingRef.current.getBoundingClientRect();
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      const isWithinBounds =
+        mouseX >= bounds.left &&
+        mouseX <= bounds.right &&
+        mouseY >= bounds.top &&
+        mouseY <= bounds.bottom;
+
+      if (isWithinBounds) return;
+    }
     setIsDragging(true);
-    const startX = e.pageX - containerRef.current.offsetLeft;
-    const startY = e.pageY - containerRef.current.offsetTop;
+    const startX = e.pageX - mapContainerRef.current.offsetLeft;
+    const startY = e.pageY - mapContainerRef.current.offsetTop;
     setStartCoords({ x: startX, y: startY });
     setScrollCoords({
-      left: containerRef.current.scrollLeft,
-      top: containerRef.current.scrollTop,
+      left: mapContainerRef.current.scrollLeft,
+      top: mapContainerRef.current.scrollTop,
     });
-    containerRef.current.style.cursor = "move";
   }
+
   function handleMouseMove(e) {
     if (!isDragging) return;
     e.preventDefault();
-    const x = e.pageX - containerRef.current.offsetLeft;
-    const y = e.pageY - containerRef.current.offsetTop;
+    const x = e.pageX - mapContainerRef.current.offsetLeft;
+    const y = e.pageY - mapContainerRef.current.offsetTop;
 
     const walkX = x - startCoords.x;
     const walkY = y - startCoords.y;
+    if (Math.abs(walkX) > 1 || Math.abs(walkY) > 1) {
+      mapContainerRef.current.style.cursor = "move";
+    }
 
-    containerRef.current.scrollLeft = scrollCoords.left - walkX;
-    containerRef.current.scrollTop = scrollCoords.top - walkY;
+    mapContainerRef.current.scrollLeft = scrollCoords.left - walkX;
+    mapContainerRef.current.scrollTop = scrollCoords.top - walkY;
   }
 
   function handleMouseUp() {
-    // setTimeout(() => setIsDragging(false), 1);
     setIsDragging(false);
-    containerRef.current.style.cursor = "unset";
+    mapContainerRef.current.style.cursor = "unset";
   }
 
-  function handleMouseLeave() {
-    setIsDragging(false);
-    containerRef.current.style.cursor = "unset";
+  function handleScroll(e) {
+    e.preventDefault();
+    const delta = Math.sign(e.deltaY);
+
+    if ((scale < 0.3 && delta > 0) || (scale > 2 && delta < 0)) return;
+    setScale((prev) => prev + (delta > 0 ? -0.1 : 0.1));
   }
+
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+    mapContainerRef.current.addEventListener("wheel", handleScroll, {
+      passive: false,
+    });
+
+    return () => {
+      mapContainerRef.current.removeEventListener("wheel", handleScroll);
+    };
+  });
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
 
   function handleElementClick(selectedTitle) {
     if (selectedTitle.id === -1) return;
@@ -322,32 +397,37 @@ const Map = ({ universe }) => {
     setElements(updatedElements);
   }, [selected]);
 
-  useEffect(() => {}, [elements]);
-
   return (
     <div className="map-frame">
       <div className="header">{universe.title}</div>
-      <MapHeading title={selected} />
-      <div
-        className="map-container"
-        ref={containerRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-      >
-        <div className="map">
-          <div className="level">
-            {elements &&
-              elements.map((title) => (
-                <Element
-                  key={title.id}
-                  item={title}
-                  style={elementStyle}
-                  onClick={handleElementClick}
-                />
-              ))}
-            <svg className="trails"></svg>
+      <div className="map-wrapper" ref={mapWrapperRef}>
+        <MapHeading
+          title={selected}
+          frameRef={mapContainerRef}
+          ref={headingRef}
+        />
+        <div
+          className="map-container"
+          ref={mapContainerRef}
+          onMouseDown={handleMouseDown}
+        >
+          <div
+            className="map"
+            ref={mapRef}
+            style={{ transform: `scale(${scale})` }}
+          >
+            <div className="level">
+              {elements &&
+                elements.map((title) => (
+                  <Element
+                    key={title.id}
+                    item={title}
+                    style={elementStyle}
+                    onClick={handleElementClick}
+                  />
+                ))}
+              <svg className="trails"></svg>
+            </div>
           </div>
         </div>
       </div>
