@@ -26,7 +26,6 @@ body {
   overflow: hidden;
   box-sizing: border-box;
   flex-grow: 1;
-  /* min-height: 100vh; */
 }
 .map-container {
   position: relative;
@@ -34,13 +33,9 @@ body {
   max-width: 100%;
   height: 100%;
   overflow: auto;
-
   display: flex;
   flex-direction: column;
-
-  /* padding: 50vmax; */
   box-sizing: border-box;
-
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -53,13 +48,9 @@ body {
   color: white;
   background-color: black;
   position: relative;
-
   overflow-x: visible;
   overflow-y: visible;
   box-sizing: border-box;
-  /* padding: auto; */
-  /* margin: 50vh 50vw; */
-  /* transition: transform 0.1s ease; */
 }
 
 .level {
@@ -68,31 +59,29 @@ body {
   position: relative;
   width: 10px;
 }
+.element-container {
+  position: absolute;
+}
 
 .element {
-  left: 0;
-  position: absolute;
-  /* width: 100px; */
-  overflow: hidden;
-  display: flex;
-  text-align: center;
-  /* padding: 0 100%; */
-  outline: 2px solid var(--border);
-  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  outline: 5px solid var(--border);
   background-color: var(--element);
-  z-index: 1;
   cursor: pointer;
   user-select: none;
   border-radius: 75px;
-  scale: 1.05;
-
   display: flex;
   align-items: center;
+  z-index: 1;
 }
 .element p {
   color: var(--border);
-  margin: 0;
-  /* font-size: 10px; */
+  margin: 0 1rem;
+  max-width: 80%;
+  font-weight: 700;
+  overflow: hidden;
   text-wrap: nowrap;
 }
 .element.filler {
@@ -103,25 +92,24 @@ body {
 }
 .element.series {
   border-radius: 0;
-  scale: 1;
 }
 
 .trails {
-  /* background-color: black; */
+  /* z-index: -1; */
   position: absolute;
   width: 1px;
   height: 1px;
   overflow: visible;
-  mix-blend-mode: normal;
-  /* stroke: black; */
 }
 
 .trail {
   stroke: var(--border);
+
+  background-color: yellow;
 }
 
 .element.active {
-  outline: 2px solid var(--active);
+  outline-color: var(--active);
 }
 
 .active {
@@ -132,15 +120,12 @@ body {
 }
 
 .element.universe {
-  outline: 3px solid white;
-  /* margin: 0 2rem; */
-  box-sizing: border-box;
+  outline-color: var(--border);
 }
 
 .map-frame .heading {
-  /* position: fixed; */
   position: absolute;
-  /* padding: 2rem 1rem; */
+
   height: 100%;
   box-sizing: border-box;
   width: 40vw;
@@ -155,7 +140,6 @@ body {
 
 .map-frame .heading img {
   position: relative;
-  /* opacity: 0.9; */
 }
 .heading .info {
   color: var(--border);

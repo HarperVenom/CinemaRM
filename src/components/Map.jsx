@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Element from "./Element";
 import MapHeading from "./MapHeading";
+import { getMapElements } from "../data/mapBuilder";
 
 const Map = ({ universe }) => {
   const initialScale = 1;
@@ -9,14 +10,20 @@ const Map = ({ universe }) => {
   const elementMarginRight = 200 * initialScale;
   const elementHeight = 50 * initialScale;
   const elementMarginBot = 60 * initialScale;
+  const elementStyle = {
+    width: elementWidth,
+    height: elementHeight,
+    marginRight: elementMarginRight,
+    marginBot: elementMarginBot,
+  };
 
-  const [branchDimensions, setBranchDimensions] = useState(null);
-  const [elementStyle, setElementStyle] = useState(null);
+  const [mapStyle, setMapStyle] = useState(null);
 
   const mapContainerRef = useRef(null);
   const mapWrapperRef = useRef(null);
   const mapRef = useRef(null);
   const headingRef = useRef(null);
+
   const [isDragging, setIsDragging] = useState(false);
   const [startCoords, setStartCoords] = useState({});
   const [scrollCoords, setScrollCoords] = useState({});
@@ -29,89 +36,19 @@ const Map = ({ universe }) => {
     ...branch.titles,
   ];
   const [elements, setElements] = useState([]);
-  const mapFrameRef = useRef();
 
   useEffect(() => {
     if (!titles) return;
-
-    titles.forEach((title, index) => {
-      if (title.watchAfter.length === 0 && index !== 0)
-        title.watchAfter = [titles[0].id];
-    });
-
-    titles.forEach((title) => {
-      if (title.xLevel) return title;
-      title.xLevel = getXLevel(title.id);
-      return title;
-    });
-
-    titles.forEach((title) => {
-      const parents = title.watchAfter.map((parentId) => {
-        return titles.find((title) => title.id === parentId);
-      });
-
-      let lastParent = null;
-      parents.forEach((parent) => {
-        if (parent === undefined) return;
-
-        const leftCorner =
-          title.xLevel > parent.xLevel ? parent.xLevel : title.xLevel;
-        const rightCorner =
-          leftCorner === title.xLevel ? parent.xLevel : title.xLevel;
-
-        const xDifference = rightCorner - leftCorner;
-
-        if (xDifference === 1) return;
-
-        for (let x = 1; x < xDifference; x++) {
-          titles.push({
-            id: parent.id + "-" + title.id + "-x" + x,
-            type: "line-filler",
-            xLevel: leftCorner + x,
-            watchAfter: [
-              lastParent === null || lastParent !== parent
-                ? parent.id
-                : titles[titles.length - 1].id,
-            ],
-          });
-          lastParent = parent;
-        }
-        title.watchAfter = [
-          ...title.watchAfter.filter((id) => id !== parent.id),
-          titles[titles.length - 1].id,
-        ];
-      });
-    });
-
-    getElementsByXLevel().forEach((level, index) => {
-      let levelHeight = getLevelHeight(level);
-      if (index === 0) {
-        level.forEach((title, index) => {
-          title.yLevel = index - levelHeight / 2;
-        });
-        return;
-      }
-      const previousLevel = getElementsByXLevel()[index - 1];
-      const previousHeight = getLevelHeight(previousLevel);
-
-      const sortedLevel = sortTitles(level);
-      sortedLevel.forEach((title, index) => {
-        title.yLevel =
-          index - levelHeight / 2 + (previousLevel.length - previousHeight) / 2;
-      });
-    });
-
-    setElements(titles);
+    const mapElements = getMapElements(titles);
+    setElements(mapElements);
   }, []);
 
   useEffect(() => {
-    window.addEventListener("resize", updateBracnhDimensions);
-    return () => {
-      window.removeEventListener("resize", updateBracnhDimensions);
-    };
-  });
+    if (!elements || elements.length === 0) return;
+    updateMapStyle();
+  }, [elements]);
 
-  function updateBracnhDimensions() {
+  function updateMapStyle(mapScale = scale) {
     let highestTitle;
     let lowestTitle;
     let rightTitle;
@@ -145,144 +82,24 @@ const Map = ({ universe }) => {
     const mapWidth =
       rightTitle.xLevel * (elementWidth + elementMarginRight) + elementWidth;
 
-    setBranchDimensions({
-      width: mapWidth,
-      height: mapHeight,
-      paddingTop: paddingTop,
-    });
-  }
-
-  function sortTitles(level) {
-    let initialArray = level;
-    let sortedArray = [];
-
-    initialArray.forEach((title) => {
-      title.yLevel = getParentsYLevel(title);
-    });
-
-    while (initialArray.length > 0) {
-      let highestTitle = initialArray[0];
-
-      initialArray.forEach((title) => {
-        if (title.yLevel === highestTitle.yLevel) {
-          if (
-            title.type === "line-filler" &&
-            highestTitle.type !== "linne-filler"
-          ) {
-            highestTitle = title;
-            return;
-          }
-        }
-        if (title.yLevel < highestTitle.yLevel) highestTitle = title;
-      });
-
-      highestTitle.yLevel = undefined;
-      sortedArray.push(highestTitle);
-      initialArray = initialArray.filter((title) => title != highestTitle);
-    }
-    const savedArray = sortedArray;
-    savedArray.forEach((title, index) => {
-      if (title.standAlone) {
-        const length = sortedArray.length;
-        sortedArray = sortedArray.filter((element) => element != title);
-        if (index >= length / 2) {
-          sortedArray.push(title);
-        } else {
-          sortedArray.unshift(title);
-        }
-      }
-    });
-
-    return sortedArray;
-
-    function getParentsYLevel(title) {
-      return title.watchAfter.reduce((acc, parentId) => {
-        const parent = titles.find((title) => title.id === parentId);
-        acc += parent.yLevel;
-        return acc;
-      }, 0);
-    }
-  }
-
-  function getLevelHeight(level) {
-    let height = 0;
-    level.forEach((title) => {
-      if (title.xLevel === 0) {
-        height++;
-        return;
-      }
-      if (!title.standAlone) height++;
-    });
-    return height;
-  }
-
-  function getElementsByXLevel() {
-    let xLevels = [];
-    titles.forEach((title) => {
-      while (xLevels.length < title.xLevel + 1) {
-        xLevels.push([]);
-      }
-      xLevels[title.xLevel].push(title);
-    });
-    return xLevels;
-  }
-
-  function getXLevel(id) {
-    let level = 0;
-    let step = titles.find((title) => title.id === id);
-
-    if (step === undefined) return;
-    while (step.watchAfter.length !== 0) {
-      level++;
-      let highestLevelIndex;
-      for (let i = 0; i < step.watchAfter.length; i++) {
-        if (
-          highestLevelIndex != undefined
-            ? getXLevel(step.watchAfter[i]) >
-              getXLevel(step.watchAfter[highestLevelIndex])
-            : true
-        )
-          highestLevelIndex = i;
-      }
-      step = titles.find(
-        (title) => title.id === step.watchAfter[highestLevelIndex]
-      );
-    }
-    return level;
-  }
-
-  useEffect(() => {
-    if (elements.length < 1) return;
-    updateBracnhDimensions(elements);
-  }, [elements, scale]);
-
-  useEffect(() => {
-    if (!branchDimensions) return;
-
-    const mapSize = mapRef.current.getBoundingClientRect();
     const mapContainerSize = mapContainerRef.current.getBoundingClientRect();
-
-    mapRef.current.style.width = branchDimensions.width + "px";
-    mapRef.current.style.minHeight = branchDimensions.height + "px";
-    mapRef.current.style.paddingTop = branchDimensions.paddingTop + "px";
-
-    const marginVertical =
-      mapContainerSize.height / 2 + (branchDimensions.height * (scale - 1)) / 2;
     const marginHorizontal =
-      mapContainerSize.width / 2 + (branchDimensions.width * (scale - 1)) / 2;
+      mapContainerSize.width / 2 + (mapWidth * (mapScale - 1)) / 2;
+    const marginVertical =
+      mapContainerSize.height / 2 + (mapHeight * (mapScale - 1)) / 2;
 
-    mapRef.current.style.margin = `${marginVertical}px ${marginHorizontal}px`;
-    setElementStyle({
-      width: elementWidth,
-      height: elementHeight,
-      marginRight: elementMarginRight,
-      marginBot: elementMarginBot,
-      branchHeight: branchDimensions,
-    });
+    const style = {
+      width: `${mapWidth}px`,
+      minHeight: `${mapHeight}px`,
+      paddingTop: `${paddingTop}px`,
+      margin: `${marginVertical}px ${marginHorizontal}px`,
+    };
+
+    setMapStyle(style);
 
     const trails = document.querySelector(".trails");
     trails.innerHTML = "";
-  }, [branchDimensions]);
+  }
 
   function handleMouseDown(e) {
     if (headingRef.current !== null) {
@@ -334,7 +151,10 @@ const Map = ({ universe }) => {
     const delta = Math.sign(e.deltaY);
 
     if ((scale < 0.3 && delta > 0) || (scale > 2 && delta < 0)) return;
-    setScale((prev) => prev + (delta > 0 ? -0.1 : 0.1));
+    const newScale = scale + (delta > 0 ? -0.1 : 0.1);
+
+    setScale(newScale);
+    updateMapStyle(newScale);
   }
 
   useEffect(() => {
@@ -344,7 +164,8 @@ const Map = ({ universe }) => {
     });
 
     return () => {
-      mapContainerRef.current.removeEventListener("wheel", handleScroll);
+      mapContainerRef.current &&
+        mapContainerRef.current.removeEventListener("wheel", handleScroll);
     };
   });
 
@@ -414,7 +235,13 @@ const Map = ({ universe }) => {
           <div
             className="map"
             ref={mapRef}
-            style={{ transform: `scale(${scale})` }}
+            style={{
+              width: mapStyle && mapStyle.width,
+              minHeight: mapStyle && mapStyle.minHeight,
+              paddingTop: mapStyle && mapStyle.paddingTop,
+              margin: mapStyle && mapStyle.margin,
+              transform: `scale(${scale})`,
+            }}
           >
             <div className="level">
               {elements &&
@@ -424,6 +251,7 @@ const Map = ({ universe }) => {
                     item={title}
                     style={elementStyle}
                     onClick={handleElementClick}
+                    allElements={elements}
                   />
                 ))}
               <svg className="trails"></svg>
