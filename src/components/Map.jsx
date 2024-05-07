@@ -26,7 +26,8 @@ const Map = ({ universe }) => {
 
   const [isDragging, setIsDragging] = useState(false);
   const [startCoords, setStartCoords] = useState({});
-  const [scrollCoords, setScrollCoords] = useState({});
+  const [scrollCoords, setScrollCoords] = useState({ x: 1000, y: 0 });
+  const [draggingOnElement, setDraggingOnElement] = useState(null);
 
   const [selected, setSelected] = useState(null);
 
@@ -48,10 +49,19 @@ const Map = ({ universe }) => {
     updateMapStyle();
   }, [elements]);
 
+  useEffect(() => {
+    window.addEventListener("resize", () => updateMapStyle());
+    return () => {
+      window.removeEventListener("resize", updateMapStyle);
+    };
+  }, [elements, scale]);
+
   function updateMapStyle(mapScale = scale) {
     let highestTitle;
     let lowestTitle;
     let rightTitle;
+
+    if (elements.length === 0) return;
     elements.forEach((title) => {
       if (!highestTitle) {
         highestTitle = title;
@@ -89,16 +99,20 @@ const Map = ({ universe }) => {
       mapContainerSize.height / 2 + (mapHeight * (mapScale - 1)) / 2;
 
     const style = {
-      width: `${mapWidth}px`,
-      minHeight: `${mapHeight}px`,
-      paddingTop: `${paddingTop}px`,
-      margin: `${marginVertical}px ${marginHorizontal}px`,
+      width: mapWidth,
+      minHeight: mapHeight,
+      paddingTop: paddingTop,
+      initialMargin: {
+        x: mapContainerSize.width / 2,
+        y: mapContainerSize.height / 2,
+      },
+      margin: {
+        x: marginHorizontal,
+        y: marginVertical,
+      },
     };
 
     setMapStyle(style);
-
-    const trails = document.querySelector(".trails");
-    trails.innerHTML = "";
   }
 
   function handleMouseDown(e) {
@@ -133,7 +147,12 @@ const Map = ({ universe }) => {
 
     const walkX = x - startCoords.x;
     const walkY = y - startCoords.y;
-    if (Math.abs(walkX) > 1 || Math.abs(walkY) > 1) {
+    if (Math.abs(walkX) > 10 || Math.abs(walkY) > 10) {
+      if (e.target.classList.contains("element")) {
+        if (draggingOnElement !== e.target) {
+          setDraggingOnElement(e.target);
+        }
+      }
       mapContainerRef.current.style.cursor = "move";
     }
 
@@ -146,18 +165,7 @@ const Map = ({ universe }) => {
     mapContainerRef.current.style.cursor = "unset";
   }
 
-  function handleScroll(e) {
-    e.preventDefault();
-    const delta = Math.sign(e.deltaY);
-
-    if ((scale < 0.3 && delta > 0) || (scale > 2 && delta < 0)) return;
-    const newScale = scale + (delta > 0 ? -0.1 : 0.1);
-
-    setScale(newScale);
-    updateMapStyle(newScale);
-  }
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!mapContainerRef.current) return;
     mapContainerRef.current.addEventListener("wheel", handleScroll, {
       passive: false,
@@ -184,6 +192,13 @@ const Map = ({ universe }) => {
   function handleElementClick(selectedTitle) {
     if (selectedTitle.id === -1) return;
     if (selectedTitle.type === "line-filler") return;
+    if (
+      draggingOnElement &&
+      draggingOnElement === document.getElementById(selectedTitle.id)
+    ) {
+      setDraggingOnElement(null);
+      return;
+    }
     setSelected(selectedTitle);
   }
 
@@ -218,6 +233,58 @@ const Map = ({ universe }) => {
     setElements(updatedElements);
   }, [selected]);
 
+  const [oldZoom, setOldZoom] = useState(null);
+
+  function handleScroll(e) {
+    e.preventDefault();
+    const delta = Math.sign(e.deltaY);
+
+    if ((scale < 0.4 && delta > 0) || (scale > 2 && delta < 0)) return;
+    const newScale = scale + (delta > 0 ? -0.1 : 0.1);
+
+    setOldZoom({
+      scale: scale,
+      scrollX: mapContainerRef.current.scrollLeft,
+      scrollY: mapContainerRef.current.scrollTop,
+    });
+    setScale(newScale);
+    updateMapStyle(newScale);
+  }
+
+  useLayoutEffect(() => {
+    if (!mapStyle) return;
+    updateScroll(oldZoom);
+
+    function updateScroll(oldZoom, newScale = scale) {
+      const oldScale = oldZoom.scale;
+      const oldScroll = {
+        x: oldZoom.scrollX,
+        y: oldZoom.scrollY,
+      };
+
+      const initialWidth = mapStyle.width + mapStyle.initialMargin.x * 2;
+      const initialHeight =
+        mapStyle.minHeight + mapStyle.paddingTop + mapStyle.initialMargin.y * 2;
+
+      const oldWidth = initialWidth * oldScale;
+      const newWidth = initialWidth * newScale;
+
+      const oldHeight = initialHeight * oldScale;
+      const newHeight = initialHeight * newScale;
+
+      const xRation = oldScroll.x / oldWidth;
+      const yRation = oldScroll.y / oldHeight;
+
+      const newScroll = {
+        x: newWidth * xRation,
+        y: newHeight * yRation,
+      };
+
+      mapContainerRef.current.scrollLeft = newScroll.x;
+      mapContainerRef.current.scrollTop = newScroll.y;
+    }
+  }, [oldZoom]);
+
   return (
     <div className="map-frame">
       <div className="header">{universe.title}</div>
@@ -236,10 +303,11 @@ const Map = ({ universe }) => {
             className="map"
             ref={mapRef}
             style={{
-              width: mapStyle && mapStyle.width,
-              minHeight: mapStyle && mapStyle.minHeight,
-              paddingTop: mapStyle && mapStyle.paddingTop,
-              margin: mapStyle && mapStyle.margin,
+              width: mapStyle && `${mapStyle.width}px`,
+              minHeight: mapStyle && `${mapStyle.minHeight}px`,
+              paddingTop: mapStyle && `${mapStyle.paddingTop}px`,
+              margin:
+                mapStyle && `${mapStyle.margin.y}px ${mapStyle.margin.x}px`,
               transform: `scale(${scale})`,
             }}
           >

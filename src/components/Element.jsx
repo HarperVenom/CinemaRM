@@ -8,8 +8,8 @@ export default Element = ({ item, style, onClick, allElements }) => {
   useEffect(() => {
     if (!style) return;
     setLocation({
-      left: `${getX(item.xLevel)}px`,
-      top: `${getY(item.yLevel)}px`,
+      left: getX(item.xLevel),
+      top: getY(item.yLevel),
     });
 
     const parentsIds = item.watchAfter;
@@ -49,12 +49,12 @@ export default Element = ({ item, style, onClick, allElements }) => {
 
     mappedParents.forEach((parent) => {
       const start = {
-        x: parseInt(location.left),
-        y: parseInt(location.top) + style.height / 2,
+        x: location.left,
+        y: location.top + style.height / 2,
       };
       const end = {
-        x: parseInt(parent.left) + style.width,
-        y: parseInt(parent.top) + style.height / 2,
+        x: parent.left + style.width,
+        y: parent.top + style.height / 2,
       };
 
       const relativeEnd = {
@@ -67,7 +67,16 @@ export default Element = ({ item, style, onClick, allElements }) => {
         Math.min(Math.abs(0.05 * (start.y - end.y)), 0.18 * style.height);
 
       const trail = {
-        d: calculatePathD(relativeEnd, parent.type, yShift),
+        type: "path",
+        d: calculatePathD(
+          relativeEnd,
+          parent.type,
+          yShift,
+          false,
+          item.type === "line-filler" || parent.type === "line-filler"
+            ? false
+            : true
+        ),
       };
 
       setTrails((prev) => [...prev, trail]);
@@ -76,14 +85,24 @@ export default Element = ({ item, style, onClick, allElements }) => {
     if (!location) return;
     if (trailsCount === 0) return;
     const fillerLine = {
-      d: calculatePathD({ x: style.width, y: 0 }, "filler", 0, true),
+      type: "line",
+      x1: 0,
+      y1: 0,
+      x2: style.width,
+      y2: 0,
     };
 
     setTrails((prev) => [...prev, fillerLine]);
   }
 
-  function calculatePathD(end, parentType, yShift, isFiller = false) {
-    return `M ${isFiller ? 0 : 10}
+  function calculatePathD(
+    end,
+    parentType,
+    yShift,
+    isFiller = false,
+    spread = true
+  ) {
+    return `M ${isFiller || !spread ? 0 : 10}
           ${item.type === "line-filler" ? 0 : -yShift} c 
 
           ${isFiller ? 0 : -0.5 * style.width} 
@@ -100,7 +119,15 @@ export default Element = ({ item, style, onClick, allElements }) => {
               : end.y + 2 * yShift
           } 
 
-          ${end.x - (isFiller ? 0 : 20)} 
+          ${
+            end.x -
+            (() => {
+              if (isFiller || !spread) return 0;
+              else if (parentType === "filler") {
+                return 10;
+              } else return 20;
+            })()
+          } 
           ${
             item.type === "line-filler"
               ? parentType === "filler"
@@ -118,7 +145,7 @@ export default Element = ({ item, style, onClick, allElements }) => {
         <div
           className="element-container"
           style={{
-            transform: `translate(${location.left}, ${location.top})`,
+            transform: `translate(${location.left}px, ${location.top}px)`,
             width: `${style.width}px`,
             height: `${style.height}px`,
             fontSize: style.height / 2.5,
@@ -127,12 +154,11 @@ export default Element = ({ item, style, onClick, allElements }) => {
         >
           <div
             id={item.id}
-            className={`element ${item.type === "line-filler" ? "filler" : ""} 
-        ${item.active ? "active" : ""} 
-        ${item.type === "series" ? "series" : ""} ${
-              item.id === -1 ? "universe" : ""
-            }
-      `}
+            className={`element${item.type === "line-filler" ? " filler" : ""}${
+              item.active ? " active" : ""
+            }${item.type === "series" ? " series" : ""}${
+              item.id === -1 ? " universe" : ""
+            }`}
             onClick={() => {
               onClick(item);
             }}
@@ -147,16 +173,30 @@ export default Element = ({ item, style, onClick, allElements }) => {
           ${-style.height / 2}px)`,
             }}
           >
-            {trails.map((trail, index) => (
-              <path
-                key={index}
-                className={"trail " + (item.active === true ? "active" : "")}
-                d={trail.d}
-                stroke="rgba(255, 255, 255, 0.5)"
-                strokeWidth="5px"
-                fill="none"
-              ></path>
-            ))}
+            {trails.map((trail, index) =>
+              trail.type === "path" ? (
+                <path
+                  key={index}
+                  className={"trail " + (item.active === true ? "active" : "")}
+                  d={trail.d}
+                  stroke="rgba(255, 255, 255, 0.5)"
+                  strokeWidth="5px"
+                  fill="none"
+                ></path>
+              ) : (
+                <line
+                  key={index}
+                  className={"trail " + (item.active === true ? "active" : "")}
+                  x1={trail.x1}
+                  y1={trail.y1}
+                  x2={trail.x2}
+                  y2={trail.y2}
+                  stroke="rgba(255, 255, 255, 0.5)"
+                  strokeWidth="5px"
+                  fill="none"
+                ></line>
+              )
+            )}
           </svg>
         </div>
       ) : null}
