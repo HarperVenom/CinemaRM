@@ -1,14 +1,22 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Element from "./Element";
 import MapHeading from "./MapHeading";
 import { getMapElements } from "../data/mapBuilder";
 
+export const ElementsContext = createContext();
+
 const Map = ({ universe }) => {
   const initialScale = 1;
   const [scale, setScale] = useState(initialScale);
-  const elementWidth = 200 * initialScale;
-  const elementMarginRight = 200 * initialScale;
-  const elementHeight = 50 * initialScale;
+  const elementWidth = 230 * initialScale;
+  const elementMarginRight = 230 * initialScale;
+  const elementHeight = 60 * initialScale;
   const elementMarginBot = 60 * initialScale;
   const elementStyle = {
     width: elementWidth,
@@ -25,8 +33,6 @@ const Map = ({ universe }) => {
   const headingRef = useRef(null);
 
   const [isDragging, setIsDragging] = useState(false);
-  const [startCoords, setStartCoords] = useState({});
-  const [scrollCoords, setScrollCoords] = useState({ x: 1000, y: 0 });
   const [draggingOnElement, setDraggingOnElement] = useState(null);
 
   const [selected, setSelected] = useState(null);
@@ -48,6 +54,14 @@ const Map = ({ universe }) => {
     if (!elements || elements.length === 0) return;
     updateMapStyle();
   }, [elements]);
+
+  useEffect(() => {
+    if (
+      mapContainerRef.current.scrollLeft === 0 &&
+      mapContainerRef.current.scrollTop === 0
+    )
+      scrollToElement(-1, false);
+  }, [mapStyle]);
 
   useEffect(() => {
     window.addEventListener("resize", () => updateMapStyle());
@@ -129,14 +143,17 @@ const Map = ({ universe }) => {
 
       if (isWithinBounds) return;
     }
+
     setIsDragging(true);
-    const startX = e.pageX - mapContainerRef.current.offsetLeft;
-    const startY = e.pageY - mapContainerRef.current.offsetTop;
-    setStartCoords({ x: startX, y: startY });
-    setScrollCoords({
-      left: mapContainerRef.current.scrollLeft,
-      top: mapContainerRef.current.scrollTop,
-    });
+    mapContainerRef.current.dataset.startX =
+      e.pageX - mapContainerRef.current.offsetLeft;
+    mapContainerRef.current.dataset.startY =
+      e.pageY - mapContainerRef.current.offsetTop;
+
+    mapContainerRef.current.dataset.scrollLeft =
+      mapContainerRef.current.scrollLeft;
+    mapContainerRef.current.dataset.scrollTop =
+      mapContainerRef.current.scrollTop;
   }
 
   function handleMouseMove(e) {
@@ -145,8 +162,9 @@ const Map = ({ universe }) => {
     const x = e.pageX - mapContainerRef.current.offsetLeft;
     const y = e.pageY - mapContainerRef.current.offsetTop;
 
-    const walkX = x - startCoords.x;
-    const walkY = y - startCoords.y;
+    const walkX = x - mapContainerRef.current.dataset.startX;
+    const walkY = y - mapContainerRef.current.dataset.startY;
+
     if (Math.abs(walkX) > 10 || Math.abs(walkY) > 10) {
       if (e.target.classList.contains("element")) {
         if (draggingOnElement !== e.target) {
@@ -155,27 +173,16 @@ const Map = ({ universe }) => {
       }
       mapContainerRef.current.style.cursor = "move";
     }
-
-    mapContainerRef.current.scrollLeft = scrollCoords.left - walkX;
-    mapContainerRef.current.scrollTop = scrollCoords.top - walkY;
+    mapContainerRef.current.scrollLeft =
+      mapContainerRef.current.dataset.scrollLeft - walkX;
+    mapContainerRef.current.scrollTop =
+      mapContainerRef.current.dataset.scrollTop - walkY;
   }
 
   function handleMouseUp() {
     setIsDragging(false);
     mapContainerRef.current.style.cursor = "unset";
   }
-
-  useLayoutEffect(() => {
-    if (!mapContainerRef.current) return;
-    mapContainerRef.current.addEventListener("wheel", handleScroll, {
-      passive: false,
-    });
-
-    return () => {
-      mapContainerRef.current &&
-        mapContainerRef.current.removeEventListener("wheel", handleScroll);
-    };
-  });
 
   useEffect(() => {
     if (isDragging) {
@@ -190,8 +197,9 @@ const Map = ({ universe }) => {
   }, [isDragging]);
 
   function handleElementClick(selectedTitle) {
-    if (selectedTitle.id === -1) return;
     if (selectedTitle.type === "line-filler") return;
+    scrollToElement(selectedTitle.id);
+    if (selectedTitle.id === -1) return;
     if (
       draggingOnElement &&
       draggingOnElement === document.getElementById(selectedTitle.id)
@@ -201,6 +209,74 @@ const Map = ({ universe }) => {
     }
     setSelected(selectedTitle);
   }
+
+  const [oldZoom, setOldZoom] = useState(null);
+
+  useLayoutEffect(() => {
+    if (!mapContainerRef.current) return;
+    mapContainerRef.current.addEventListener("wheel", handleScroll, {
+      passive: false,
+    });
+
+    return () => {
+      mapContainerRef.current &&
+        mapContainerRef.current.removeEventListener("wheel", handleScroll);
+    };
+  });
+
+  function handleScroll(e) {
+    e.preventDefault();
+    const delta = Math.sign(e.deltaY);
+
+    if ((scale < 0.6 && delta > 0) || (scale > 2 && delta < 0)) return;
+    const newScale = scale + (delta > 0 ? -0.1 : 0.1);
+
+    setOldZoom({
+      scale: scale,
+      scrollX: mapContainerRef.current.scrollLeft,
+      scrollY: mapContainerRef.current.scrollTop,
+    });
+    setScale(newScale);
+    updateMapStyle(newScale);
+  }
+
+  useLayoutEffect(() => {
+    if (!mapStyle) return;
+    updateScroll(oldZoom);
+
+    function updateScroll(oldZoom, newScale = scale) {
+      const oldScale = oldZoom.scale;
+
+      const headingWidth =
+        headingRef.current && headingRef.current.getBoundingClientRect().width;
+
+      const oldScroll = {
+        x: oldZoom.scrollX + headingWidth / 2,
+        y: oldZoom.scrollY,
+      };
+
+      const initialWidth = mapStyle.width + mapStyle.initialMargin.x * 2;
+      const initialHeight =
+        mapStyle.minHeight + mapStyle.paddingTop + mapStyle.initialMargin.y * 2;
+
+      const oldWidth = initialWidth * oldScale;
+      const newWidth = initialWidth * newScale;
+
+      const oldHeight = initialHeight * oldScale;
+      const newHeight = initialHeight * newScale;
+
+      const xRation = oldScroll.x / oldWidth;
+      const yRation = oldScroll.y / oldHeight;
+
+      const newScroll = {
+        x: newWidth * xRation - headingWidth / 2,
+        y: newHeight * yRation,
+      };
+
+      mapContainerRef.current.scrollLeft = newScroll.x;
+      mapContainerRef.current.scrollTop = newScroll.y;
+    }
+  }, [oldZoom]);
 
   useEffect(() => {
     if (!selected) return;
@@ -233,101 +309,118 @@ const Map = ({ universe }) => {
     setElements(updatedElements);
   }, [selected]);
 
-  const [oldZoom, setOldZoom] = useState(null);
+  function scrollToElement(id, smooth = true) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    const x = element.getBoundingClientRect().x;
+    const y = element.getBoundingClientRect().y;
 
-  function handleScroll(e) {
-    e.preventDefault();
-    const delta = Math.sign(e.deltaY);
+    const currentScrollLeft = mapContainerRef.current.scrollLeft;
+    const currentScrollTop = mapContainerRef.current.scrollTop;
 
-    if ((scale < 0.4 && delta > 0) || (scale > 2 && delta < 0)) return;
-    const newScale = scale + (delta > 0 ? -0.1 : 0.1);
+    const windowWidth = mapContainerRef.current.getBoundingClientRect().width;
+    const windowHeight = mapContainerRef.current.getBoundingClientRect().height;
 
-    setOldZoom({
-      scale: scale,
-      scrollX: mapContainerRef.current.scrollLeft,
-      scrollY: mapContainerRef.current.scrollTop,
-    });
-    setScale(newScale);
-    updateMapStyle(newScale);
+    const headingWidth =
+      headingRef.current && headingRef.current.getBoundingClientRect().width;
+
+    const newScrollLeft =
+      currentScrollLeft +
+      x -
+      mapWrapperRef.current.offsetLeft -
+      windowWidth / 2 +
+      (elementStyle.width * scale) / 2 -
+      headingWidth / 2;
+    const newScrollTop =
+      currentScrollTop +
+      y -
+      mapWrapperRef.current.offsetTop -
+      windowHeight / 2 +
+      (elementStyle.height * scale) / 2;
+
+    if (smooth)
+      smoothScrollTo(mapContainerRef.current, newScrollLeft, newScrollTop, 500);
+    else {
+      mapContainerRef.current.scrollLeft = newScrollLeft;
+      mapContainerRef.current.scrollTop = newScrollTop;
+    }
   }
 
-  useLayoutEffect(() => {
-    if (!mapStyle) return;
-    updateScroll(oldZoom);
+  function smoothScrollTo(container, targetX, targetY, duration) {
+    const startX = container.scrollLeft;
+    const startY = container.scrollTop;
+    const distanceX = targetX - startX;
+    const distanceY = targetY - startY;
+    const startTime = performance.now();
 
-    function updateScroll(oldZoom, newScale = scale) {
-      const oldScale = oldZoom.scale;
-      const oldScroll = {
-        x: oldZoom.scrollX,
-        y: oldZoom.scrollY,
-      };
+    function step() {
+      const currentTime = performance.now();
+      const elapsedTime = currentTime - startTime;
+      const scrollProgress = Math.min(elapsedTime / duration, 1);
+      const scrollPositionX =
+        startX + distanceX * easeInOutQuad(scrollProgress);
+      const scrollPositionY =
+        startY + distanceY * easeInOutQuad(scrollProgress);
 
-      const initialWidth = mapStyle.width + mapStyle.initialMargin.x * 2;
-      const initialHeight =
-        mapStyle.minHeight + mapStyle.paddingTop + mapStyle.initialMargin.y * 2;
+      container.scrollLeft = scrollPositionX;
+      container.scrollTop = scrollPositionY;
 
-      const oldWidth = initialWidth * oldScale;
-      const newWidth = initialWidth * newScale;
-
-      const oldHeight = initialHeight * oldScale;
-      const newHeight = initialHeight * newScale;
-
-      const xRation = oldScroll.x / oldWidth;
-      const yRation = oldScroll.y / oldHeight;
-
-      const newScroll = {
-        x: newWidth * xRation,
-        y: newHeight * yRation,
-      };
-
-      mapContainerRef.current.scrollLeft = newScroll.x;
-      mapContainerRef.current.scrollTop = newScroll.y;
+      if (scrollProgress < 1) {
+        requestAnimationFrame(step);
+      }
     }
-  }, [oldZoom]);
+
+    requestAnimationFrame(step);
+  }
+  function easeInOutQuad(t) {
+    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  }
 
   return (
-    <div className="map-frame">
-      <div className="header">{universe.title}</div>
-      <div className="map-wrapper" ref={mapWrapperRef}>
-        <MapHeading
-          title={selected}
-          frameRef={mapContainerRef}
-          ref={headingRef}
-        />
-        <div
-          className="map-container"
-          ref={mapContainerRef}
-          onMouseDown={handleMouseDown}
-        >
+    <ElementsContext.Provider value={elements}>
+      <div className="map-frame">
+        <div className="header">{universe.title}</div>
+        <div className="map-wrapper" ref={mapWrapperRef}>
+          <MapHeading
+            title={selected}
+            frameRef={mapContainerRef}
+            ref={headingRef}
+            focusElement={scrollToElement}
+          />
           <div
-            className="map"
-            ref={mapRef}
-            style={{
-              width: mapStyle && `${mapStyle.width}px`,
-              minHeight: mapStyle && `${mapStyle.minHeight}px`,
-              paddingTop: mapStyle && `${mapStyle.paddingTop}px`,
-              margin:
-                mapStyle && `${mapStyle.margin.y}px ${mapStyle.margin.x}px`,
-              transform: `scale(${scale})`,
-            }}
+            className="map-container"
+            ref={mapContainerRef}
+            onMouseDown={handleMouseDown}
           >
-            <div className="level">
-              {elements &&
-                elements.map((title) => (
-                  <Element
-                    key={title.id}
-                    item={title}
-                    style={elementStyle}
-                    onClick={handleElementClick}
-                    allElements={elements}
-                  />
-                ))}
-              <svg className="trails"></svg>
+            <div
+              className="map"
+              ref={mapRef}
+              style={{
+                width: mapStyle && `${mapStyle.width}px`,
+                minHeight: mapStyle && `${mapStyle.minHeight}px`,
+                paddingTop: mapStyle && `${mapStyle.paddingTop}px`,
+                margin:
+                  mapStyle && `${mapStyle.margin.y}px ${mapStyle.margin.x}px`,
+                transform: `scale(${scale})`,
+              }}
+            >
+              <div className="level">
+                {elements &&
+                  elements.map((title) => (
+                    <Element
+                      key={title.id}
+                      item={title}
+                      style={elementStyle}
+                      onClick={handleElementClick}
+                    />
+                  ))}
+                <svg className="trails"></svg>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ElementsContext.Provider>
   );
 };
 

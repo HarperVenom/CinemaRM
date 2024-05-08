@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ElementsContext } from "./Map";
 
-export default Element = ({ item, style, onClick, allElements }) => {
+export default Element = ({ item, style, onClick }) => {
   const [location, setLocation] = useState(null);
   const [parents, setParents] = useState([]);
   const [trails, setTrails] = useState([]);
+  const elements = useContext(ElementsContext);
 
   useEffect(() => {
     if (!style) return;
@@ -16,7 +18,7 @@ export default Element = ({ item, style, onClick, allElements }) => {
     if (parentsIds.length === 0) return;
     let parents = [];
     parentsIds.forEach((id) => {
-      const parent = allElements.find((element) => element.id === id);
+      const parent = elements.find((element) => element.id === id);
       parents.push(parent);
     });
     setParents(parents);
@@ -72,7 +74,6 @@ export default Element = ({ item, style, onClick, allElements }) => {
           relativeEnd,
           parent.type,
           yShift,
-          false,
           item.type === "line-filler" || parent.type === "line-filler"
             ? false
             : true
@@ -95,20 +96,14 @@ export default Element = ({ item, style, onClick, allElements }) => {
     setTrails((prev) => [...prev, fillerLine]);
   }
 
-  function calculatePathD(
-    end,
-    parentType,
-    yShift,
-    isFiller = false,
-    spread = true
-  ) {
-    return `M ${isFiller || !spread ? 0 : 10}
+  function calculatePathD(end, parentType, yShift, spread = true) {
+    return `M ${item.type === "line-filler" ? 0 : 10}
           ${item.type === "line-filler" ? 0 : -yShift} c 
 
-          ${isFiller ? 0 : -0.5 * style.width} 
+          ${-0.5 * style.width} 
           ${0} 
           
-          ${isFiller ? end.x : end.x + 0.5 * style.width} 
+          ${end.x + 0.5 * style.width} 
           ${
             item.type === "line-filler"
               ? parentType === "filler"
@@ -122,10 +117,11 @@ export default Element = ({ item, style, onClick, allElements }) => {
           ${
             end.x -
             (() => {
-              if (isFiller || !spread) return 0;
-              else if (parentType === "filler") {
-                return 10;
-              } else return 20;
+              if (item.type === "line-filler") {
+                if (parentType === "filler") return 0;
+                else return 10;
+              } else if (parentType === "filler") return 10;
+              else return 20;
             })()
           } 
           ${
@@ -149,7 +145,9 @@ export default Element = ({ item, style, onClick, allElements }) => {
             width: `${style.width}px`,
             height: `${style.height}px`,
             fontSize: style.height / 2.5,
-            zIndex: isNaN(item.xLevel) ? "unset" : -item.xLevel,
+            zIndex: isNaN(item.xLevel)
+              ? "unset"
+              : -item.xLevel + (item.active ? 1 : 0),
           }}
         >
           <div
