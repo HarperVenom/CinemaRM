@@ -198,8 +198,6 @@ const Map = ({ universe }) => {
 
   function handleElementClick(selectedTitle) {
     if (selectedTitle.type === "line-filler") return;
-    scrollToElement(selectedTitle.id);
-    if (selectedTitle.id === -1) return;
     if (
       draggingOnElement &&
       draggingOnElement === document.getElementById(selectedTitle.id)
@@ -207,6 +205,8 @@ const Map = ({ universe }) => {
       setDraggingOnElement(null);
       return;
     }
+    scrollToElement(selectedTitle.id);
+    if (selectedTitle.id === -1) return;
     setSelected(selectedTitle);
   }
 

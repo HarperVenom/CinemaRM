@@ -22,7 +22,7 @@ export default Element = ({ item, style, onClick }) => {
       parents.push(parent);
     });
     setParents(parents);
-  }, [item, style]);
+  }, [item]);
 
   function getX(xLevel) {
     return (style.width + style.marginRight) * xLevel;

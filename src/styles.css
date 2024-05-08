@@ -112,7 +112,6 @@ body {
 
 .trails {
   pointer-events: none;
-  /* z-index: -1; */
   position: absolute;
   width: 1px;
   height: 1px;
@@ -121,7 +120,6 @@ body {
 
 .trail {
   stroke: var(--border);
-
   background-color: yellow;
 }
 
@@ -175,9 +173,9 @@ body {
   box-sizing: border-box;
   width: 40vw;
   min-width: 200px;
-  max-width: 400px;
+  max-width: 300px;
 
-  background-color: rgba(18, 15, 39, 0.9);
+  background-color: rgba(18, 15, 39, 0.6);
   display: flex;
   flex-direction: column;
   z-index: 2;
