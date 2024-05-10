@@ -87,9 +87,9 @@ export default Element = ({ item, style, onClick }) => {
     if (trailsCount === 0) return;
     const fillerLine = {
       type: "line",
-      x1: 0,
+      x1: -1,
       y1: 0,
-      x2: style.width,
+      x2: style.width + 1,
       y2: 0,
     };
 

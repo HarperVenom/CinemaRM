@@ -1,3 +1,4 @@
+import Page from "../components/FranchisePage";
 import Map from "../components/Map";
 import useFetch from "../data/useFetch";
 
@@ -12,7 +13,7 @@ const Root = () => {
         ) : error ? (
           <div>Error: {error.message}</div>
         ) : (
-          <Map universe={universes[0]} loading={loading} error={error} />
+          <Page universe={universes[0]} loading={loading} error={error}></Page>
         )
       ) : null}
     </div>

@@ -1,8 +1,8 @@
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { ElementsContext } from "./Map";
 
-const MapHeading = forwardRef(function MapHeading(props, headingRef) {
-  const { title, frameRef, focusElement } = props;
+const TitleOverview = forwardRef(function (props, overviewRef) {
+  const { title, frameRef, focusElement, className } = props;
   const elements = useContext(ElementsContext);
   const [directParents, setDirectParents] = useState([]);
   const [watchAfter, setWatchAfter] = useState([]);
@@ -48,7 +48,7 @@ const MapHeading = forwardRef(function MapHeading(props, headingRef) {
   }
 
   return title ? (
-    <div className="heading" ref={headingRef}>
+    <div className={"overview " + className} ref={overviewRef}>
       <img src={title.img_url} alt="" />
       <div className="info">
         <div className="title">{title.title}</div>
@@ -75,4 +75,4 @@ const MapHeading = forwardRef(function MapHeading(props, headingRef) {
   ) : null;
 });
 
-export default MapHeading;
+export default TitleOverview;
