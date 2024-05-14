@@ -5,7 +5,7 @@ export default Element = ({ item, style, onClick }) => {
   const [location, setLocation] = useState(null);
   const [parents, setParents] = useState([]);
   const [trails, setTrails] = useState([]);
-  const elements = useContext(ElementsContext);
+  const { elements } = useContext(ElementsContext);
 
   useEffect(() => {
     if (!style) return;
@@ -22,7 +22,7 @@ export default Element = ({ item, style, onClick }) => {
       parents.push(parent);
     });
     setParents(parents);
-  }, [item]);
+  }, [item, item.yLevel, item.xLevel]);
 
   function getX(xLevel) {
     return (style.width + style.marginRight) * xLevel;
@@ -32,12 +32,14 @@ export default Element = ({ item, style, onClick }) => {
   }
 
   useEffect(() => {
-    if (trails.length >= item.watchAfter.length + 1 || item.standAlone) return;
+    if (item.standAlone) return;
     connectToParents();
   }, [parents]);
 
   function connectToParents() {
     let trailsCount = 0;
+
+    const newTrails = [];
 
     const mappedParents = parents
       .filter((parent) => parent !== null)
@@ -79,25 +81,24 @@ export default Element = ({ item, style, onClick }) => {
             : true
         ),
       };
-
-      setTrails((prev) => [...prev, trail]);
+      newTrails.push(trail);
       trailsCount++;
     });
     if (!location) return;
     if (trailsCount === 0) return;
     const fillerLine = {
       type: "line",
-      x1: -1,
+      x1: 9,
       y1: 0,
-      x2: style.width + 1,
+      x2: style.width - 9,
       y2: 0,
     };
-
-    setTrails((prev) => [...prev, fillerLine]);
+    newTrails.push(fillerLine);
+    setTrails(newTrails);
   }
 
   function calculatePathD(end, parentType, yShift, spread = true) {
-    return `M ${item.type === "line-filler" ? 0 : 10}
+    return `M ${10}
           ${item.type === "line-filler" ? 0 : -yShift} c 
 
           ${-0.5 * style.width} 
@@ -114,16 +115,7 @@ export default Element = ({ item, style, onClick }) => {
               : end.y + 2 * yShift
           } 
 
-          ${
-            end.x -
-            (() => {
-              if (item.type === "line-filler") {
-                if (parentType === "filler") return 0;
-                else return 10;
-              } else if (parentType === "filler") return 10;
-              else return 20;
-            })()
-          } 
+          ${end.x - 20} 
           ${
             item.type === "line-filler"
               ? parentType === "filler"

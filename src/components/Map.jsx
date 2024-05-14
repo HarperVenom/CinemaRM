@@ -1,5 +1,6 @@
 import {
   createContext,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -9,21 +10,28 @@ import Element from "./Element";
 import TitleOverview from "./TitleOverview";
 import { getMapElements } from "../data/mapBuilder";
 import { MapFunctionality } from "../data/mapFunctionality";
-import Filter from "./Filter";
+import FilterBar from "./FilterBar";
 import List from "./List";
+import { UniverseContext } from "./FranchisePage";
 
 export const ElementsContext = createContext();
 
 const Map = ({ universe }) => {
+  const { selectedFilters } = useContext(UniverseContext);
+
   const [elements, setElements] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [activeElements, setActiveElements] = useState([]);
   const [scale, setScale] = useState(1);
   const [mapStyle, setMapStyle] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [draggingOnElement, setDraggingOnElement] = useState(null);
   const [oldZoom, setOldZoom] = useState(null);
 
+  const prevSelected = useRef();
+  const prevMapStyle = useRef();
   const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
   const mapWrapperRef = useRef(null);
   const overviewRef = useRef(null);
   const listRef = useRef(null);
@@ -38,6 +46,7 @@ const Map = ({ universe }) => {
     { title: universe.title, id: -1, watchAfter: [] },
     ...universe.branches[0].titles,
   ];
+
   const map = new MapFunctionality(
     mapContainerRef.current,
     getMapCenterOffsets(),
@@ -45,20 +54,37 @@ const Map = ({ universe }) => {
     scale,
     mapStyle,
     elements,
-    mapWrapperRef.current
+    mapWrapperRef.current,
+    mapRef.current
   );
 
   useEffect(() => {
-    if (!titles) return;
-    const mapElements = getMapElements(titles);
+    if (!titles || !selectedFilters.value || selectedFilters.value.length === 0)
+      return;
+    const mapElements = getMapElements(map, titles, selectedFilters.value);
     setElements(mapElements);
-  }, []);
+  }, [selectedFilters]);
 
   useEffect(() => {
     if (!elements || elements.length === 0) return;
+    setOldZoom({
+      scale: scale,
+      mapPadding: mapRef.current.style.paddingTop,
+    });
     setMapStyle(map.updateMapStyle());
     if (!selected) {
       setSelected(elements[0]);
+    } else {
+      if (!prevSelected.current) return;
+      const prevElement = elements.find(
+        (element) => element.id === prevSelected.current.id
+      );
+      if (!prevElement) {
+        prevSelected.current = null;
+        setSelected(elements[0]);
+        return;
+      }
+      setSelected(prevElement);
     }
   }, [elements]);
 
@@ -76,30 +102,23 @@ const Map = ({ universe }) => {
         map.scrollToElement(selected.id, false, offset);
       }
     }
+    prevMapStyle.current = mapStyle;
   }, [mapStyle]);
 
   //SELECTION
   useEffect(() => {
     if (!selected) return;
-    map.scrollToElement(selected.id, true, getMapCenterOffsets());
 
-    let ids = [selected.id, ...getAllParentsIds(selected)];
-
-    function getAllParentsIds(element) {
-      let ids = [];
-      if (element.watchAfter.length < 1 || element.standAlone) return ids;
-      ids = [...ids, ...element.watchAfter];
-      element.watchAfter.forEach((parentId) => {
-        const parent = elements.find((element) => element.id === parentId);
-        ids = [
-          ...ids,
-          ...getAllParentsIds(parent).filter((id) => !ids.includes(id)),
-        ];
-      });
-      return ids;
+    if (prevSelected.current && prevSelected.current.id !== selected.id) {
+      map.scrollToElement(selected.id, true, getMapCenterOffsets());
     }
 
-    const updatedElements = elements.map((element) => {
+    let ids = [
+      selected.id,
+      ...map.getAllParentElements(selected).map((element) => element.id),
+    ];
+
+    const selectedElements = elements.map((element) => {
       if (ids.includes(element.id)) {
         element.active = true;
         return element;
@@ -107,8 +126,8 @@ const Map = ({ universe }) => {
       element.active = false;
       return element;
     });
-
-    setElements(updatedElements);
+    prevSelected.current = selected;
+    setActiveElements(selectedElements);
   }, [selected]);
 
   useEffect(() => {
@@ -125,13 +144,13 @@ const Map = ({ universe }) => {
 
   useEffect(() => {
     const setStyle = () => {
-      setMapStyle(map.updateMapStyle(undefined, undefined, true));
+      setMapStyle(map.updateMapStyle(undefined, elements, true));
     };
     window.addEventListener("resize", setStyle);
     return () => {
       window.removeEventListener("resize", setStyle);
     };
-  }, [elements, scale]);
+  }, [mapStyle, scale]);
 
   useLayoutEffect(() => {
     if (!mapContainerRef.current) return;
@@ -169,28 +188,14 @@ const Map = ({ universe }) => {
     if (!overviewRef.current || !listRef.current) return { x: 0, y: 0 };
     const overviewRect = overviewRef.current.getBoundingClientRect();
     const listRect = listRef.current.getBoundingClientRect();
-    if (mapStyle.overviewLayout === "left")
+    if (mapStyle.overlayLayout === "big")
       return { x: overviewRect.width + listRect.width, y: 0 };
-    else if (mapStyle.overviewLayout === "bot")
+    else if (mapStyle.overlayLayout === "small")
       return { x: listRect.width, y: -overviewRect.height };
     else return { x: 0, y: 0 };
   }
 
   function handleMouseDown(e) {
-    if (overviewRef.current !== null) {
-      const bounds = overviewRef.current.getBoundingClientRect();
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      const isWithinBounds =
-        mouseX >= bounds.left &&
-        mouseX <= bounds.right &&
-        mouseY >= bounds.top &&
-        mouseY <= bounds.bottom;
-
-      if (isWithinBounds) return;
-    }
-
     setIsDragging(true);
     mapContainerRef.current.dataset.startX =
       e.pageX - mapContainerRef.current.offsetLeft;
@@ -240,8 +245,12 @@ const Map = ({ universe }) => {
 
     setOldZoom({
       scale: scale,
-      scrollX: mapContainerRef.current.scrollLeft,
-      scrollY: mapContainerRef.current.scrollTop,
+      mapX:
+        mapRef.current.getBoundingClientRect().x -
+        mapWrapperRef.current.getBoundingClientRect().x,
+      mapY:
+        mapRef.current.getBoundingClientRect().y -
+        mapWrapperRef.current.getBoundingClientRect().y,
     });
     setScale(newScale);
     setMapStyle(map.updateMapStyle(newScale));
@@ -252,13 +261,13 @@ const Map = ({ universe }) => {
   }
 
   return (
-    <ElementsContext.Provider value={elements}>
+    <ElementsContext.Provider value={{ elements, map }}>
       <div className="map-wrapper" ref={mapWrapperRef}>
-        <div className="overlay">
-          <Filter></Filter>
+        <div className={"overlay" + " " + (mapStyle && mapStyle.overlayLayout)}>
+          <FilterBar elements={elements}></FilterBar>
           <List ref={listRef}></List>
           <TitleOverview
-            className={mapStyle ? mapStyle.overviewLayout : ""}
+            className={mapStyle ? mapStyle.overlayLayout : ""}
             title={selected}
             frameRef={mapContainerRef}
             ref={overviewRef}
@@ -272,13 +281,15 @@ const Map = ({ universe }) => {
         >
           <div
             className="map"
+            ref={mapRef}
             style={
               mapStyle
                 ? {
                     width: `${mapStyle.width}px`,
                     minHeight: `${mapStyle.minHeight}px`,
                     paddingTop: `${mapStyle.paddingTop}px`,
-                    margin: `${mapStyle.margin.y}px ${mapStyle.margin.x}px`,
+                    margin: `${mapStyle.margin.top}px ${mapStyle.margin.right}px
+                     ${mapStyle.margin.bot}px ${mapStyle.margin.left}px`,
                     transform: `scale(${scale})`,
                   }
                 : null

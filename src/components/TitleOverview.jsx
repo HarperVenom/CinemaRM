@@ -3,49 +3,22 @@ import { ElementsContext } from "./Map";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
   const { title, frameRef, focusElement, className } = props;
-  const elements = useContext(ElementsContext);
+  const { elements, map } = useContext(ElementsContext);
   const [directParents, setDirectParents] = useState([]);
   const [watchAfter, setWatchAfter] = useState([]);
 
   useEffect(() => {
     if (!title) return;
 
-    setDirectParents(getDirectParents(title));
+    setDirectParents(map.getDirectParents(title));
     setWatchAfter(
-      getWatchAfter(title).filter(
-        (element) => element.type !== "line-filler" && element.id !== -1
-      )
+      map
+        .getAllParentElements(title)
+        .filter(
+          (element) => element.type !== "line-filler" && element.id !== -1
+        )
     );
-
-    function getWatchAfter(title) {
-      const watchAfter = new Set();
-      getDirectParents(title).forEach((parent) => {
-        watchAfter.add(parent);
-      });
-      title.watchAfter.forEach((id) => {
-        const element = elements.find((element) => element.id === id);
-        if (element.standAlone) return;
-        getWatchAfter(element).forEach((element) => {
-          watchAfter.add(element);
-        });
-      });
-      return [...watchAfter];
-    }
   }, [title]);
-
-  function getDirectParents(element) {
-    const directParents = [];
-    element.watchAfter.forEach((parentId) => {
-      let notFiller = elements.find((element) => element.id === parentId);
-      while (notFiller.type === "line-filler") {
-        notFiller = elements.find(
-          (element) => element.id === notFiller.watchAfter[0]
-        );
-      }
-      directParents.push(notFiller);
-    });
-    return directParents;
-  }
 
   return title ? (
     <div className={"overview " + className} ref={overviewRef}>

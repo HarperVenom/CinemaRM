@@ -6,7 +6,8 @@ export class MapFunctionality {
     scale,
     mapStyle,
     elements,
-    wrapper
+    wrapper,
+    map
   ) {
     this.mapContainer = mapContainer;
     this.shift = shift;
@@ -15,6 +16,7 @@ export class MapFunctionality {
     this.mapStyle = mapStyle;
     this.elements = elements;
     this.wrapper = wrapper;
+    this.map = map;
   }
 
   scrollToElement(id, smooth = true, shift = this.shift) {
@@ -22,6 +24,9 @@ export class MapFunctionality {
     if (!element) return;
     const x = element.getBoundingClientRect().x;
     const y = element.getBoundingClientRect().y;
+
+    const elementWidth = parseInt(window.getComputedStyle(element).width);
+    const elementHeight = parseInt(window.getComputedStyle(element).height);
 
     const currentScrollLeft = this.mapContainer.scrollLeft;
     const currentScrollTop = this.mapContainer.scrollTop;
@@ -37,7 +42,7 @@ export class MapFunctionality {
       x -
       offsetX -
       windowWidth / 2 +
-      (this.elementStyle.width * this.scale) / 2 -
+      (elementWidth * this.scale) / 2 -
       shift.x / 2;
 
     const newScrollTop =
@@ -45,7 +50,7 @@ export class MapFunctionality {
       y -
       offsetY -
       windowHeight / 2 +
-      (this.elementStyle.height * this.scale) / 2 -
+      (elementHeight * this.scale) / 2 -
       shift.y / 2;
 
     if (smooth)
@@ -56,38 +61,72 @@ export class MapFunctionality {
     }
   }
 
-  updateScroll(oldZoom, newScale = this.scale) {
+  updateScroll(oldZoom) {
     if (!this.mapStyle) return;
     const oldScale = oldZoom.scale;
 
-    const oldScroll = {
-      x: oldZoom.scrollX + this.shift.x / 2,
-      y: oldZoom.scrollY + this.shift.y / 2,
-    };
+    const windowWidth = this.mapContainer.getBoundingClientRect().width;
+    const windowHeight = this.mapContainer.getBoundingClientRect().height;
 
-    const initialWidth =
-      this.mapStyle.width + this.mapStyle.initialMargin.x * 2;
-    const initialHeight =
-      this.mapStyle.minHeight +
-      this.mapStyle.paddingTop +
-      this.mapStyle.initialMargin.y * 2;
+    const offsetX = this.wrapper.getBoundingClientRect().x;
+    const offsetY = this.wrapper.getBoundingClientRect().y;
 
-    const oldWidth = initialWidth * oldScale;
-    const newWidth = initialWidth * newScale;
+    const mapX = oldZoom.mapX
+      ? oldZoom.mapX
+      : this.map.getBoundingClientRect().x - offsetX;
+    const mapY = oldZoom.mapY
+      ? oldZoom.mapY
+      : this.map.getBoundingClientRect().y - offsetY;
 
-    const oldHeight = initialHeight * oldScale;
-    const newHeight = initialHeight * newScale;
+    const mapWidth = parseInt(this.map.style.width);
+    const mapHeight = parseInt(this.map.style.minHeight);
+    const heightDifference = oldZoom.mapPadding
+      ? parseInt(this.map.style.paddingTop) - parseInt(oldZoom.mapPadding)
+      : 0;
 
-    const xRation = oldScroll.x / oldWidth;
-    const yRation = oldScroll.y / oldHeight;
+    const windowCenterXRation =
+      (-mapX + windowWidth / 2 + this.shift.x / 2) / (mapWidth * oldScale);
+    const windowCenterYRation =
+      (-mapY + windowHeight / 2 + this.shift.y / 2) / (mapHeight * oldScale);
 
-    const newScroll = {
-      x: newWidth * xRation - this.shift.x / 2,
-      y: newHeight * yRation - this.shift.y / 2,
-    };
+    const windowCenterX = windowCenterXRation * mapWidth;
+    const windowCenterY =
+      windowCenterYRation * mapHeight -
+      parseInt(this.map.style.paddingTop) +
+      heightDifference;
 
-    this.mapContainer.scrollLeft = newScroll.x;
-    this.mapContainer.scrollTop = newScroll.y;
+    const dot = document.createElement("div");
+    dot.classList.add("dot");
+    dot.setAttribute("id", "scrollAnchor");
+    dot.style.transform = `translate(${windowCenterX}px, ${windowCenterY}px)`;
+    this.map.appendChild(dot);
+
+    this.scrollToElement(dot.id, false);
+    dot.remove();
+  }
+
+  calculateDimension(dimension, scale) {
+    let size;
+    if (dimension === "height") {
+      let marginTop = this.mapStyle.initialMargin.top;
+      let marginBot = this.mapStyle.initialMargin.bot;
+      const height = this.mapStyle.minHeight;
+
+      marginTop += (height * (scale - 1)) / 2;
+
+      marginBot += (height * (scale - 1)) / 2;
+      size = marginTop + marginBot + height;
+    } else if (dimension === "width") {
+      let marginLeft = this.mapStyle.initialMargin.left;
+      let marginRight = this.mapStyle.initialMargin.right;
+      const width = this.mapStyle.width;
+
+      marginLeft += (width * (scale - 1)) / 2;
+
+      marginRight += (width * (scale - 1)) / 2;
+      size = marginLeft + marginRight + width;
+    }
+    return size;
   }
 
   updateMapStyle(
@@ -127,34 +166,78 @@ export class MapFunctionality {
       this.elementStyle.width;
 
     const mapContainerSize = this.wrapper.getBoundingClientRect();
-    const marginHorizontal =
-      mapContainerSize.width / 2 + (mapWidth * (mapScale - 1)) / 2;
-    const marginVertical =
-      mapContainerSize.height / 2 + (mapHeight * (mapScale - 1)) / 2;
+    const initialMarginLeft = mapContainerSize.width / 1.5;
+    const initialMarginRight = mapContainerSize.width / 1.5;
+    const initialMarginTop = mapContainerSize.height / 1.5;
+    const initialMarginBot = mapContainerSize.height / 1.5;
+
+    const marginLeft = initialMarginLeft + (mapWidth * (mapScale - 1)) / 2;
+    const marginTop = initialMarginTop + (mapHeight * (mapScale - 1)) / 2;
+
+    const marginRight = initialMarginRight + (mapWidth * (mapScale - 1)) / 2;
+    const marginBot = initialMarginBot + (mapHeight * (mapScale - 1)) / 2;
 
     const overviewLayout = this.mapContainer
       ? this.mapContainer.getBoundingClientRect().width > 1000
-        ? "left"
-        : "bot"
-      : "left";
+        ? "big"
+        : "small"
+      : "big";
 
     const style = {
       width: mapWidth,
       minHeight: mapHeight,
       paddingTop: paddingTop,
       initialMargin: {
-        x: mapContainerSize.width / 2,
-        y: mapContainerSize.height / 2,
+        left: initialMarginLeft,
+        right: initialMarginRight,
+        top: initialMarginTop,
+        bot: initialMarginBot,
       },
       margin: {
-        x: marginHorizontal,
-        y: marginVertical,
+        left: marginLeft,
+        right: marginRight,
+        top: marginTop,
+        bot: marginBot,
       },
-      overviewLayout: overviewLayout,
+      overlayLayout: overviewLayout,
       resized: resized,
     };
 
     return style;
+  }
+
+  getDirectParents(element, elements = this.elements) {
+    const directParents = [];
+    element.watchAfter.forEach((parentId) => {
+      let notFiller = elements.find((element) => element.id === parentId);
+      while (notFiller.type === "line-filler") {
+        notFiller = elements.find(
+          (element) => element.id === notFiller.watchAfter[0]
+        );
+      }
+      directParents.push(notFiller);
+    });
+    return directParents;
+  }
+
+  getAllParentElements(element, elements = this.elements) {
+    const watchAfter = new Set();
+    if (element.standAlone) return [...watchAfter];
+
+    this.getDirectParents(element, elements).forEach((parent) => {
+      watchAfter.add(parent);
+    });
+    element.watchAfter.forEach((id) => {
+      const element = elements.find((element) => element.id === id);
+      if (!element) return;
+      watchAfter.add(element);
+
+      if (element.standAlone) return;
+      this.getAllParentElements(element, elements).forEach((element) => {
+        watchAfter.add(element);
+      });
+    });
+    return [...watchAfter];
   }
 }
 

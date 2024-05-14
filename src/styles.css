@@ -61,21 +61,74 @@ body {
   box-sizing: border-box;
   gap: 0.5rem;
 }
-.overlay > * {
+.overlay.big {
+  grid-template-areas: "sidebar overview filters";
+  grid-template-columns: auto auto 1fr;
+  grid-template-rows: auto;
+}
+.overlay > *,
+.filter {
+  pointer-events: all;
   box-shadow: 0 0 10px black;
   backdrop-filter: blur(10px);
   border-radius: 10px;
   background-color: var(--overlay);
 }
-.filter {
+.filter-bar {
+  pointer-events: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  background-color: rgba(255, 255, 255, 0);
   grid-area: filters;
-  height: 2rem;
-  padding: 0.5rem;
+  height: max-content;
+
+  display: flex;
+  overflow-x: auto;
+}
+.filter {
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 500;
+  background-color: var(--overlay);
+  border-radius: 30px;
+  /* padding: 0.5rem 4rem 0.5rem 1rem; */
+  margin-right: 0.5rem;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+.filter label {
+  padding: 0.5rem 3rem 0.5rem 1rem;
+  cursor: pointer;
+}
+.filter input {
+  position: relative;
+  display: none;
+}
+.filter .custom-checkbox {
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  margin-right: 1rem;
+  background-color: transparent;
+  outline: 2px solid var(--border);
+  width: 20px;
+  height: 20px;
+  margin-left: 1rem;
+  border-radius: 50%;
+}
+.filter input:checked ~ .custom-checkbox {
+  outline: 2px solid var(--border);
+  background: radial-gradient(var(--border) 49%, transparent 50%);
 }
 
 .list {
   grid-area: sidebar;
   width: 80px;
+  height: 100%;
 }
 
 .overview {
@@ -85,29 +138,39 @@ body {
   flex-direction: column;
   overflow: hidden;
 }
-.overview.left {
+.overlay.big .overview {
   height: 100%;
   width: 300px;
 }
-.overview.bot {
+.overlay.small .overview {
   height: 200px;
   width: 100%;
   margin-top: auto;
 }
-
-.map-wrapper .overview img {
+.overview img {
   position: relative;
+  width: 100%;
   max-height: 50%;
+
   object-fit: cover;
   object-position: 0 0;
+
+  /* -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 10%); */
+  /* Apply mask gradient */
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }
+
 .overview .info {
+  transform: translate(0, -1rem);
+  /* margin-top: 100%; */
   color: var(--text);
   padding: 0 1.5rem 1.5rem 1.5rem;
   overflow: auto;
+  z-index: 1;
 }
 
 .overview .title {
+  z-index: 1;
   text-align: center;
 
   font-size: 2rem;
@@ -178,6 +241,8 @@ body {
   overflow-x: visible;
   overflow-y: visible;
   box-sizing: border-box;
+  /* background-color: black; */
+  /* transform-origin: 0 0; */
 }
 
 .level {
@@ -188,6 +253,7 @@ body {
 }
 .element-container {
   position: absolute;
+  transition: transform 0.5s ease;
 }
 
 .element {
@@ -272,4 +338,12 @@ body {
 
 .element.universe {
   outline-color: var(--text);
+}
+
+.dot {
+  background-color: red;
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  z-index: 100;
 }

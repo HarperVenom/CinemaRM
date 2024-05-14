@@ -1,18 +1,22 @@
-export function getMapElements(titles) {
-  titles.forEach((title, index) => {
+export function getMapElements(map, oldTitles, filters) {
+  const elements = filterElements(oldTitles.map((title) => ({ ...title }))).map(
+    (element) => ({ ...element })
+  );
+
+  elements.forEach((title, index) => {
     if (title.watchAfter.length === 0 && index !== 0)
-      title.watchAfter = [titles[0].id];
+      title.watchAfter = [elements[0].id];
   });
 
-  titles.forEach((title) => {
+  elements.forEach((title) => {
     if (title.xLevel) return title;
     title.xLevel = getXLevel(title.id);
     return title;
   });
 
-  titles.forEach((title) => {
+  elements.forEach((title) => {
     const parents = title.watchAfter.map((parentId) => {
-      return titles.find((title) => title.id === parentId);
+      return elements.find((title) => title.id === parentId);
     });
 
     let lastParent = null;
@@ -29,21 +33,21 @@ export function getMapElements(titles) {
       if (xDifference === 1) return;
 
       for (let x = 1; x < xDifference; x++) {
-        titles.push({
+        elements.push({
           id: parent.id + "-" + title.id + "-x" + x,
           type: "line-filler",
           xLevel: leftCorner + x,
           watchAfter: [
             lastParent === null || lastParent !== parent
               ? parent.id
-              : titles[titles.length - 1].id,
+              : elements[elements.length - 1].id,
           ],
         });
         lastParent = parent;
       }
       title.watchAfter = [
         ...title.watchAfter.filter((id) => id !== parent.id),
-        titles[titles.length - 1].id,
+        elements[elements.length - 1].id,
       ];
     });
   });
@@ -66,7 +70,59 @@ export function getMapElements(titles) {
     });
   });
 
-  return titles;
+  return elements;
+
+  function filterElements(elements) {
+    if (!filters) return;
+    elements.forEach((element) => {
+      let needCheck = true;
+      // let standalone = true;
+
+      while (needCheck) {
+        const newWatchAfter = [];
+        needCheck = false;
+        element.watchAfter.forEach((parentId) => {
+          const element = elements.find((title) => title.id === parentId);
+          if (!filters.includes(element.type)) {
+            needCheck = true;
+            newWatchAfter.push(...element.watchAfter);
+          } else {
+            newWatchAfter.push(element.id);
+          }
+          // if (!element.standAlone) standalone = false;
+        });
+        element.watchAfter = newWatchAfter;
+      }
+      // element.standAlone = standalone;
+    });
+    const filtered = elements.filter(
+      (element) => element.id === -1 || filters.includes(element.type)
+    );
+    adjustParents(filtered);
+    return filtered;
+  }
+
+  function adjustParents(elements) {
+    elements.forEach((element) => {
+      if (element.standAlone) return;
+      const parents = element.watchAfter.map((elementId) =>
+        elements.find((element) => element.id === elementId)
+      );
+      parents.forEach((parent) => {
+        const grandparents = map.getAllParentElements(parent, elements);
+        if (parent.standAlone) return;
+        grandparents.forEach((grandparent) => {
+          parents.forEach((parent) => {
+            if (parent.id === grandparent.id) {
+              element.watchAfter = element.watchAfter.filter(
+                (id) => id !== parent.id
+              );
+            }
+          });
+        });
+      });
+    });
+  }
 
   function getLevelHeight(level) {
     let height = 0;
@@ -82,7 +138,7 @@ export function getMapElements(titles) {
 
   function getElementsByXLevel() {
     let xLevels = [];
-    titles.forEach((title) => {
+    elements.forEach((title) => {
       while (xLevels.length < title.xLevel + 1) {
         xLevels.push([]);
       }
@@ -93,7 +149,7 @@ export function getMapElements(titles) {
 
   function getXLevel(id) {
     let level = 0;
-    let step = titles.find((title) => title.id === id);
+    let step = elements.find((title) => title.id === id);
 
     if (step === undefined) return;
     while (step.watchAfter.length !== 0) {
@@ -108,7 +164,7 @@ export function getMapElements(titles) {
         )
           highestLevelIndex = i;
       }
-      step = titles.find(
+      step = elements.find(
         (title) => title.id === step.watchAfter[highestLevelIndex]
       );
     }
@@ -160,7 +216,7 @@ export function getMapElements(titles) {
 
     function getParentsYLevel(title) {
       return title.watchAfter.reduce((acc, parentId) => {
-        const parent = titles.find((title) => title.id === parentId);
+        const parent = elements.find((title) => title.id === parentId);
         acc += parent.yLevel;
         return acc;
       }, 0);
