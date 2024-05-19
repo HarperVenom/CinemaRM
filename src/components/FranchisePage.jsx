@@ -16,13 +16,9 @@ const Page = ({ universe, loading, error }) => {
     setSelectedFilters([filters[0]]);
   }, [filters]);
 
-  useEffect(() => {
-    // console.log(selectedFilters);
-  }, [selectedFilters]);
-
   function getAllFilters() {
     const filters = [];
-    const elements = universe.branches[0].titles;
+    const elements = universe.titles;
     if (!elements) return;
     elements.forEach((element) => {
       const type = element.type;

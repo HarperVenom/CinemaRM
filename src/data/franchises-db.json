@@ -3,18 +3,19 @@
         {
             "id": 0,
             "title": "Marvel Cinematic Universe",
-            "branches": [
-                {
-                    "id": 0,
-                    "title": "Avengers",
-                    "titles": [
+            "img_url": "https://i.ytimg.com/vi/Tgh0dsR_bl8/maxresdefault.jpg",
+            "description": "The Marvel Cinematic Universe is an American media franchise and shared universe centered on a series of superhero films produced by Marvel Studios. The films are based on characters that appear in American comic books published by Marvel Comics.",
+            "background_url": "https://i.pinimg.com/736x/5c/1d/f8/5c1df865ec798229c9a722c6240a896f.jpg",
+            "titles": [
                 {
                     "id": 0,
                     "type": "movie",
                     "title": "Iron Man",
                     "img_url": "https://i.ebayimg.com/images/g/i~cAAOSwS6phZO9h/s-l1200.webp",
+                    "background_url": "https://images.squarespace-cdn.com/content/v1/54853324e4b0fdd780637baa/1487456759503-EHFBL73BG5U9N3S8583P/image-asset.jpeg",
                     "description": "When Tony Stark, an industrialist, is captured, he constructs a high-tech armoured suit to escape. Once he manages to escape, he decides to use his suit to fight against evil forces to save the world.",
                     "release": "2008-05-02",
+                    "duration": 126,
                     "storyDate": "2008-2009",
                     "watchAfter": [],
                     "standAlone": false
@@ -23,8 +24,10 @@
                     "id": 1,
                     "type": "movie",
                     "title": "The Incredible Hulk",
-                    "img_url": "",
-                    "description": "",
+                    "img_url": "https://m.media-amazon.com/images/M/MV5BMTUyNzk3MjA1OF5BMl5BanBnXkFtZTcwMTE1Njg2MQ@@._V1_.jpg",
+                    "background_url": "https://mculocationscout.com/wp-content/uploads/2021/01/incredible-hulk_039-rooftopsaerial.jpg?w=1200",
+                    "description": "Dr Bruce Banner subjects himself to high levels of gamma radiation, which triggers his transformation into a huge green creature, the Hulk, whenever he experiences negative emotions such as anger.",
+                    "duration": 112,
                     "release": "2008-06-13",
                     "storyDate": "2011",
                     "watchAfter": [],
@@ -34,8 +37,9 @@
                     "id": 2,
                     "type": "movie",
                     "title": "Iron Man 2",
-                    "img_url": "",
-                    "description": "",
+                    "img_url": "https://m.media-amazon.com/images/M/MV5BZGVkNDAyM2EtYzYxYy00ZWUxLTgwMjgtY2VmODE5OTk3N2M5XkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_.jpg",
+                    "description": "Tony Stark is under pressure from various sources, including the government, to share his technology with the world. He must find a way to fight them while also tackling his other enemies.",
+                    "duration": 125,
                     "release": "2010-05-07",
                     "storyDate": "2010",
                     "watchAfter": [0],
@@ -45,8 +49,10 @@
                     "id": 3,
                     "type": "movie",
                     "title": "Thor",
-                    "img_url": "",
-                    "description": "",
+                    "img_url": "https://m.media-amazon.com/images/M/MV5BOGE4NzU1YTAtNzA3Mi00ZTA2LTg2YmYtMDJmMThiMjlkYjg2XkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_.jpg",
+                    "description": "Thor is exiled by his father, Odin, the King of Asgard, to the Earth to live among mortals. When he lands on Earth, his trusted weapon Mjolnir is discovered and captured by S.H.I.E.L.D.",
+                    "background_url": "https://i.ibb.co/dPsxKDs/Screenshot-2024-05-17-154958.png",
+                    "duration": 114,
                     "release": "2011-05-02",
                     "storyDate": "2011",
                     "watchAfter": [],
@@ -56,8 +62,9 @@
                     "id": 4,
                     "type": "movie",
                     "title": "Captain America: The First Avenger",
-                    "img_url": "",
-                    "description": "",
+                    "img_url": "https://m.media-amazon.com/images/M/MV5BNzAxMjg0NjYtNjNlOS00NTdlLThkMGEtMjAwYjk3NmNkOGFhXkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_FMjpg_UX1000_.jpg",
+                    "description": "During World War II, Steve Rogers decides to volunteer in an experiment that transforms his weak body. He must now battle a secret Nazi organisation headed by Johann Schmidt to defend his nation.",
+                    "duration": 124,
                     "release": "2011-07-19",
                     "storyDate": "1942-1945",
                     "watchAfter": [],
@@ -89,10 +96,11 @@
                     "id": 7,
                     "type": "movie",
                     "title": "The Avengers",
-                    "img_url": "",
-                    "description": "",
+                    "img_url": "https://t2.gstatic.com/licensed-image?q=tbn:ANd9GcSK0mRgxk6RD6AXbkAzpQRs7FCh9J0FiOxC9eIHCqoxAgpBeywiPrFjbAcGKbCaVYkc",
+                    "description": "Earth's mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity.",
                     "release": "2012-05-04",
                     "storyDate": "2012",
+                    "duration": 143,
                     "watchAfter": [1,4,6],
                     "standAlone": false
                 },
@@ -437,11 +445,7 @@
                     "watchAfter": [30,31,33,36],
                     "standAlone": false
                 }
-                
             ]
-                }
-            ]
-            
         }
     ]
 }

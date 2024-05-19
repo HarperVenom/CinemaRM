@@ -13,15 +13,26 @@ import { MapFunctionality } from "../data/mapFunctionality";
 import FilterBar from "./FilterBar";
 import List from "./List";
 import { UniverseContext } from "./FranchisePage";
+import { useSelector, useDispatch } from "react-redux";
+import { filtersSelect } from "../data/franchiseSlice";
+import {
+  addCompleted,
+  selectCompleted,
+  selectCompletedUniverse,
+} from "../data/userSlice";
 
 export const ElementsContext = createContext();
 
 const Map = ({ universe }) => {
   const { selectedFilters } = useContext(UniverseContext);
+  const completedTitles = useSelector((state) =>
+    selectCompletedUniverse(state, universe.id)
+  )?.titles;
 
   const [elements, setElements] = useState([]);
   const [selected, setSelected] = useState(null);
   const [activeElements, setActiveElements] = useState([]);
+  const [completedElements, setCompletedElements] = useState([]);
   const [scale, setScale] = useState(1);
   const [mapStyle, setMapStyle] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -43,8 +54,15 @@ const Map = ({ universe }) => {
     marginBot: 80,
   };
   const titles = [
-    { title: universe.title, id: -1, watchAfter: [] },
-    ...universe.branches[0].titles,
+    {
+      id: -1,
+      title: universe.title,
+      img_url: universe.img_url,
+      description: universe.description,
+      // background_url: universe.background_url,
+      watchAfter: [],
+    },
+    ...universe.titles,
   ];
 
   const map = new MapFunctionality(
@@ -53,7 +71,7 @@ const Map = ({ universe }) => {
     elementStyle,
     scale,
     mapStyle,
-    elements,
+    { all: elements, active: activeElements, completed: completedElements },
     mapWrapperRef.current,
     mapRef.current
   );
@@ -93,8 +111,7 @@ const Map = ({ universe }) => {
     if (
       mapContainerRef.current.scrollLeft === 0 &&
       mapContainerRef.current.scrollTop === 0 &&
-      offset.x !== 0 &&
-      offset.y !== 0
+      (offset.x !== 0 || offset.y !== 0)
     ) {
       map.scrollToElement(-1, false, offset);
     } else {
@@ -112,23 +129,28 @@ const Map = ({ universe }) => {
     if (prevSelected.current && prevSelected.current.id !== selected.id) {
       map.scrollToElement(selected.id, true, getMapCenterOffsets());
     }
-
-    let ids = [
-      selected.id,
-      ...map.getAllParentElements(selected).map((element) => element.id),
-    ];
-
-    const selectedElements = elements.map((element) => {
-      if (ids.includes(element.id)) {
-        element.active = true;
-        return element;
-      }
-      element.active = false;
-      return element;
-    });
+    let ids = !completedElements.includes(selected.id) ? [selected.id] : [];
+    ids.push(
+      ...map
+        .getAllParentElements(selected, undefined, true)
+        .map((element) => element.id)
+    );
     prevSelected.current = selected;
-    setActiveElements(selectedElements);
-  }, [selected]);
+    setActiveElements(ids);
+    console.log(ids);
+  }, [selected, completedElements]);
+
+  useEffect(() => {
+    if (!elements || !completedTitles) return;
+    const completedElements = [];
+    elements.forEach((element) => {
+      if (completedTitles.includes(element.id)) {
+        completedElements.push(element);
+        completedElements.push(...map.getAllFillerParents(element));
+      }
+    });
+    setCompletedElements(completedElements.map((element) => element.id));
+  }, [completedTitles, elements]);
 
   useEffect(() => {
     if (isDragging) {
@@ -261,11 +283,20 @@ const Map = ({ universe }) => {
   }
 
   return (
-    <ElementsContext.Provider value={{ elements, map }}>
+    <ElementsContext.Provider
+      value={{
+        universe,
+        elements,
+        activeElements,
+        completedElements,
+        map,
+        selected,
+      }}
+    >
       <div className="map-wrapper" ref={mapWrapperRef}>
         <div className={"overlay" + " " + (mapStyle && mapStyle.overlayLayout)}>
-          <FilterBar elements={elements}></FilterBar>
-          <List ref={listRef}></List>
+          <FilterBar></FilterBar>
+          <List ref={listRef} onClick={handleElementClick}></List>
           <TitleOverview
             className={mapStyle ? mapStyle.overlayLayout : ""}
             title={selected}
@@ -279,6 +310,9 @@ const Map = ({ universe }) => {
           ref={mapContainerRef}
           onMouseDown={handleMouseDown}
         >
+          {selected && selected.background_url ? (
+            <img src={selected.background_url} alt="" className="background" />
+          ) : null}
           <div
             className="map"
             ref={mapRef}

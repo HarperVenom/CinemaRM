@@ -1,11 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { ElementsContext } from "./Map";
+import { useSelector } from "react-redux";
+import { selectCompletedUniverse } from "../data/userSlice";
 
 export default Element = ({ item, style, onClick }) => {
   const [location, setLocation] = useState(null);
   const [parents, setParents] = useState([]);
   const [trails, setTrails] = useState([]);
-  const { elements } = useContext(ElementsContext);
+  const { elements, activeElements, completedElements } =
+    useContext(ElementsContext);
 
   useEffect(() => {
     if (!style) return;
@@ -139,21 +142,26 @@ export default Element = ({ item, style, onClick }) => {
             fontSize: style.height / 2.5,
             zIndex: isNaN(item.xLevel)
               ? "unset"
-              : -item.xLevel + (item.active ? 1 : 0),
+              : -item.xLevel * 2 + (activeElements.includes(item.id) ? 1 : 0),
           }}
         >
           <div
             id={item.id}
             className={`element${item.type === "line-filler" ? " filler" : ""}${
-              item.active ? " active" : ""
-            }${item.type === "series" ? " series" : ""}${
-              item.id === -1 ? " universe" : ""
+              activeElements.includes(item.id) ? " active" : ""
+            }${item.id === -1 ? " universe" : ""}${
+              completedElements.includes(item.id) ? " completed" : ""
             }`}
             onClick={() => {
               onClick(item);
             }}
           >
-            <p className="title">{item.title}</p>
+            {item.type !== "line-filler" && (
+              <div className="cover">
+                <img src={item.img_url} alt="" />
+                <p className="title">{item.title}</p>
+              </div>
+            )}
           </div>
 
           <svg
@@ -167,7 +175,10 @@ export default Element = ({ item, style, onClick }) => {
               trail.type === "path" ? (
                 <path
                   key={index}
-                  className={"trail " + (item.active === true ? "active" : "")}
+                  className={`trail${
+                    activeElements.includes(item.id) ? " active" : ""
+                  }
+                  ${completedElements.includes(item.id) ? " completed" : ""}`}
                   d={trail.d}
                   stroke="rgba(255, 255, 255, 0.5)"
                   strokeWidth="5px"
@@ -176,7 +187,10 @@ export default Element = ({ item, style, onClick }) => {
               ) : (
                 <line
                   key={index}
-                  className={"trail " + (item.active === true ? "active" : "")}
+                  className={`trail${
+                    activeElements.includes(item.id) ? " active" : ""
+                  }
+                  ${completedElements.includes(item.id) ? " completed" : ""}`}
                   x1={trail.x1}
                   y1={trail.y1}
                   x2={trail.x2}

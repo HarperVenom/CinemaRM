@@ -131,7 +131,7 @@ export class MapFunctionality {
 
   updateMapStyle(
     mapScale = this.scale,
-    elements = this.elements,
+    elements = this.elements.all,
     resized = false
   ) {
     let highestTitle;
@@ -177,8 +177,11 @@ export class MapFunctionality {
     const marginRight = initialMarginRight + (mapWidth * (mapScale - 1)) / 2;
     const marginBot = initialMarginBot + (mapHeight * (mapScale - 1)) / 2;
 
+    const containerWidth = this.wrapper.getBoundingClientRect().width;
+    const containerHeight = this.wrapper.getBoundingClientRect().height;
+
     const overviewLayout = this.mapContainer
-      ? this.mapContainer.getBoundingClientRect().width > 1000
+      ? containerHeight < containerWidth
         ? "big"
         : "small"
       : "big";
@@ -206,7 +209,7 @@ export class MapFunctionality {
     return style;
   }
 
-  getDirectParents(element, elements = this.elements) {
+  getDirectParents(element, elements = this.elements.all) {
     const directParents = [];
     element.watchAfter.forEach((parentId) => {
       let notFiller = elements.find((element) => element.id === parentId);
@@ -220,24 +223,53 @@ export class MapFunctionality {
     return directParents;
   }
 
-  getAllParentElements(element, elements = this.elements) {
+  getAllParentElements(
+    element,
+    elements = this.elements.all,
+    untilCompleted = false
+  ) {
     const watchAfter = new Set();
-    if (element.standAlone) return [...watchAfter];
+    if (
+      element.standAlone ||
+      (untilCompleted && this.elements.completed.includes(element.id))
+    )
+      return [...watchAfter];
 
     this.getDirectParents(element, elements).forEach((parent) => {
+      if (untilCompleted && this.elements.completed.includes(parent.id)) return;
       watchAfter.add(parent);
     });
+
     element.watchAfter.forEach((id) => {
       const element = elements.find((element) => element.id === id);
-      if (!element) return;
+      if (
+        !element ||
+        (untilCompleted && this.elements.completed.includes(element.id))
+      )
+        return;
       watchAfter.add(element);
 
       if (element.standAlone) return;
       this.getAllParentElements(element, elements).forEach((element) => {
+        if (untilCompleted && this.elements.completed.includes(id)) return;
         watchAfter.add(element);
       });
     });
     return [...watchAfter];
+  }
+
+  getAllFillerParents(element) {
+    const fillers = [];
+    element.watchAfter.forEach((parentId) => {
+      const element = this.elements.all.find(
+        (element) => element.id === parentId
+      );
+      if (element.type === "line-filler") {
+        fillers.push(element);
+        fillers.push(...this.getAllFillerParents(element));
+      }
+    });
+    return fillers;
   }
 }
 

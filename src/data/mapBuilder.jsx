@@ -186,7 +186,7 @@ export function getMapElements(map, oldTitles, filters) {
         if (title.yLevel === highestTitle.yLevel) {
           if (
             title.type === "line-filler" &&
-            highestTitle.type !== "linne-filler"
+            highestTitle.type !== "line-filler"
           ) {
             highestTitle = title;
             return;
