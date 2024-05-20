@@ -1,14 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import { ElementsContext } from "./Map";
 import { useSelector } from "react-redux";
-import { selectCompletedUniverse } from "../data/userSlice";
+import { UniverseContext } from "../Pages/FranchisePage";
+import {
+  selectActiveIds,
+  selectSelectedId,
+} from "../../redux/slices/franchiseSlice";
+import "../../styles/element.css";
 
-export default Element = ({ item, style, onClick }) => {
+export default Element = ({ item, style, onClick, completed }) => {
+  const { elements } = useContext(UniverseContext);
+
+  const activeElements = useSelector(selectActiveIds);
+  const selected = useSelector(selectSelectedId);
+
   const [location, setLocation] = useState(null);
   const [parents, setParents] = useState([]);
   const [trails, setTrails] = useState([]);
-  const { elements, activeElements, completedElements } =
-    useContext(ElementsContext);
 
   useEffect(() => {
     if (!style) return;
@@ -150,15 +157,15 @@ export default Element = ({ item, style, onClick }) => {
             className={`element${item.type === "line-filler" ? " filler" : ""}${
               activeElements.includes(item.id) ? " active" : ""
             }${item.id === -1 ? " universe" : ""}${
-              completedElements.includes(item.id) ? " completed" : ""
-            }`}
+              completed ? " completed" : ""
+            }${selected === item.id ? " selected" : ""}`}
             onClick={() => {
               onClick(item);
             }}
           >
             {item.type !== "line-filler" && (
               <div className="cover">
-                <img src={item.img_url} alt="" />
+                <img className="element-background" src={item.img_url} alt="" />
                 <p className="title">{item.title}</p>
               </div>
             )}
@@ -178,7 +185,7 @@ export default Element = ({ item, style, onClick }) => {
                   className={`trail${
                     activeElements.includes(item.id) ? " active" : ""
                   }
-                  ${completedElements.includes(item.id) ? " completed" : ""}`}
+                  ${completed ? " completed" : ""}`}
                   d={trail.d}
                   stroke="rgba(255, 255, 255, 0.5)"
                   strokeWidth="5px"
@@ -190,7 +197,7 @@ export default Element = ({ item, style, onClick }) => {
                   className={`trail${
                     activeElements.includes(item.id) ? " active" : ""
                   }
-                  ${completedElements.includes(item.id) ? " completed" : ""}`}
+                  ${completed ? " completed" : ""}`}
                   x1={trail.x1}
                   y1={trail.y1}
                   x2={trail.x2}

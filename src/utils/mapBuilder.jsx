@@ -1,4 +1,6 @@
-export function getMapElements(map, oldTitles, filters) {
+import { getAllParentElements } from "./mapFunctionality";
+
+export function getMapElements(oldTitles, filters) {
   const elements = filterElements(oldTitles.map((title) => ({ ...title }))).map(
     (element) => ({ ...element })
   );
@@ -109,7 +111,7 @@ export function getMapElements(map, oldTitles, filters) {
         elements.find((element) => element.id === elementId)
       );
       parents.forEach((parent) => {
-        const grandparents = map.getAllParentElements(parent, elements);
+        const grandparents = getAllParentElements(parent.id, elements);
         if (parent.standAlone) return;
         grandparents.forEach((grandparent) => {
           parents.forEach((parent) => {

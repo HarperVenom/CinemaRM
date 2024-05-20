@@ -1,34 +1,35 @@
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
-import { ElementsContext } from "./Map";
+import { ElementsContext } from "../Map/Map";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addCompleted,
-  selectCompleted,
+  selectCompletedIds,
   selectCompletedUniverse,
-} from "../data/userSlice";
-import CheckMark from "../assets/checkMark.svg";
+} from "../../redux/slices/userSlice";
+import CheckMark from "../../assets/checkMark.svg";
+import { selectUniverseId } from "../../redux/slices/franchiseSlice";
+import { UniverseContext } from "../Pages/FranchisePage";
+import { getAllParentElements } from "../../utils/mapFunctionality";
+import "../../styles/overview.css";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
-  const { title, frameRef, focusElement, className } = props;
-  const { universe, elements, map } = useContext(ElementsContext);
-  const [directParents, setDirectParents] = useState([]);
+  const { elements } = useContext(UniverseContext);
+  const { title, className } = props;
   const [watchAfter, setWatchAfter] = useState([]);
 
+  const universeId = useSelector(selectUniverseId);
   const completedTitles = useSelector((state) =>
-    selectCompletedUniverse(state, universe.id)
-  )?.titles;
+    selectCompletedUniverse(state, universeId)
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (!title) return;
 
-    setDirectParents(map.getDirectParents(title));
     setWatchAfter(
-      map
-        .getAllParentElements(title)
-        .filter(
-          (element) => element.type !== "line-filler" && element.id !== -1
-        )
+      getAllParentElements(title.id, elements).filter(
+        (element) => element.type !== "line-filler" && element.id !== -1
+      )
     );
   }, [title]);
 
@@ -54,7 +55,7 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
   }
 
   function handleCompleteButton() {
-    const titleToAdd = { id: universe.id, titleId: title.id };
+    const titleToAdd = { id: universeId, titleId: title.id };
     dispatch(addCompleted(titleToAdd));
   }
 

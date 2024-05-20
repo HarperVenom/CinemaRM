@@ -1,3 +1,6 @@
+import { useDispatch } from "react-redux";
+import { setLayout } from "../redux/slices/franchiseSlice";
+
 export class MapFunctionality {
   constructor(
     mapContainer,
@@ -21,6 +24,7 @@ export class MapFunctionality {
 
   scrollToElement(id, smooth = true, shift = this.shift) {
     const element = document.getElementById(id);
+    // console.log(element);
     if (!element) return;
     const x = element.getBoundingClientRect().x;
     const y = element.getBoundingClientRect().y;
@@ -105,30 +109,6 @@ export class MapFunctionality {
     dot.remove();
   }
 
-  calculateDimension(dimension, scale) {
-    let size;
-    if (dimension === "height") {
-      let marginTop = this.mapStyle.initialMargin.top;
-      let marginBot = this.mapStyle.initialMargin.bot;
-      const height = this.mapStyle.minHeight;
-
-      marginTop += (height * (scale - 1)) / 2;
-
-      marginBot += (height * (scale - 1)) / 2;
-      size = marginTop + marginBot + height;
-    } else if (dimension === "width") {
-      let marginLeft = this.mapStyle.initialMargin.left;
-      let marginRight = this.mapStyle.initialMargin.right;
-      const width = this.mapStyle.width;
-
-      marginLeft += (width * (scale - 1)) / 2;
-
-      marginRight += (width * (scale - 1)) / 2;
-      size = marginLeft + marginRight + width;
-    }
-    return size;
-  }
-
   updateMapStyle(
     mapScale = this.scale,
     elements = this.elements.all,
@@ -184,7 +164,7 @@ export class MapFunctionality {
       ? containerHeight < containerWidth
         ? "big"
         : "small"
-      : "big";
+      : null;
 
     const style = {
       width: mapWidth,
@@ -209,55 +189,6 @@ export class MapFunctionality {
     return style;
   }
 
-  getDirectParents(element, elements = this.elements.all) {
-    const directParents = [];
-    element.watchAfter.forEach((parentId) => {
-      let notFiller = elements.find((element) => element.id === parentId);
-      while (notFiller.type === "line-filler") {
-        notFiller = elements.find(
-          (element) => element.id === notFiller.watchAfter[0]
-        );
-      }
-      directParents.push(notFiller);
-    });
-    return directParents;
-  }
-
-  getAllParentElements(
-    element,
-    elements = this.elements.all,
-    untilCompleted = false
-  ) {
-    const watchAfter = new Set();
-    if (
-      element.standAlone ||
-      (untilCompleted && this.elements.completed.includes(element.id))
-    )
-      return [...watchAfter];
-
-    this.getDirectParents(element, elements).forEach((parent) => {
-      if (untilCompleted && this.elements.completed.includes(parent.id)) return;
-      watchAfter.add(parent);
-    });
-
-    element.watchAfter.forEach((id) => {
-      const element = elements.find((element) => element.id === id);
-      if (
-        !element ||
-        (untilCompleted && this.elements.completed.includes(element.id))
-      )
-        return;
-      watchAfter.add(element);
-
-      if (element.standAlone) return;
-      this.getAllParentElements(element, elements).forEach((element) => {
-        if (untilCompleted && this.elements.completed.includes(id)) return;
-        watchAfter.add(element);
-      });
-    });
-    return [...watchAfter];
-  }
-
   getAllFillerParents(element) {
     const fillers = [];
     element.watchAfter.forEach((parentId) => {
@@ -271,6 +202,60 @@ export class MapFunctionality {
     });
     return fillers;
   }
+}
+
+export function getAllParentElements(
+  elementId,
+  elements,
+  untilCompleted = false,
+  completedIds
+) {
+  const element = elements.find((element) => element.id === elementId);
+  if (!element) return [];
+  const watchAfter = new Set();
+  if (
+    element.standAlone ||
+    (untilCompleted && completedIds.includes(element.id))
+  )
+    return [...watchAfter];
+
+  getDirectParents(element, elements).forEach((parent) => {
+    if (untilCompleted && completedIds.includes(parent.id)) return;
+    watchAfter.add(parent);
+  });
+
+  element.watchAfter.forEach((id) => {
+    const element = elements.find((element) => element.id === id);
+    if (!element || (untilCompleted && completedIds.includes(element.id)))
+      return;
+    watchAfter.add(element);
+
+    if (element.standAlone) return;
+    getAllParentElements(
+      element.id,
+      elements,
+      untilCompleted,
+      completedIds
+    ).forEach((element) => {
+      if (untilCompleted && completedIds.includes(id)) return;
+      watchAfter.add(element);
+    });
+  });
+  return [...watchAfter];
+}
+
+export function getDirectParents(element, elements = this.elements.all) {
+  const directParents = [];
+  element.watchAfter.forEach((parentId) => {
+    let notFiller = elements.find((element) => element.id === parentId);
+    while (notFiller.type === "line-filler") {
+      notFiller = elements.find(
+        (element) => element.id === notFiller.watchAfter[0]
+      );
+    }
+    directParents.push(notFiller);
+  });
+  return directParents;
 }
 
 function smoothScrollTo(container, targetX, targetY, duration) {

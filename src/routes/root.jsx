@@ -1,6 +1,6 @@
-import Page from "../components/FranchisePage";
-import Map from "../components/Map";
-import useFetch from "../data/useFetch";
+import Page from "../components/Pages/FranchisePage";
+import Map from "../components/Map/Map";
+import useFetch from "../utils/useFetch";
 
 const Root = () => {
   const [universes, loading, error] = useFetch("/api/universes");

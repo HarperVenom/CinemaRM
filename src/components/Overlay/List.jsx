@@ -6,12 +6,26 @@ import {
   useRef,
   useState,
 } from "react";
-import { ElementsContext } from "./Map";
-import Arrow from "../assets/arrow.svg";
+import { ElementsContext } from "../Map/Map";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectSelectedId,
+  selectUniverseId,
+  setSelectedId,
+} from "../../redux/slices/franchiseSlice";
+import { UniverseContext } from "../Pages/FranchisePage";
+import { selectCompletedUniverse } from "../../redux/slices/userSlice";
+import "../../styles/list.css";
 
 const List = forwardRef(function (props, listContainerRef) {
-  const { onClick } = props;
-  const { elements, selected } = useContext(ElementsContext);
+  const dispatch = useDispatch();
+  const { elements } = useContext(UniverseContext);
+  const selected = useSelector(selectSelectedId);
+  const universeId = useSelector(selectUniverseId);
+  const completedTitles = useSelector((state) =>
+    selectCompletedUniverse(state, universeId)
+  );
+
   const [expanded, setExpanded] = useState(false);
 
   const [titles, setTitles] = useState([]);
@@ -23,9 +37,9 @@ const List = forwardRef(function (props, listContainerRef) {
   }, [elements]);
 
   useEffect(() => {
-    if (!selected) return;
+    if (selected === null) return;
     const selectedTitle = document.querySelector(
-      `.list-element[data-id="${selected.id}"]`
+      `.list-element[data-id="${selected}"]`
     );
     if (!selectedTitle) return;
     const container = listRef.current;
@@ -59,12 +73,18 @@ const List = forwardRef(function (props, listContainerRef) {
           <div
             key={title.id}
             className={`list-element block${
-              selected && selected.id === title.id ? " selected" : ""
+              selected === title.id ? " selected" : ""
+            }${
+              completedTitles && completedTitles.includes(title.id)
+                ? " completed"
+                : ""
             }`}
             data-id={title.id}
-            onClick={() => onClick(title)}
+            onClick={() => dispatch(setSelectedId(title.id))}
           >
-            {title.img_url ? <img src={title.img_url} alt="" /> : null}
+            {title.img_url ? (
+              <img className="list-image" src={title.img_url} alt="" />
+            ) : null}
             <h1 className="index">{index}</h1>
           </div>
         ))}

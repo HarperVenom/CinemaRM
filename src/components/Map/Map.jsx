@@ -6,35 +6,45 @@ import {
   useRef,
   useState,
 } from "react";
-import Element from "./Element";
-import TitleOverview from "./TitleOverview";
-import { getMapElements } from "../data/mapBuilder";
-import { MapFunctionality } from "../data/mapFunctionality";
-import FilterBar from "./FilterBar";
-import List from "./List";
-import { UniverseContext } from "./FranchisePage";
-import { useSelector, useDispatch } from "react-redux";
-import { filtersSelect } from "../data/franchiseSlice";
+import Element from "../Map/Element";
 import {
-  addCompleted,
-  selectCompleted,
-  selectCompletedUniverse,
-} from "../data/userSlice";
+  MapFunctionality,
+  getAllParentElements,
+} from "../../utils/mapFunctionality";
+import { UniverseContext } from "../Pages/FranchisePage";
+import { useSelector, useDispatch } from "react-redux";
+import { selectCompletedUniverse } from "../../redux/slices/userSlice";
+import {
+  selectActiveIds,
+  selectLayout,
+  selectSelectedId,
+  selectUniverseId,
+  setActiveIds,
+  setLayout,
+  setSelectedId,
+} from "../../redux/slices/franchiseSlice";
+import "../../styles/map.css";
 
 export const ElementsContext = createContext();
 
-const Map = ({ universe }) => {
-  const { selectedFilters } = useContext(UniverseContext);
-  const completedTitles = useSelector((state) =>
-    selectCompletedUniverse(state, universe.id)
-  )?.titles;
+const Map = () => {
+  const { elements, pageRef, listRef, overviewRef } =
+    useContext(UniverseContext);
 
-  const [elements, setElements] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [activeElements, setActiveElements] = useState([]);
+  const dispatch = useDispatch();
+  const universeId = useSelector(selectUniverseId);
+  const completedTitles = useSelector((state) =>
+    selectCompletedUniverse(state, universeId)
+  );
+
+  const selected = useSelector(selectSelectedId);
+  const activeIds = useSelector(selectActiveIds);
+  const layout = useSelector(selectLayout);
+
+  const [mapStyle, setMapStyle] = useState(null);
   const [completedElements, setCompletedElements] = useState([]);
   const [scale, setScale] = useState(1);
-  const [mapStyle, setMapStyle] = useState(null);
+
   const [isDragging, setIsDragging] = useState(false);
   const [draggingOnElement, setDraggingOnElement] = useState(null);
   const [oldZoom, setOldZoom] = useState(null);
@@ -43,9 +53,6 @@ const Map = ({ universe }) => {
   const prevMapStyle = useRef();
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
-  const mapWrapperRef = useRef(null);
-  const overviewRef = useRef(null);
-  const listRef = useRef(null);
 
   const elementStyle = {
     width: 230,
@@ -53,17 +60,6 @@ const Map = ({ universe }) => {
     marginRight: 250,
     marginBot: 80,
   };
-  const titles = [
-    {
-      id: -1,
-      title: universe.title,
-      img_url: universe.img_url,
-      description: universe.description,
-      // background_url: universe.background_url,
-      watchAfter: [],
-    },
-    ...universe.titles,
-  ];
 
   const map = new MapFunctionality(
     mapContainerRef.current,
@@ -71,17 +67,10 @@ const Map = ({ universe }) => {
     elementStyle,
     scale,
     mapStyle,
-    { all: elements, active: activeElements, completed: completedElements },
-    mapWrapperRef.current,
+    { all: elements, active: activeIds, completed: completedElements },
+    pageRef.current,
     mapRef.current
   );
-
-  useEffect(() => {
-    if (!titles || !selectedFilters.value || selectedFilters.value.length === 0)
-      return;
-    const mapElements = getMapElements(map, titles, selectedFilters.value);
-    setElements(mapElements);
-  }, [selectedFilters]);
 
   useEffect(() => {
     if (!elements || elements.length === 0) return;
@@ -89,20 +78,20 @@ const Map = ({ universe }) => {
       scale: scale,
       mapPadding: mapRef.current.style.paddingTop,
     });
-    setMapStyle(map.updateMapStyle());
+    updateMapStyle();
     if (!selected) {
-      setSelected(elements[0]);
+      dispatch(setSelectedId(elements[0].id));
     } else {
       if (!prevSelected.current) return;
       const prevElement = elements.find(
-        (element) => element.id === prevSelected.current.id
+        (element) => element.id === prevSelected.current
       );
       if (!prevElement) {
         prevSelected.current = null;
-        setSelected(elements[0]);
+        dispatch(setSelectedId(elements[0].id));
         return;
       }
-      setSelected(prevElement);
+      dispatch(setSelectedId(prevElement.id));
     }
   }, [elements]);
 
@@ -115,8 +104,8 @@ const Map = ({ universe }) => {
     ) {
       map.scrollToElement(-1, false, offset);
     } else {
-      if (selected && mapStyle.resized) {
-        map.scrollToElement(selected.id, false, offset);
+      if (selected && mapStyle && mapStyle.resized) {
+        map.scrollToElement(selected, false, offset);
       }
     }
     prevMapStyle.current = mapStyle;
@@ -124,21 +113,23 @@ const Map = ({ universe }) => {
 
   //SELECTION
   useEffect(() => {
-    if (!selected) return;
-
-    if (prevSelected.current && prevSelected.current.id !== selected.id) {
-      map.scrollToElement(selected.id, true, getMapCenterOffsets());
+    if (selected === null) return;
+    const selectedElement = elements.find((element) => element.id === selected);
+    if (prevSelected.current !== selected) {
+      map.scrollToElement(selected, true, getMapCenterOffsets());
     }
-    let ids = !completedElements.includes(selected.id) ? [selected.id] : [];
+    let ids = !completedElements.includes(selected) ? [selected] : [];
     ids.push(
-      ...map
-        .getAllParentElements(selected, undefined, true)
-        .map((element) => element.id)
+      ...getAllParentElements(
+        selectedElement.id,
+        elements,
+        true,
+        completedElements
+      ).map((element) => element.id)
     );
     prevSelected.current = selected;
-    setActiveElements(ids);
-    console.log(ids);
-  }, [selected, completedElements]);
+    dispatch(setActiveIds(ids));
+  }, [elements, selected, completedElements]);
 
   useEffect(() => {
     if (!elements || !completedTitles) return;
@@ -166,7 +157,7 @@ const Map = ({ universe }) => {
 
   useEffect(() => {
     const setStyle = () => {
-      setMapStyle(map.updateMapStyle(undefined, elements, true));
+      updateMapStyle(scale, elements, true);
     };
     window.addEventListener("resize", setStyle);
     return () => {
@@ -184,11 +175,17 @@ const Map = ({ universe }) => {
       mapContainerRef.current &&
         mapContainerRef.current.removeEventListener("wheel", handleScroll);
     };
-  }, [mapStyle]);
+  }, [layout, scale]);
 
   useLayoutEffect(() => {
     map.updateScroll(oldZoom);
   }, [oldZoom]);
+
+  function updateMapStyle(scale, elements, resized) {
+    const newStyle = map.updateMapStyle(scale, elements, resized);
+    setMapStyle(newStyle);
+    dispatch(setLayout(newStyle.overlayLayout));
+  }
 
   function handleElementClick(selectedTitle) {
     if (selectedTitle.type === "line-filler") return;
@@ -199,20 +196,20 @@ const Map = ({ universe }) => {
       setDraggingOnElement(null);
       return;
     }
-    if (selected && selected.id === selectedTitle.id) {
-      map.scrollToElement(selected.id);
+    if (selected && selected === selectedTitle.id) {
+      map.scrollToElement(selected);
       return;
     }
-    setSelected(selectedTitle);
+    dispatch(setSelectedId(selectedTitle.id));
   }
 
   function getMapCenterOffsets() {
     if (!overviewRef.current || !listRef.current) return { x: 0, y: 0 };
     const overviewRect = overviewRef.current.getBoundingClientRect();
     const listRect = listRef.current.getBoundingClientRect();
-    if (mapStyle.overlayLayout === "big")
+    if (layout === "big")
       return { x: overviewRect.width + listRect.width, y: 0 };
-    else if (mapStyle.overlayLayout === "small")
+    else if (layout === "small")
       return { x: listRect.width, y: -overviewRect.height };
     else return { x: 0, y: 0 };
   }
@@ -269,82 +266,63 @@ const Map = ({ universe }) => {
       scale: scale,
       mapX:
         mapRef.current.getBoundingClientRect().x -
-        mapWrapperRef.current.getBoundingClientRect().x,
+        pageRef.current.getBoundingClientRect().x,
       mapY:
         mapRef.current.getBoundingClientRect().y -
-        mapWrapperRef.current.getBoundingClientRect().y,
+        pageRef.current.getBoundingClientRect().y,
     });
     setScale(newScale);
-    setMapStyle(map.updateMapStyle(newScale));
+    updateMapStyle(newScale, elements);
   }
 
-  function focusElement(id, smooth) {
-    map.scrollToElement(id, smooth);
+  function getElement(id) {
+    return elements.find((element) => element.id === id);
   }
 
   return (
-    <ElementsContext.Provider
-      value={{
-        universe,
-        elements,
-        activeElements,
-        completedElements,
-        map,
-        selected,
-      }}
+    <div
+      className="map-container"
+      ref={mapContainerRef}
+      onMouseDown={handleMouseDown}
     >
-      <div className="map-wrapper" ref={mapWrapperRef}>
-        <div className={"overlay" + " " + (mapStyle && mapStyle.overlayLayout)}>
-          <FilterBar></FilterBar>
-          <List ref={listRef} onClick={handleElementClick}></List>
-          <TitleOverview
-            className={mapStyle ? mapStyle.overlayLayout : ""}
-            title={selected}
-            frameRef={mapContainerRef}
-            ref={overviewRef}
-            focusElement={focusElement}
-          />
-        </div>
-        <div
-          className="map-container"
-          ref={mapContainerRef}
-          onMouseDown={handleMouseDown}
-        >
-          {selected && selected.background_url ? (
-            <img src={selected.background_url} alt="" className="background" />
-          ) : null}
-          <div
-            className="map"
-            ref={mapRef}
-            style={
-              mapStyle
-                ? {
-                    width: `${mapStyle.width}px`,
-                    minHeight: `${mapStyle.minHeight}px`,
-                    paddingTop: `${mapStyle.paddingTop}px`,
-                    margin: `${mapStyle.margin.top}px ${mapStyle.margin.right}px
+      {selected !== null && getElement(selected).background_url ? (
+        <img
+          src={getElement(selected).background_url}
+          alt=""
+          className="background"
+        />
+      ) : null}
+      <div
+        className="map"
+        ref={mapRef}
+        style={
+          mapStyle
+            ? {
+                width: `${mapStyle.width}px`,
+                minHeight: `${mapStyle.minHeight}px`,
+                paddingTop: `${mapStyle.paddingTop}px`,
+                margin: `${mapStyle.margin.top}px ${mapStyle.margin.right}px
                      ${mapStyle.margin.bot}px ${mapStyle.margin.left}px`,
-                    transform: `scale(${scale})`,
-                  }
-                : null
-            }
-          >
-            <div className="level">
-              {elements &&
-                elements.map((title) => (
-                  <Element
-                    key={title.id}
-                    item={title}
-                    style={elementStyle}
-                    onClick={handleElementClick}
-                  />
-                ))}
-              <svg className="trails"></svg>
-            </div>
-          </div>
+                transform: `scale(${scale})`,
+              }
+            : null
+        }
+      >
+        <div className="level">
+          {elements &&
+            elements.map((title) => (
+              <Element
+                key={title.id}
+                item={title}
+                style={elementStyle}
+                onClick={handleElementClick}
+                completed={completedElements.includes(title.id)}
+              />
+            ))}
+          <svg className="trails"></svg>
         </div>
       </div>
-    </ElementsContext.Provider>
+    </div>
   );
 };
 

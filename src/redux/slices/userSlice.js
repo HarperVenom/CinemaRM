@@ -28,9 +28,8 @@ export const userSlice = createSlice({
   },
 });
 export const selectCompletedUniverse = (state, id) =>
-  state.user.value.completed.find(
-    (completed) => completed && completed.id === id
-  );
-export const selectCompleted = (state) => state.user.value.completed;
+  state.user.value.completed.find((universe) => universe && universe.id === id)
+    ?.titles;
+export const selectCompletedIds = (state) => state.user.value.completed;
 export const { setCompleted, addCompleted } = userSlice.actions;
 export default userSlice.reducer;

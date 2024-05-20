@@ -27,10 +27,12 @@ body {
 }
 ::-webkit-scrollbar-track {
   background-color: rgba(255, 255, 255, 0);
+  /* margin-block: 0.5rem; */
 }
 ::-webkit-scrollbar-thumb {
   background-color: var(--element);
   opacity: 0.8;
+  /* border-radius: 5px; */
 }
 ::-webkit-scrollbar-thumb:hover {
   background-color: #3d3d77;
