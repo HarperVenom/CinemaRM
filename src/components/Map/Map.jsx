@@ -6,12 +6,12 @@ import {
   useRef,
   useState,
 } from "react";
-import Element from "../Map/Element";
+import Element from "./Element";
 import {
   MapFunctionality,
   getAllParentElements,
 } from "../../utils/mapFunctionality";
-import { UniverseContext } from "../Pages/FranchisePage";
+import { UniverseContext } from "../../routes/FranchisePage";
 import { useSelector, useDispatch } from "react-redux";
 import { selectCompletedUniverse } from "../../redux/slices/userSlice";
 import {
@@ -113,8 +113,8 @@ const Map = () => {
 
   //SELECTION
   useEffect(() => {
-    if (selected === null) return;
-    const selectedElement = elements.find((element) => element.id === selected);
+    const selectedElement = getElement(selected);
+    if (!selectedElement) return;
     if (prevSelected.current !== selected) {
       map.scrollToElement(selected, true, getMapCenterOffsets());
     }
@@ -279,13 +279,14 @@ const Map = () => {
     return elements.find((element) => element.id === id);
   }
 
+  console.log(layout);
   return (
     <div
       className="map-container"
       ref={mapContainerRef}
       onMouseDown={handleMouseDown}
     >
-      {selected !== null && getElement(selected).background_url ? (
+      {getElement(selected) && getElement(selected).background_url ? (
         <img
           src={getElement(selected).background_url}
           alt=""

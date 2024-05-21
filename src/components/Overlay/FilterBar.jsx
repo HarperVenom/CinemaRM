@@ -1,6 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import Filter from "./Filter";
-import { UniverseContext } from "../Pages/FranchisePage";
 import { useSelector } from "react-redux";
 import {
   makeSelectAllFilters,

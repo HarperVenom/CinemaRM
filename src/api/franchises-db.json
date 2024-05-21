@@ -1,7 +1,7 @@
 {
     "universes": [
         {
-            "id": 0,
+            "id": "marvel-cinematic-universe",
             "title": "Marvel Cinematic Universe",
             "img_url": "https://i.ytimg.com/vi/Tgh0dsR_bl8/maxresdefault.jpg",
             "description": "The Marvel Cinematic Universe is an American media franchise and shared universe centered on a series of superhero films produced by Marvel Studios. The films are based on characters that appear in American comic books published by Marvel Comics.",

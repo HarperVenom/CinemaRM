@@ -1,11 +1,14 @@
 :root {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
+  --dark: #020210;
+  --normal: #151536;
+  --text: rgb(201, 204, 255);
+
   --back: #151536;
-  --window: #030319;
   --overlay: rgba(31, 26, 63, 0.8);
   --map-back: #030319;
-  --text: rgb(201, 204, 255);
+
   --text-bright: rgb(225, 226, 255);
   --element: #333363;
   --active: rgba(255, 255, 255);
@@ -26,7 +29,7 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background-color: rgba(255, 255, 255, 0);
+  background-color: var(--dark);
   /* margin-block: 0.5rem; */
 }
 ::-webkit-scrollbar-thumb {

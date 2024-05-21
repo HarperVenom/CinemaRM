@@ -1,5 +1,4 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { UniverseContext } from "../Pages/FranchisePage";
 import {
   makeSelectActiveFilters,
   updateFilter,

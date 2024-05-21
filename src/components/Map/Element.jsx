@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { UniverseContext } from "../Pages/FranchisePage";
+import { UniverseContext } from "../../routes/FranchisePage";
 import {
   selectActiveIds,
   selectSelectedId,

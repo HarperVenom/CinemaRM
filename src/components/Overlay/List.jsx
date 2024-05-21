@@ -13,7 +13,7 @@ import {
   selectUniverseId,
   setSelectedId,
 } from "../../redux/slices/franchiseSlice";
-import { UniverseContext } from "../Pages/FranchisePage";
+import { UniverseContext } from "../../routes/FranchisePage";
 import { selectCompletedUniverse } from "../../redux/slices/userSlice";
 import "../../styles/list.css";
 

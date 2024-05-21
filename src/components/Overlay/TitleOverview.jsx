@@ -8,7 +8,7 @@ import {
 } from "../../redux/slices/userSlice";
 import CheckMark from "../../assets/checkMark.svg";
 import { selectUniverseId } from "../../redux/slices/franchiseSlice";
-import { UniverseContext } from "../Pages/FranchisePage";
+import { UniverseContext } from "../../routes/FranchisePage";
 import { getAllParentElements } from "../../utils/mapFunctionality";
 import "../../styles/overview.css";
 

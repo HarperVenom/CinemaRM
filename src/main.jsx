@@ -1,15 +1,27 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Root from "./routes/root";
-import "./styles.css";
+import "./styles/global.css";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import HomePage from "./routes/HomePage";
+import FranchisePage, {
+  loader as franchisePageLoader,
+} from "./routes/FranchisePage";
+import Root from "./routes/root";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Root />,
+    element: <Root></Root>,
+    children: [
+      { index: true, element: <HomePage></HomePage> },
+      {
+        path: "/:universeId",
+        element: <FranchisePage></FranchisePage>,
+        loader: franchisePageLoader,
+      },
+    ],
   },
 ]);
 
