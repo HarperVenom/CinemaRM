@@ -14,7 +14,9 @@ import FilterBar from "../components/Overlay/FilterBar";
 import List from "../components/Overlay/List";
 import TitleOverview from "../components/Overlay/TitleOverview";
 import "../styles/franchisePage.css";
-import useFetch from "../utils/useFetch";
+import useApi from "../utils/useApi";
+import { useLoaderData } from "react-router-dom";
+import { backendUrl } from "../../config";
 
 export const UniverseContext = createContext();
 
@@ -23,8 +25,10 @@ export async function loader({ params }) {
 }
 
 const FranchisePage = () => {
-  const [universes, loading, error] = useFetch("/api/universes");
-  const universe = universes ? universes[0] : null;
+  const universeId = useLoaderData();
+  const { data: universe } = useApi(
+    `${backendUrl}/api/universes/${universeId}`
+  );
 
   const [elements, setElements] = useState([]);
 
@@ -55,11 +59,11 @@ const FranchisePage = () => {
     if (!universe) return;
     const titles = [
       {
-        id: -1,
-        title: universe.title,
-        img_url: universe.img_url,
-        description: universe.description,
+        id: "mapRoot",
         watchAfter: [],
+        title: universe.title,
+        imgUrl: universe.imgUrl,
+        description: universe.description,
       },
       ...universe.titles,
     ];
@@ -74,7 +78,7 @@ const FranchisePage = () => {
     const elements = universe.titles;
     if (!elements) return;
     elements.forEach((element) => {
-      const type = element.type;
+      const type = element.branch;
       if (!type || type === "line-filler") return;
       if (!filters.includes(type)) filters.push(type);
     });
@@ -82,7 +86,7 @@ const FranchisePage = () => {
   }
 
   return (
-    <div className="page" ref={pageRef}>
+    <div className="franchise-page" ref={pageRef}>
       {!layout ? <div className="map-hide"></div> : null}
       {elements && elements.length > 0 ? (
         <UniverseContext.Provider

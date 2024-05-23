@@ -1,32 +1,34 @@
 import { useEffect, useState } from "react";
-import useFetch from "../utils/useFetch";
-import { Link } from "react-router-dom";
+import useApi from "../utils/useApi";
+import { Form, Link } from "react-router-dom";
 import "../styles/homePage.css";
 import UniverseBlock from "../components/common/UniverseBlock";
+import { backendUrl } from "../../config";
 
 const HomePage = () => {
-  const [universesData, loading, error] = useFetch("/api/universes");
+  const { data } = useApi(`${backendUrl}/api/universes`);
   const [universes, setUniverses] = useState([]);
-
   useEffect(() => {
-    if (!universesData) return;
+    if (!data) return;
     setUniverses(
-      universesData.map((universe) => ({
+      data.map((universe) => ({
         id: universe.id,
         title: universe.title,
-        img_url: universe.img_url,
+        imgUrl: universe.imgUrl,
       }))
     );
-    // console.log(universes);
-  }, [universesData]);
+  }, [data]);
 
   return (
-    <div className="homepage">
+    <div className="home-page">
       <header>
         <nav className="navbar">
           <div className="wrapper">
             <Link to={"/"} className="logo">
               FRANCHISER
+            </Link>
+            <Link to={"/login"} className="sign-in-button">
+              Sign In
             </Link>
           </div>
         </nav>

@@ -6,7 +6,7 @@ const UniverseBlock = ({ universe }) => {
 
   return (
     <Link to={"/" + universe.id} className="universe-link">
-      <img src={universe.img_url} alt="" />
+      <img src={universe.imgUrl} alt="" />
       <div className="info">
         <h2>{universe.title}</h2>
       </div>

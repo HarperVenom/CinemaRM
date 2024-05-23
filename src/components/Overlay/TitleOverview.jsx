@@ -28,14 +28,14 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
 
     setWatchAfter(
       getAllParentElements(title.id, elements).filter(
-        (element) => element.type !== "line-filler" && element.id !== -1
+        (element) => element.branch !== "line-filler" && element.id !== -1
       )
     );
   }, [title]);
 
   function getYear() {
-    if (!title || !title.release) return "";
-    const releaseDate = new Date(title.release);
+    if (!title || !title.releaseDate) return "";
+    const releaseDate = new Date(title.releaseDate);
     return releaseDate.getFullYear();
   }
 
@@ -61,8 +61,8 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
 
   return title ? (
     <div className={"overview " + className} ref={overviewRef}>
-      {title && title.img_url && (
-        <img className="poster" src={title.img_url} alt="" />
+      {title && title.imgUrl && (
+        <img className="poster" src={title.imgUrl} alt="" />
       )}
       <div className="info">
         <div className="title" style={{ fontSize: getFontSize() }}>

@@ -57,7 +57,7 @@ export default Element = ({ item, style, onClick, completed }) => {
         return {
           left: getX(parent.xLevel),
           top: getY(parent.yLevel),
-          type: parent.type === "line-filler" ? "filler" : "element",
+          branch: parent.branch === "line-filler" ? "filler" : "element",
         };
       });
 
@@ -81,12 +81,12 @@ export default Element = ({ item, style, onClick, completed }) => {
         Math.min(Math.abs(0.05 * (start.y - end.y)), 0.18 * style.height);
 
       const trail = {
-        type: "path",
+        branch: "path",
         d: calculatePathD(
           relativeEnd,
-          parent.type,
+          parent.branch,
           yShift,
-          item.type === "line-filler" || parent.type === "line-filler"
+          item.branch === "line-filler" || parent.branch === "line-filler"
             ? false
             : true
         ),
@@ -97,7 +97,7 @@ export default Element = ({ item, style, onClick, completed }) => {
     if (!location) return;
     if (trailsCount === 0) return;
     const fillerLine = {
-      type: "line",
+      branch: "line",
       x1: 9,
       y1: 0,
       x2: style.width - 9,
@@ -109,14 +109,14 @@ export default Element = ({ item, style, onClick, completed }) => {
 
   function calculatePathD(end, parentType, yShift, spread = true) {
     return `M ${10}
-          ${item.type === "line-filler" ? 0 : -yShift} c 
+          ${item.branch === "line-filler" ? 0 : -yShift} c 
 
           ${-0.5 * style.width} 
           ${0} 
           
           ${end.x + 0.5 * style.width} 
           ${
-            item.type === "line-filler"
+            item.branch === "line-filler"
               ? parentType === "filler"
                 ? end.y
                 : end.y + yShift
@@ -127,7 +127,7 @@ export default Element = ({ item, style, onClick, completed }) => {
 
           ${end.x - 20} 
           ${
-            item.type === "line-filler"
+            item.branch === "line-filler"
               ? parentType === "filler"
                 ? end.y
                 : end.y + yShift
@@ -154,18 +154,20 @@ export default Element = ({ item, style, onClick, completed }) => {
         >
           <div
             id={item.id}
-            className={`element${item.type === "line-filler" ? " filler" : ""}${
-              activeElements.includes(item.id) ? " active" : ""
-            }${item.id === -1 ? " universe" : ""}${
-              completed ? " completed" : ""
-            }${selected === item.id ? " selected" : ""}`}
+            className={`element${
+              item.branch === "line-filler" ? " filler" : ""
+            }${activeElements.includes(item.id) ? " active" : ""}${
+              item.id === -1 ? " universe" : ""
+            }${completed ? " completed" : ""}${
+              selected === item.id ? " selected" : ""
+            }`}
             onClick={() => {
               onClick(item);
             }}
           >
-            {item.type !== "line-filler" && (
+            {item.branch !== "line-filler" && (
               <div className="cover">
-                <img className="element-background" src={item.img_url} alt="" />
+                <img className="element-background" src={item.imgUrl} alt="" />
                 <p className="title">{item.title}</p>
               </div>
             )}
@@ -179,7 +181,7 @@ export default Element = ({ item, style, onClick, completed }) => {
             }}
           >
             {trails.map((trail, index) =>
-              trail.type === "path" ? (
+              trail.branch === "path" ? (
                 <path
                   key={index}
                   className={`trail${

@@ -33,7 +33,7 @@ const List = forwardRef(function (props, listContainerRef) {
   const listRef = useRef();
 
   useEffect(() => {
-    setTitles(elements.filter((element) => element.type != "line-filler"));
+    setTitles(elements.filter((element) => element.branch != "line-filler"));
   }, [elements]);
 
   useEffect(() => {
@@ -82,8 +82,8 @@ const List = forwardRef(function (props, listContainerRef) {
             data-id={title.id}
             onClick={() => dispatch(setSelectedId(title.id))}
           >
-            {title.img_url ? (
-              <img className="list-image" src={title.img_url} alt="" />
+            {title.imgUrl ? (
+              <img className="list-image" src={title.imgUrl} alt="" />
             ) : null}
             <h1 className="index">{index}</h1>
           </div>

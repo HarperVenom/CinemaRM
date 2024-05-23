@@ -1,0 +1,59 @@
+.login-page {
+  background-color: var(--normal);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sign-in-window {
+  /* background-color: var(--dark); */
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+  color: var(--text-bright);
+  padding: 2rem;
+  border-radius: 5px;
+}
+.sign-in-window h1 {
+  margin-bottom: 1rem;
+}
+
+.sign-in-window label {
+  display: flex;
+  flex-direction: column;
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 300;
+  box-sizing: border-box;
+}
+.sign-in-window input {
+  font-size: 1.2rem;
+  height: 2rem;
+  /* width: 100%; */
+  background-color: var(--dark);
+  border: none;
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  margin-top: 0.2rem;
+}
+.sign-in-window input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text) !important;
+  caret-color: var(--text);
+  -webkit-box-shadow: 0 0 0 30px var(--dark) inset !important;
+}
+
+.sign-in-window button {
+  background-color: var(--text-bright);
+  border: none;
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: 700;
+  margin: 2rem 0;
+  /* width: 100%; */
+  /* box-sizing: border-box; */
+}

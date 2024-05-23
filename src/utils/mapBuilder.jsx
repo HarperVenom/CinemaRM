@@ -37,7 +37,7 @@ export function getMapElements(oldTitles, filters) {
       for (let x = 1; x < xDifference; x++) {
         elements.push({
           id: parent.id + "-" + title.id + "-x" + x,
-          type: "line-filler",
+          branch: "line-filler",
           xLevel: leftCorner + x,
           watchAfter: [
             lastParent === null || lastParent !== parent
@@ -85,7 +85,7 @@ export function getMapElements(oldTitles, filters) {
         needCheck = false;
         element.watchAfter.forEach((parentId) => {
           const element = elements.find((title) => title.id === parentId);
-          if (!filters.includes(element.type)) {
+          if (!filters.includes(element.branch)) {
             needCheck = true;
             newWatchAfter.push(...element.watchAfter);
           } else {
@@ -98,7 +98,7 @@ export function getMapElements(oldTitles, filters) {
       // element.standAlone = standalone;
     });
     const filtered = elements.filter(
-      (element) => element.id === -1 || filters.includes(element.type)
+      (element) => element.id === "mapRoot" || filters.includes(element.branch)
     );
     adjustParents(filtered);
     return filtered;
@@ -187,8 +187,8 @@ export function getMapElements(oldTitles, filters) {
       initialArray.forEach((title) => {
         if (title.yLevel === highestTitle.yLevel) {
           if (
-            title.type === "line-filler" &&
-            highestTitle.type !== "line-filler"
+            title.branch === "line-filler" &&
+            highestTitle.branch !== "line-filler"
           ) {
             highestTitle = title;
             return;

@@ -9,6 +9,7 @@ import FranchisePage, {
   loader as franchisePageLoader,
 } from "./routes/FranchisePage";
 import Root from "./routes/root";
+import LoginPage from "./routes/LoginPage";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
         path: "/:universeId",
         element: <FranchisePage></FranchisePage>,
         loader: franchisePageLoader,
+      },
+      {
+        path: "/login",
+        element: <LoginPage></LoginPage>,
       },
     ],
   },

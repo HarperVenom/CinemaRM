@@ -1,6 +1,3 @@
-import { useDispatch } from "react-redux";
-import { setLayout } from "../redux/slices/franchiseSlice";
-
 export class MapFunctionality {
   constructor(
     mapContainer,
@@ -9,7 +6,7 @@ export class MapFunctionality {
     scale,
     mapStyle,
     elements,
-    wrapper,
+    page,
     map
   ) {
     this.mapContainer = mapContainer;
@@ -18,13 +15,12 @@ export class MapFunctionality {
     this.scale = scale;
     this.mapStyle = mapStyle;
     this.elements = elements;
-    this.wrapper = wrapper;
+    this.page = page;
     this.map = map;
   }
 
   scrollToElement(id, smooth = true, shift = this.shift) {
     const element = document.getElementById(id);
-    // console.log(element);
     if (!element) return;
     const x = element.getBoundingClientRect().x;
     const y = element.getBoundingClientRect().y;
@@ -72,8 +68,8 @@ export class MapFunctionality {
     const windowWidth = this.mapContainer.getBoundingClientRect().width;
     const windowHeight = this.mapContainer.getBoundingClientRect().height;
 
-    const offsetX = this.wrapper.getBoundingClientRect().x;
-    const offsetY = this.wrapper.getBoundingClientRect().y;
+    const offsetX = this.page.getBoundingClientRect().x;
+    const offsetY = this.page.getBoundingClientRect().y;
 
     const mapX = oldZoom.mapX
       ? oldZoom.mapX
@@ -88,14 +84,15 @@ export class MapFunctionality {
       ? parseInt(this.map.style.paddingTop) - parseInt(oldZoom.mapPadding)
       : 0;
 
-    const windowCenterXRation =
+    const windowCenterXRatio =
       (-mapX + windowWidth / 2 + this.shift.x / 2) / (mapWidth * oldScale);
-    const windowCenterYRation =
+    const windowCenterYRatio =
       (-mapY + windowHeight / 2 + this.shift.y / 2) / (mapHeight * oldScale);
 
-    const windowCenterX = windowCenterXRation * mapWidth;
+    const windowCenterX = windowCenterXRatio * mapWidth;
+
     const windowCenterY =
-      windowCenterYRation * mapHeight -
+      windowCenterYRatio * mapHeight -
       parseInt(this.map.style.paddingTop) +
       heightDifference;
 
@@ -145,7 +142,7 @@ export class MapFunctionality {
         (this.elementStyle.width + this.elementStyle.marginRight) +
       this.elementStyle.width;
 
-    const mapContainerSize = this.wrapper.getBoundingClientRect();
+    const mapContainerSize = this.page.getBoundingClientRect();
     const initialMarginLeft = mapContainerSize.width / 1.5;
     const initialMarginRight = mapContainerSize.width / 1.5;
     const initialMarginTop = mapContainerSize.height / 1.5;
@@ -157,8 +154,8 @@ export class MapFunctionality {
     const marginRight = initialMarginRight + (mapWidth * (mapScale - 1)) / 2;
     const marginBot = initialMarginBot + (mapHeight * (mapScale - 1)) / 2;
 
-    const containerWidth = this.wrapper.getBoundingClientRect().width;
-    const containerHeight = this.wrapper.getBoundingClientRect().height;
+    const containerWidth = this.page.getBoundingClientRect().width;
+    const containerHeight = this.page.getBoundingClientRect().height;
 
     const overviewLayout = this.mapContainer
       ? containerHeight < containerWidth
@@ -195,7 +192,7 @@ export class MapFunctionality {
       const element = this.elements.all.find(
         (element) => element.id === parentId
       );
-      if (element.type === "line-filler") {
+      if (element.branch === "line-filler") {
         fillers.push(element);
         fillers.push(...this.getAllFillerParents(element));
       }
@@ -248,7 +245,7 @@ export function getDirectParents(element, elements = this.elements.all) {
   const directParents = [];
   element.watchAfter.forEach((parentId) => {
     let notFiller = elements.find((element) => element.id === parentId);
-    while (notFiller.type === "line-filler") {
+    while (notFiller.branch === "line-filler") {
       notFiller = elements.find(
         (element) => element.id === notFiller.watchAfter[0]
       );

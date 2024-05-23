@@ -102,7 +102,7 @@ const Map = () => {
       mapContainerRef.current.scrollTop === 0 &&
       (offset.x !== 0 || offset.y !== 0)
     ) {
-      map.scrollToElement(-1, false, offset);
+      map.scrollToElement("mapRoot", false, offset);
     } else {
       if (selected && mapStyle && mapStyle.resized) {
         map.scrollToElement(selected, false, offset);
@@ -188,7 +188,7 @@ const Map = () => {
   }
 
   function handleElementClick(selectedTitle) {
-    if (selectedTitle.type === "line-filler") return;
+    if (selectedTitle.branch === "line-filler") return;
     if (
       draggingOnElement &&
       draggingOnElement === document.getElementById(selectedTitle.id)
@@ -271,6 +271,8 @@ const Map = () => {
         mapRef.current.getBoundingClientRect().y -
         pageRef.current.getBoundingClientRect().y,
     });
+    // setScale(scale);
+    // updateMapStyle(scale, elements);
     setScale(newScale);
     updateMapStyle(newScale, elements);
   }
@@ -279,16 +281,15 @@ const Map = () => {
     return elements.find((element) => element.id === id);
   }
 
-  console.log(layout);
   return (
     <div
       className="map-container"
       ref={mapContainerRef}
       onMouseDown={handleMouseDown}
     >
-      {getElement(selected) && getElement(selected).background_url ? (
+      {getElement(selected) && getElement(selected).backgroundUrl ? (
         <img
-          src={getElement(selected).background_url}
+          src={getElement(selected).backgroundUrl}
           alt=""
           className="background"
         />

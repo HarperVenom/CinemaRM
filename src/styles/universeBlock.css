@@ -11,7 +11,7 @@
   /* justify-content: center;
   align-items: center; */
   margin: 1rem;
-  border-radius: 20px;
+  border-radius: 5px;
   overflow: hidden;
 }
 .universe-link img {
@@ -29,7 +29,7 @@
   align-items: end;
   padding: 1rem;
   box-sizing: border-box;
-  background: linear-gradient(to bottom, transparent 50%, var(--normal) 95%);
+  background: linear-gradient(to bottom, transparent 50%, var(--dark) 95%);
 }
 .universe-link h2 {
   color: var(--text-bright);
