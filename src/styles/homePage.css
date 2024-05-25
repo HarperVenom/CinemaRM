@@ -5,12 +5,14 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  position: relative;
 }
 .wrapper {
   all: inherit;
   width: 100%;
-  max-width: 1300px;
+  max-width: 1000px;
   margin: auto;
+  position: relative;
 }
 .navbar {
   height: 60px;
@@ -18,9 +20,12 @@
   align-items: center;
   background-color: var(--normal);
   justify-content: space-between;
+  z-index: 1;
+}
+.navbar .wrapper {
+  padding: 0 2vw;
 }
 .navbar .sign-in-button {
-  margin: 0 2rem;
   font-size: 1rem;
   font-weight: 600;
   border: none;
@@ -30,10 +35,55 @@
   justify-content: center;
   align-items: center;
   height: 2rem;
-  padding: 0 1rem;
   border-radius: 5px;
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
+  padding: 0 1rem;
+}
+.navbar .user-menu {
+  position: relative;
+  height: 100%;
+  color: var(--text);
+}
+.navbar .user-menu-button {
+  cursor: pointer;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 0.5rem;
+  font-weight: 500;
+  user-select: none;
+  height: 100%;
+  background-color: var(--normal);
+}
+.navbar .user-icon {
+  width: 40px;
+  height: 40px;
+  z-index: 1;
+}
+.navbar .username {
+  margin: 0 0.5rem;
+  font-size: 1.1rem;
+  z-index: 1;
+}
+.navbar .user-menu-list {
+  position: absolute;
+  right: 0;
+  width: 100%;
+  background-color: var(--normal);
+  top: 100%;
+  z-index: 0;
+  border-radius: 0 0 5px 5px;
+  transition: transform 0.2s ease;
+}
+.navbar .user-menu-list > * {
+  position: relative;
+  text-align: center;
+  padding: 1rem;
+  margin: 0;
+  cursor: pointer;
 }
 .logo {
   color: var(--text);
@@ -43,7 +93,7 @@
   height: 100%;
   display: flex;
   align-items: center;
-  padding: 0 2rem;
+  /* padding: 0 5vw; */
 }
 .hero {
   height: 60vh;

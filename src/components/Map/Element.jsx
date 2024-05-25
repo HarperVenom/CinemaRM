@@ -6,8 +6,7 @@ import {
   selectSelectedId,
 } from "../../redux/slices/franchiseSlice";
 import "../../styles/element.css";
-
-export default Element = ({ item, style, onClick, completed }) => {
+const MapElement = ({ item, style, onClick, completed }) => {
   const { elements } = useContext(UniverseContext);
 
   const activeElements = useSelector(selectActiveIds);
@@ -216,3 +215,5 @@ export default Element = ({ item, style, onClick, completed }) => {
     </>
   );
 };
+
+export default MapElement;

@@ -1,13 +1,19 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useApi from "../utils/useApi";
 import { Form, Link } from "react-router-dom";
 import "../styles/homePage.css";
 import UniverseBlock from "../components/common/UniverseBlock";
 import { backendUrl } from "../../config";
+import SignInButton from "../components/common/SignInButton";
+import { GlobalContext } from "../GlobalState";
+import UserIcon from "../assets/user.svg";
 
 const HomePage = () => {
+  const { user, logout } = useContext(GlobalContext);
   const { data } = useApi(`${backendUrl}/api/universes`);
   const [universes, setUniverses] = useState([]);
+
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     if (!data) return;
     setUniverses(
@@ -19,6 +25,10 @@ const HomePage = () => {
     );
   }, [data]);
 
+  function handleMenuButtonClick() {
+    setMenuOpen((prev) => !prev);
+  }
+
   return (
     <div className="home-page">
       <header>
@@ -27,9 +37,28 @@ const HomePage = () => {
             <Link to={"/"} className="logo">
               FRANCHISER
             </Link>
-            <Link to={"/login"} className="sign-in-button">
-              Sign In
-            </Link>
+            {user ? (
+              <div className="user-menu">
+                <div
+                  className="user-menu-button"
+                  onClick={handleMenuButtonClick}
+                >
+                  <p className="username">{user.name}</p>
+                  <img className="user-icon" src={UserIcon} alt="" />
+                </div>
+                <div
+                  className="user-menu-list"
+                  style={{ transform: menuOpen ? "" : "translate(0, -100%)" }}
+                >
+                  <p className="profile-button">Profile</p>
+                  <p className="sign-out-button" onClick={() => logout()}>
+                    Sign Out
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <SignInButton></SignInButton>
+            )}
           </div>
         </nav>
         <div className="wrapper">

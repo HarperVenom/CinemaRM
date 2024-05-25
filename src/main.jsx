@@ -9,7 +9,10 @@ import FranchisePage, {
   loader as franchisePageLoader,
 } from "./routes/FranchisePage";
 import Root from "./routes/root";
-import LoginPage from "./routes/LoginPage";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
+const clientId =
+  "41982569166-nkim7lc1na132p34k9fg7bfnac3rnio3.apps.googleusercontent.com";
 
 const router = createBrowserRouter([
   {
@@ -22,18 +25,16 @@ const router = createBrowserRouter([
         element: <FranchisePage></FranchisePage>,
         loader: franchisePageLoader,
       },
-      {
-        path: "/login",
-        element: <LoginPage></LoginPage>,
-      },
     ],
   },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router}></RouterProvider>
-    </Provider>
+    <GoogleOAuthProvider clientId={clientId}>
+      <Provider store={store}>
+        <RouterProvider router={router}></RouterProvider>
+      </Provider>
+    </GoogleOAuthProvider>
   </React.StrictMode>
 );

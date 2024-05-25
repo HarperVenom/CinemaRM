@@ -6,11 +6,12 @@ export default function useApi(url) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  async function getData() {
+  async function getData(url) {
     try {
       setLoading(true);
       const response = await axios.get(url);
       setData(response.data);
+      return response?.data;
     } catch (err) {
       setError(err);
     } finally {
@@ -43,8 +44,8 @@ export default function useApi(url) {
   }
 
   useEffect(() => {
-    getData();
+    getData(url);
   }, [url]);
 
-  return { data, loading, error, postData, updateData };
+  return { data, loading, error, getData, postData, updateData };
 }

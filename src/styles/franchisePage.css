@@ -1,3 +1,7 @@
+.franchise-page * {
+  user-select: none;
+}
+
 .map-hide {
   position: absolute;
   width: 100vw;

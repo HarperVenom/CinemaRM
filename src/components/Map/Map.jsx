@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import Element from "./Element";
+import MapElement from "./Element";
 import {
   MapFunctionality,
   getAllParentElements,
@@ -313,7 +313,7 @@ const Map = () => {
         <div className="level">
           {elements &&
             elements.map((title) => (
-              <Element
+              <MapElement
                 key={title.id}
                 item={title}
                 style={elementStyle}
