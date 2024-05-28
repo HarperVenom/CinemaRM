@@ -1,33 +1,11 @@
-import {
-  forwardRef,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import { ElementsContext } from "../Map/Map";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  selectSelectedId,
-  selectUniverseId,
-  setSelectedId,
-} from "../../redux/slices/franchiseSlice";
-import { UniverseContext } from "../../routes/FranchisePage";
-import { selectCompletedUniverse } from "../../redux/slices/userSlice";
-import "../../styles/list.css";
+import { forwardRef, useContext, useEffect, useRef, useState } from "react";
+import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
+import "./list.css";
+import { GlobalContext } from "@/GlobalState";
 
 const List = forwardRef(function (props, listContainerRef) {
-  const dispatch = useDispatch();
-  const { elements } = useContext(UniverseContext);
-  const selected = useSelector(selectSelectedId);
-  const universeId = useSelector(selectUniverseId);
-  const completedTitles = useSelector((state) =>
-    selectCompletedUniverse(state, universeId)
-  );
-
+  const { elements, isCompleted, selected } = useContext(UniverseContext);
   const [expanded, setExpanded] = useState(false);
-
   const [titles, setTitles] = useState([]);
 
   const listRef = useRef();
@@ -37,9 +15,26 @@ const List = forwardRef(function (props, listContainerRef) {
   }, [elements]);
 
   useEffect(() => {
-    if (selected === null) return;
+    updateScroll();
+  }, [listRef.current]);
+
+  //To prevent scroll bar bug when it doesnt take space after page loading
+  function updateScroll() {
+    if (!listRef.current) return;
+    const scrollHeight = listRef.current.scrollHeight;
+    const height = listRef.current.getBoundingClientRect().height + 1;
+    if (scrollHeight > height) {
+      listRef.current.style.overflowY = "scroll";
+      setTimeout(() => {
+        listRef.current.style.overflowY = "auto";
+      }, 1);
+    }
+  }
+
+  useEffect(() => {
+    if (selected.id === null) return;
     const selectedTitle = document.querySelector(
-      `.list-element[data-id="${selected}"]`
+      `.list-element[data-id="${selected.id}"]`
     );
     if (!selectedTitle) return;
     const container = listRef.current;
@@ -49,7 +44,7 @@ const List = forwardRef(function (props, listContainerRef) {
 
     // Check if the selected element is above the visible area
     if (selectedElementOffsetTop < containerScrollTop) {
-      container.scrollTop = selectedElementOffsetTop - 5;
+      container.scrollTop = selectedElementOffsetTop - 20;
     }
     // Check if the selected element is below the visible area
     else if (
@@ -62,7 +57,8 @@ const List = forwardRef(function (props, listContainerRef) {
         5 -
         containerHeight;
     }
-  }, [selected]);
+  }, [selected.id]);
+
   return (
     <div
       className={`list-container${expanded ? " expanded" : ""}`}
@@ -73,14 +69,10 @@ const List = forwardRef(function (props, listContainerRef) {
           <div
             key={title.id}
             className={`list-element block${
-              selected === title.id ? " selected" : ""
-            }${
-              completedTitles && completedTitles.includes(title.id)
-                ? " completed"
-                : ""
-            }`}
+              selected.id === title.id ? " selected" : ""
+            }${isCompleted(title.id) ? " completed" : ""}`}
             data-id={title.id}
-            onClick={() => dispatch(setSelectedId(title.id))}
+            onClick={() => selected.set(title.id)}
           >
             {title.imgUrl ? (
               <img className="list-image" src={title.imgUrl} alt="" />

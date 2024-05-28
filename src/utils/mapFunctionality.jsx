@@ -109,7 +109,8 @@ export class MapFunctionality {
   updateMapStyle(
     mapScale = this.scale,
     elements = this.elements.all,
-    resized = false
+    resized = false,
+    container
   ) {
     let highestTitle;
     let lowestTitle;
@@ -157,7 +158,7 @@ export class MapFunctionality {
     const containerWidth = this.page.getBoundingClientRect().width;
     const containerHeight = this.page.getBoundingClientRect().height;
 
-    const overviewLayout = this.mapContainer
+    const overviewLayout = container
       ? containerHeight < containerWidth
         ? "big"
         : "small"

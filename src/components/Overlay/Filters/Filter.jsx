@@ -1,15 +1,8 @@
-import { useContext, useEffect, useMemo, useState } from "react";
-import {
-  makeSelectActiveFilters,
-  updateFilter,
-} from "../../redux/slices/franchiseSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useContext, useEffect, useState } from "react";
+import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 
 const Filter = ({ name }) => {
-  const dispatch = useDispatch();
-  const selectActiveFilters = useMemo(makeSelectActiveFilters, []);
-  const activeFilters = useSelector(selectActiveFilters);
-
+  const { activeFilters, setActiveFilters } = useContext(UniverseContext);
   const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
@@ -18,11 +11,13 @@ const Filter = ({ name }) => {
 
   function handleCheck() {
     setIsChecked(!isChecked);
-    dispatch(updateFilter({ filter: name, value: !isChecked }));
+    setActiveFilters((prev) =>
+      !isChecked ? [...prev, name] : prev.filter((filter) => filter !== name)
+    );
   }
 
   return (
-    <div className="filter">
+    <div className="filter" style={{ opacity: isChecked ? null : "0.6" }}>
       <label htmlFor={name}>{name}</label>
       <input
         onChange={handleCheck}

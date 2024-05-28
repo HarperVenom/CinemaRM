@@ -4,22 +4,31 @@
   background-color: rgba(255, 255, 255, 0);
   grid-area: filters;
   height: max-content;
-  padding-bottom: 5px;
+  padding: 0 0.5rem;
   display: flex;
-  overflow-y: visible;
-  overflow-x: auto;
-  /* margin: -10px;
-  padding: 10px; */
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+.filter-bar ::-webkit-scrollbar-track {
+  margin-block: 0.5rem;
+}
+.filters {
+  position: relative;
+  width: 100%;
+  overflow: auto;
+  display: flex;
+  padding-left: 0.5rem;
 }
 .filter {
+  position: relative;
   box-shadow: none;
-  border: 2px solid rgba(0, 0, 0, 0.5);
   color: var(--text);
   font-size: 1.2rem;
   font-weight: 500;
-  background-color: var(--overlay);
+  background-color: var(--element);
   border-radius: 5px;
-  margin-right: 0.5rem;
+  margin: 0.8rem 0.8rem 0.8rem 0;
   /* box-sizing: border-box; */
   display: flex;
   align-items: center;

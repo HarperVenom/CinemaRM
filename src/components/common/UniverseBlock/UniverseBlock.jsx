@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../../styles/universeBlock.css";
+import "./universeBlock.css";
 
 const UniverseBlock = ({ universe }) => {
   function handleUniverseCLick() {}

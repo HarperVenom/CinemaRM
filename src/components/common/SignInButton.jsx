@@ -1,7 +1,6 @@
 import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
-import "../../styles/homePage.css";
 import { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../../GlobalState";
+import { GlobalContext } from "@/GlobalState";
 const SignInButton = () => {
   const { login } = useContext(GlobalContext);
 

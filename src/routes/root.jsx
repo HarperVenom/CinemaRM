@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import GlobalState from "../GlobalState";
+import GlobalState from "@/GlobalState";
 
 const Root = () => {
   return (

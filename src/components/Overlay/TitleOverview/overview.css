@@ -5,6 +5,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  width: max-content;
 }
 .overlay.big .overview {
   height: 100%;

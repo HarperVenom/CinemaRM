@@ -1,16 +1,18 @@
 .background {
   pointer-events: none;
   position: fixed;
-  height: 80%;
+  height: 100%;
   width: 100%;
   object-fit: cover;
-  mask-image: linear-gradient(
+  /* mask-image: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 1) 1%,
+    rgba(255, 255, 255, 0.7) 0%,
     transparent 100%
-  );
+  ); */
+  opacity: 0.6;
+  filter: brightness(110%) blur(1px);
   animation-name: fade-in;
-  animation-duration: 0.5s;
+  animation-duration: 1s;
 }
 
 @keyframes fade-in {
@@ -18,7 +20,7 @@
     opacity: 0;
   }
   100% {
-    opacity: 100%;
+    opacity: 0.6;
   }
 }
 

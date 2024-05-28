@@ -1,16 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { UniverseContext } from "../../routes/FranchisePage";
-import {
-  selectActiveIds,
-  selectSelectedId,
-} from "../../redux/slices/franchiseSlice";
-import "../../styles/element.css";
-const MapElement = ({ item, style, onClick, completed }) => {
-  const { elements } = useContext(UniverseContext);
+import { UniverseContext } from "../../routes/FranchisePage/FranchisePage";
+import "./element.css";
 
-  const activeElements = useSelector(selectActiveIds);
-  const selected = useSelector(selectSelectedId);
+const MapElement = ({ item, style, onClick, isActive, isCompleted }) => {
+  const { elements, selected } = useContext(UniverseContext);
 
   const [location, setLocation] = useState(null);
   const [parents, setParents] = useState([]);
@@ -148,18 +141,16 @@ const MapElement = ({ item, style, onClick, completed }) => {
             fontSize: style.height / 2.5,
             zIndex: isNaN(item.xLevel)
               ? "unset"
-              : -item.xLevel * 2 + (activeElements.includes(item.id) ? 1 : 0),
+              : -item.xLevel * 2 + (isActive ? 1 : 0),
           }}
         >
           <div
             id={item.id}
             className={`element${
               item.branch === "line-filler" ? " filler" : ""
-            }${activeElements.includes(item.id) ? " active" : ""}${
-              item.id === -1 ? " universe" : ""
-            }${completed ? " completed" : ""}${
-              selected === item.id ? " selected" : ""
-            }`}
+            }${isActive ? " active" : ""}${item.id === -1 ? " universe" : ""}${
+              isCompleted ? " completed" : ""
+            }${selected.id === item.id ? " selected" : ""}`}
             onClick={() => {
               onClick(item);
             }}
@@ -183,10 +174,8 @@ const MapElement = ({ item, style, onClick, completed }) => {
               trail.branch === "path" ? (
                 <path
                   key={index}
-                  className={`trail${
-                    activeElements.includes(item.id) ? " active" : ""
-                  }
-                  ${completed ? " completed" : ""}`}
+                  className={`trail${isActive ? " active" : ""}
+                  ${isCompleted ? " completed" : ""}`}
                   d={trail.d}
                   stroke="rgba(255, 255, 255, 0.5)"
                   strokeWidth="5px"
@@ -195,10 +184,8 @@ const MapElement = ({ item, style, onClick, completed }) => {
               ) : (
                 <line
                   key={index}
-                  className={`trail${
-                    activeElements.includes(item.id) ? " active" : ""
-                  }
-                  ${completed ? " completed" : ""}`}
+                  className={`trail${isActive ? " active" : ""}
+                  ${isCompleted ? " completed" : ""}`}
                   x1={trail.x1}
                   y1={trail.y1}
                   x2={trail.x2}

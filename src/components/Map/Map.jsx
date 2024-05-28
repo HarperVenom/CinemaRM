@@ -6,43 +6,29 @@ import {
   useRef,
   useState,
 } from "react";
-import MapElement from "./Element";
+import MapElement from "@/components/Element/Element";
 import {
   MapFunctionality,
   getAllParentElements,
-} from "../../utils/mapFunctionality";
-import { UniverseContext } from "../../routes/FranchisePage";
-import { useSelector, useDispatch } from "react-redux";
-import { selectCompletedUniverse } from "../../redux/slices/userSlice";
-import {
-  selectActiveIds,
-  selectLayout,
-  selectSelectedId,
-  selectUniverseId,
-  setActiveIds,
-  setLayout,
-  setSelectedId,
-} from "../../redux/slices/franchiseSlice";
-import "../../styles/map.css";
-
-export const ElementsContext = createContext();
+} from "@/utils/mapFunctionality";
+import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
+import "./map.css";
 
 const Map = () => {
-  const { elements, pageRef, listRef, overviewRef } =
-    useContext(UniverseContext);
-
-  const dispatch = useDispatch();
-  const universeId = useSelector(selectUniverseId);
-  const completedTitles = useSelector((state) =>
-    selectCompletedUniverse(state, universeId)
-  );
-
-  const selected = useSelector(selectSelectedId);
-  const activeIds = useSelector(selectActiveIds);
-  const layout = useSelector(selectLayout);
+  const {
+    universe,
+    elements,
+    pageRef,
+    listRef,
+    overviewRef,
+    completedIds,
+    layout,
+    selected,
+  } = useContext(UniverseContext);
 
   const [mapStyle, setMapStyle] = useState(null);
   const [completedElements, setCompletedElements] = useState([]);
+  const [activeElements, setActiveElements] = useState();
   const [scale, setScale] = useState(1);
 
   const [isDragging, setIsDragging] = useState(false);
@@ -67,20 +53,20 @@ const Map = () => {
     elementStyle,
     scale,
     mapStyle,
-    { all: elements, active: activeIds, completed: completedElements },
+    { all: elements },
     pageRef.current,
     mapRef.current
   );
 
   useEffect(() => {
-    if (!elements || elements.length === 0) return;
+    if (!elements || elements.length === 0 || !mapContainerRef.current) return;
     setOldZoom({
       scale: scale,
       mapPadding: mapRef.current.style.paddingTop,
     });
     updateMapStyle();
-    if (!selected) {
-      dispatch(setSelectedId(elements[0].id));
+    if (!selected.id) {
+      selected.set(elements[0].id);
     } else {
       if (!prevSelected.current) return;
       const prevElement = elements.find(
@@ -88,13 +74,12 @@ const Map = () => {
       );
       if (!prevElement) {
         prevSelected.current = null;
-        dispatch(setSelectedId(elements[0].id));
+        selected.set(elements[0].id);
         return;
       }
-      dispatch(setSelectedId(prevElement.id));
+      selected.set(prevElement.id);
     }
-  }, [elements]);
-
+  }, [elements, mapContainerRef.current]);
   useEffect(() => {
     const offset = getMapCenterOffsets();
     if (
@@ -102,23 +87,40 @@ const Map = () => {
       mapContainerRef.current.scrollTop === 0 &&
       (offset.x !== 0 || offset.y !== 0)
     ) {
+      // console.log(prevMapStyle.current);
       map.scrollToElement("mapRoot", false, offset);
     } else {
-      if (selected && mapStyle && mapStyle.resized) {
-        map.scrollToElement(selected, false, offset);
+      if (selected.id && mapStyle && mapStyle.resized) {
+        map.scrollToElement(selected.id, false, offset);
       }
     }
     prevMapStyle.current = mapStyle;
   }, [mapStyle]);
 
+  useEffect(() => {
+    if (!completedIds) return;
+    let currentTitle = elements[1];
+
+    let i = 1;
+    while (
+      completedIds.includes(currentTitle.id) ||
+      currentTitle.branch === "line-filler"
+    ) {
+      i++;
+      if (i >= elements.length) return;
+      currentTitle = elements[i];
+    }
+    selected.set(currentTitle.id);
+  }, [completedIds]);
+
   //SELECTION
   useEffect(() => {
-    const selectedElement = getElement(selected);
+    const selectedElement = getElement(selected.id);
     if (!selectedElement) return;
-    if (prevSelected.current !== selected) {
-      map.scrollToElement(selected, true, getMapCenterOffsets());
+    if (prevSelected.current !== selected.id) {
+      map.scrollToElement(selected.id, true, getMapCenterOffsets());
     }
-    let ids = !completedElements.includes(selected) ? [selected] : [];
+    let ids = !completedElements.includes(selected.id) ? [selected.id] : [];
     ids.push(
       ...getAllParentElements(
         selectedElement.id,
@@ -127,21 +129,24 @@ const Map = () => {
         completedElements
       ).map((element) => element.id)
     );
-    prevSelected.current = selected;
-    dispatch(setActiveIds(ids));
-  }, [elements, selected, completedElements]);
+    setActiveElements(ids);
+    prevSelected.current = selected.id;
+  }, [elements, selected.id, completedElements]);
 
   useEffect(() => {
-    if (!elements || !completedTitles) return;
-    const completedElements = [];
+    if (!elements || !completedIds) {
+      setCompletedElements([]);
+      return;
+    }
+    const completedElements = [elements[0]];
     elements.forEach((element) => {
-      if (completedTitles.includes(element.id)) {
+      if (completedIds.includes(element.id)) {
         completedElements.push(element);
         completedElements.push(...map.getAllFillerParents(element));
       }
     });
     setCompletedElements(completedElements.map((element) => element.id));
-  }, [completedTitles, elements]);
+  }, [completedIds, elements]);
 
   useEffect(() => {
     if (isDragging) {
@@ -175,16 +180,21 @@ const Map = () => {
       mapContainerRef.current &&
         mapContainerRef.current.removeEventListener("wheel", handleScroll);
     };
-  }, [layout, scale]);
+  }, [layout.value, scale]);
 
   useLayoutEffect(() => {
     map.updateScroll(oldZoom);
   }, [oldZoom]);
 
   function updateMapStyle(scale, elements, resized) {
-    const newStyle = map.updateMapStyle(scale, elements, resized);
+    const newStyle = map.updateMapStyle(
+      scale,
+      elements,
+      resized,
+      mapContainerRef.current
+    );
     setMapStyle(newStyle);
-    dispatch(setLayout(newStyle.overlayLayout));
+    layout.set(newStyle.overlayLayout);
   }
 
   function handleElementClick(selectedTitle) {
@@ -196,20 +206,20 @@ const Map = () => {
       setDraggingOnElement(null);
       return;
     }
-    if (selected && selected === selectedTitle.id) {
-      map.scrollToElement(selected);
+    if (selected.id && selected.id === selectedTitle.id) {
+      map.scrollToElement(selected.id);
       return;
     }
-    dispatch(setSelectedId(selectedTitle.id));
+    selected.set(selectedTitle.id);
   }
 
   function getMapCenterOffsets() {
     if (!overviewRef.current || !listRef.current) return { x: 0, y: 0 };
     const overviewRect = overviewRef.current.getBoundingClientRect();
     const listRect = listRef.current.getBoundingClientRect();
-    if (layout === "big")
+    if (layout.value === "big")
       return { x: overviewRect.width + listRect.width, y: 0 };
-    else if (layout === "small")
+    else if (layout.value === "small")
       return { x: listRect.width, y: -overviewRect.height };
     else return { x: 0, y: 0 };
   }
@@ -271,8 +281,6 @@ const Map = () => {
         mapRef.current.getBoundingClientRect().y -
         pageRef.current.getBoundingClientRect().y,
     });
-    // setScale(scale);
-    // updateMapStyle(scale, elements);
     setScale(newScale);
     updateMapStyle(newScale, elements);
   }
@@ -287,12 +295,8 @@ const Map = () => {
       ref={mapContainerRef}
       onMouseDown={handleMouseDown}
     >
-      {getElement(selected) && getElement(selected).backgroundUrl ? (
-        <img
-          src={getElement(selected).backgroundUrl}
-          alt=""
-          className="background"
-        />
+      {universe && universe.backgroundUrl ? (
+        <img src={universe.backgroundUrl} alt="" className="background" />
       ) : null}
       <div
         className="map"
@@ -318,7 +322,10 @@ const Map = () => {
                 item={title}
                 style={elementStyle}
                 onClick={handleElementClick}
-                completed={completedElements.includes(title.id)}
+                isActive={activeElements && activeElements.includes(title.id)}
+                isCompleted={
+                  completedElements && completedElements.includes(title.id)
+                }
               />
             ))}
           <svg className="trails"></svg>

@@ -1,27 +1,15 @@
-import { forwardRef, useContext, useEffect, useRef, useState } from "react";
-import { ElementsContext } from "../Map/Map";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addCompleted,
-  selectCompletedIds,
-  selectCompletedUniverse,
-} from "../../redux/slices/userSlice";
-import CheckMark from "../../assets/checkMark.svg";
-import { selectUniverseId } from "../../redux/slices/franchiseSlice";
-import { UniverseContext } from "../../routes/FranchisePage";
-import { getAllParentElements } from "../../utils/mapFunctionality";
-import "../../styles/overview.css";
+import { forwardRef, useContext, useEffect, useState } from "react";
+import CheckMark from "@/assets/checkMark.svg";
+import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
+import { getAllParentElements } from "@/utils/mapFunctionality";
+import "./overview.css";
+import { GlobalContext } from "@/GlobalState";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
-  const { elements } = useContext(UniverseContext);
+  const { completed, setCompleted } = useContext(GlobalContext);
+  const { universe, elements, isCompleted } = useContext(UniverseContext);
   const { title, className } = props;
   const [watchAfter, setWatchAfter] = useState([]);
-
-  const universeId = useSelector(selectUniverseId);
-  const completedTitles = useSelector((state) =>
-    selectCompletedUniverse(state, universeId)
-  );
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!title) return;
@@ -55,8 +43,45 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
   }
 
   function handleCompleteButton() {
-    const titleToAdd = { id: universeId, titleId: title.id };
-    dispatch(addCompleted(titleToAdd));
+    const newCompleted = completed.map((universe) => ({ ...universe }));
+    const universeId = universe.id;
+    const currentUniverse = completed.find(
+      (universe) => universe.universeId === universeId
+    );
+
+    if (title.id === "mapRoot") {
+      if (currentUniverse) {
+        setCompleted(
+          newCompleted.filter(
+            (universe) => universe.universeId !== currentUniverse.universeId
+          )
+        );
+        return;
+      } else newCompleted.push({ universeId: universe.id, titles: [] });
+    } else if (currentUniverse) {
+      const currentTitle = currentUniverse.titles.find(
+        (completedTitle) => title.id === completedTitle
+      );
+      if (currentTitle) {
+        setCompleted([
+          ...newCompleted.filter(
+            (universe) => universe.universeId !== currentUniverse.universeId
+          ),
+          {
+            ...currentUniverse,
+            titles: currentUniverse.titles.filter(
+              (title) => title !== currentTitle
+            ),
+          },
+        ]);
+        return;
+      }
+      currentUniverse.titles.push(title.id);
+    } else {
+      newCompleted.push({ universeId: universe.id, titles: [title.id] });
+    }
+
+    setCompleted(newCompleted);
   }
 
   return title ? (
@@ -91,14 +116,17 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
               })}
           </div>
         </div> */}
-        {completedTitles && completedTitles.includes(title.id) ? (
-          <button className="complete-button completed">
+        {isCompleted(title.id) ? (
+          <button
+            className="complete-button completed"
+            onClick={handleCompleteButton}
+          >
             Completed
             <img className="checkMark" src={CheckMark} alt="" />
           </button>
         ) : (
           <button className="complete-button" onClick={handleCompleteButton}>
-            Complete
+            {title.id === "mapRoot" ? "Start" : "Complete"}
           </button>
         )}
       </div>

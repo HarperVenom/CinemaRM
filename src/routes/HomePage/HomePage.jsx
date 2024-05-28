@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import useApi from "../utils/useApi";
+import useApi from "@/utils/useApi";
 import { Form, Link } from "react-router-dom";
-import "../styles/homePage.css";
-import UniverseBlock from "../components/common/UniverseBlock";
-import { backendUrl } from "../../config";
-import SignInButton from "../components/common/SignInButton";
-import { GlobalContext } from "../GlobalState";
-import UserIcon from "../assets/user.svg";
+import "./homePage.css";
+import UniverseBlock from "@/components/common/UniverseBlock/UniverseBlock";
+import { backendUrl } from "@/config";
+import SignInButton from "@/components/common/SignInButton";
+import { GlobalContext } from "@/GlobalState";
+import UserIcon from "@/assets/user.svg";
 
 const HomePage = () => {
   const { user, logout } = useContext(GlobalContext);
@@ -25,10 +25,14 @@ const HomePage = () => {
     );
   }, [data]);
 
+  useEffect(() => {
+    if (user) return;
+    setMenuOpen(false);
+  }, [user]);
+
   function handleMenuButtonClick() {
     setMenuOpen((prev) => !prev);
   }
-
   return (
     <div className="home-page">
       <header>

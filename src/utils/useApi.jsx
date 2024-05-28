@@ -34,7 +34,7 @@ export default function useApi(url) {
   async function updateData(updateUrl, updateData) {
     try {
       setLoading(true);
-      const response = await axios.update(updateUrl, updateData);
+      const response = await axios.put(updateUrl, updateData);
       return response;
     } catch (err) {
       setError(err);

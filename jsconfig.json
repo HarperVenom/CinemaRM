@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src" // Assuming your root directory for source code is 'src'
+  },
+  "include": ["src"]
+}
