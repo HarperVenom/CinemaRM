@@ -30,11 +30,13 @@ const FranchisePage = () => {
   );
 
   const { user, completed, updateUser, loading } = useContext(GlobalContext);
+  // console.log(completed);
   const completedUniverse = completed.find(
     (universe) => universe.universeId === universeId
   );
+  // console.log(completedUniverse);
   const completedIds = completedUniverse?.titles;
-
+  // console.log(completedIds);
   const [elements, setElements] = useState([]);
   const [activeFilters, setActiveFilters] = useState([]);
 
@@ -63,26 +65,12 @@ const FranchisePage = () => {
     ) {
       setActiveFilters(completedUniverse.filters);
     } else {
-      setActiveFilters(getAllFilters());
+      if (activeFilters.length === 0) setActiveFilters(getAllFilters());
     }
   }, [completed, universe]);
 
   useEffect(() => {
-    if (!universe) return;
-    const titles = [
-      {
-        id: "mapRoot",
-        watchAfter: [],
-        title: universe.title,
-        imgUrl: universe.imgUrl,
-        description: universe.description,
-      },
-      ...universe.titles,
-    ];
-
-    if (!titles || !activeFilters || activeFilters.length === 0) return;
-    const mapElements = getMapElements(titles, activeFilters);
-    setElements(mapElements);
+    updateElements();
     if (!completedUniverse) return;
     updateUser({
       completed: [
@@ -94,6 +82,28 @@ const FranchisePage = () => {
       ],
     });
   }, [activeFilters, universe]);
+
+  useEffect(() => {
+    if (user) return;
+    updateElements();
+  }, [completed]);
+
+  function updateElements() {
+    if (!universe) return;
+    const titles = [
+      {
+        id: "mapRoot",
+        watchAfter: [],
+        title: universe.title,
+        imgUrl: universe.imgUrl,
+        description: universe.description,
+      },
+      ...universe.titles,
+    ];
+    if (!titles || !activeFilters || activeFilters.length === 0) return;
+    const mapElements = getMapElements(titles, activeFilters);
+    setElements(mapElements);
+  }
 
   function getAllFilters() {
     if (!universe) return [];
@@ -123,6 +133,7 @@ const FranchisePage = () => {
   return (
     <div className="franchise-page" ref={pageRef}>
       {!universe ? <div className="map-hide"></div> : null}
+      {loading ? <div className="loading-screen"></div> : null}
       {elements && elements.length > 0 ? (
         <UniverseContext.Provider
           value={{

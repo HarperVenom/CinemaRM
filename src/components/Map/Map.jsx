@@ -13,8 +13,10 @@ import {
 } from "@/utils/mapFunctionality";
 import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 import "./map.css";
+import { GlobalContext } from "@/GlobalState";
 
 const Map = () => {
+  const { completed } = useContext(GlobalContext);
   const {
     universe,
     elements,
@@ -77,9 +79,10 @@ const Map = () => {
         selected.set(elements[0].id);
         return;
       }
-      selected.set(prevElement.id);
+      // selected.set(prevElement.id);
     }
   }, [elements, mapContainerRef.current]);
+
   useEffect(() => {
     const offset = getMapCenterOffsets();
     if (
@@ -111,7 +114,7 @@ const Map = () => {
       currentTitle = elements[i];
     }
     selected.set(currentTitle.id);
-  }, [completedIds]);
+  }, [completedIds, completed]);
 
   //SELECTION
   useEffect(() => {
