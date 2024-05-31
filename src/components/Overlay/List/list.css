@@ -1,3 +1,9 @@
+@media screen and (max-width: 450px) {
+  .list-container {
+    display: none;
+  }
+}
+
 .list-container {
   position: relative;
   grid-area: sidebar;
@@ -20,9 +26,18 @@
   min-width: 70px;
   max-width: 70px;
   border-radius: 5px;
-  margin: 0.8rem 0.8rem 0 0.8rem;
+  margin: 0.8rem 0.6rem 0 0.6rem;
   cursor: pointer;
   background-color: black;
+  box-shadow: none;
+  transition: box-shadow 0.1s ease, scale 0.1s ease;
+}
+.block:hover {
+  /* scale: 1.05; */
+  box-shadow: 0 0 7px rgba(255, 255, 255, 0.5);
+}
+.block:active {
+  scale: 0.98;
 }
 
 .list {
@@ -39,7 +54,7 @@
 .list-element {
   position: relative;
   color: var(--text);
-  box-shadow: 0 0 10px black;
+  /* box-shadow: 0 0 10px black; */
   background-size: cover;
   overflow: hidden;
 }

@@ -17,7 +17,10 @@ const Filter = ({ name }) => {
   }
 
   return (
-    <div className="filter" style={{ opacity: isChecked ? null : "0.6" }}>
+    <div
+      className="filter interactive-element"
+      style={{ opacity: isChecked ? null : "0.6" }}
+    >
       <label htmlFor={name}>{name}</label>
       <input
         onChange={handleCheck}

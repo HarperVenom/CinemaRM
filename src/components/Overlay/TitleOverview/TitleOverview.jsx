@@ -1,4 +1,11 @@
-import { forwardRef, useContext, useEffect, useState } from "react";
+import {
+  forwardRef,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import CheckMark from "@/assets/checkMark.svg";
 import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 import { getAllParentElements } from "@/utils/mapFunctionality";
@@ -7,18 +14,25 @@ import { GlobalContext } from "@/GlobalState";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
   const { completed, setCompleted } = useContext(GlobalContext);
-  const { universe, elements, isCompleted } = useContext(UniverseContext);
-  const { title, className } = props;
+  const { universe, elements, isCompleted, layout } =
+    useContext(UniverseContext);
+  const { title } = props;
   const [watchAfter, setWatchAfter] = useState([]);
+
+  const infoRef = useRef(null);
 
   useEffect(() => {
     if (!title) return;
 
-    setWatchAfter(
-      getAllParentElements(title.id, elements).filter(
-        (element) => element.branch !== "line-filler" && element.id !== -1
-      )
-    );
+    if (infoRef.current) {
+      infoRef.current.scrollTop = 0;
+    }
+
+    // setWatchAfter(
+    //   getAllParentElements(title.id, elements).filter(
+    //     (element) => element.branch !== "line-filler" && element.id !== -1
+    //   )
+    // );
   }, [title]);
 
   function getYear() {
@@ -39,7 +53,7 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
     if (!title || !title.title) return;
     const length = title.title.length;
     const newSize = 5 - parseInt(length / 8) / 2;
-    return newSize + "vh";
+    return (layout.value === "small" ? 0.6 * newSize : newSize) + "vh";
   }
 
   function handleCompleteButton() {
@@ -85,19 +99,20 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
   }
 
   return title ? (
-    <div className={"overview " + className} ref={overviewRef}>
+    <div className={`overview${" " + layout.value}`} ref={overviewRef}>
       {title && title.imgUrl && (
         <img className="poster" src={title.imgUrl} alt="" />
       )}
-      <div className="info">
-        <div className="title" style={{ fontSize: getFontSize() }}>
-          {title.title}
+      <div className="info-action">
+        <div className="info" ref={infoRef}>
+          <div className="title" style={{ fontSize: getFontSize() }}>
+            {title.title}
+          </div>
+          <div className="specifics">{`${getYear()} · ${getDuration()}`}</div>
+          <div className="description">{title.description}</div>
         </div>
-        <div className="specifics">{`${getYear()} · ${getDuration()}`}</div>
-        <div className="description">{title.description}</div>
-      </div>
-      <div className="action-bar">
-        {/* <div className="watch-after">
+        <div className="action-bar">
+          {/* <div className="watch-after">
           {watchAfter.length > 0 && !title.standAlone && <h5>WATCH FIRST: </h5>}
           <div className="watch-after-list">
             {!title.standAlone &&
@@ -116,19 +131,20 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
               })}
           </div>
         </div> */}
-        {isCompleted(title.id) ? (
-          <button
-            className="complete-button completed"
-            onClick={handleCompleteButton}
-          >
-            Completed
-            <img className="checkMark" src={CheckMark} alt="" />
-          </button>
-        ) : (
-          <button className="complete-button" onClick={handleCompleteButton}>
-            {title.id === "mapRoot" ? "Start" : "Complete"}
-          </button>
-        )}
+          {isCompleted(title.id) ? (
+            <button
+              className="complete-button completed"
+              onClick={handleCompleteButton}
+            >
+              {title.id === "mapRoot" ? "Started" : "Completed"}
+              <img className="checkMark" src={CheckMark} alt="" />
+            </button>
+          ) : (
+            <button className="complete-button" onClick={handleCompleteButton}>
+              {title.id === "mapRoot" ? "Start" : "Complete"}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   ) : null;

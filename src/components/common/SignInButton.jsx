@@ -43,7 +43,7 @@ const SignInButton = () => {
 
   return (
     <div onClick={() => googleLogin()} className="sign-in-button">
-      Sign In
+      Google Login
     </div>
   );
 };

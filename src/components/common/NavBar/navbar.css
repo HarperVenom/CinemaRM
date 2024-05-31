@@ -1,0 +1,162 @@
+.navbar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  background-color: var(--normal);
+  justify-content: space-between;
+  z-index: 1;
+}
+.navbar .wrapper {
+  padding: 0 2vw;
+  transition: none;
+}
+.navbar .nav-cover {
+  left: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: var(--normal);
+}
+.navbar .sign-in-button {
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  background-color: var(--text);
+  color: var(--normal);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0 1rem;
+  z-index: 1;
+  box-shadow: none;
+  transition: box-shadow 0.2s ease, scale 0.05s ease;
+}
+.navbar .sign-in-button:hover {
+  box-shadow: 0 0 12px white;
+}
+.navbar .sign-in-button:active {
+  scale: 0.98;
+}
+.navbar .user-menu {
+  position: relative;
+  height: 100%;
+  color: var(--text);
+}
+.navbar .user-menu-button {
+  cursor: pointer;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 0.5rem;
+  font-weight: 500;
+  user-select: none;
+  height: 100%;
+  background-color: var(--normal);
+  box-shadow: 0 0 0 black;
+  transition: box-shadow 0.2s ease;
+  border-radius: 5px;
+}
+.navbar .user-menu-button:hover {
+  background-color: var(--normal1);
+}
+.navbar .user-menu-button:active {
+  background-color: var(--normal2);
+}
+.user-menu.opened .user-menu-button {
+  box-shadow: 0 0 10px black;
+}
+.navbar .user-icon {
+  border-radius: 5px;
+  border: 2px solid var(--text);
+  width: 36px;
+  height: 36px;
+  z-index: 1;
+}
+.navbar .username {
+  margin: 0 0.5rem;
+  font-size: 1.1rem;
+  z-index: 1;
+}
+.navbar .screen-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -2;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.3s ease;
+}
+.navbar .screen-cover.visible {
+  pointer-events: all;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.navbar .user-menu-list {
+  position: absolute;
+  right: 0;
+  width: 100%;
+  background-color: var(--normal);
+  top: 100%;
+  /* z-index: 1; */
+  border-radius: 0 0 5px 5px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 0 black;
+}
+.user-menu.opened .user-menu-list {
+  box-shadow: 0 0 10px black;
+}
+.navbar .button {
+  position: relative;
+  text-align: center;
+  padding: 1rem;
+  margin: 0;
+  cursor: pointer;
+  color: var(--text);
+  text-decoration: none;
+  background-color: transparent;
+  transition: background-color 0.1s ease;
+}
+
+.hover:hover {
+  background-color: var(--normal1);
+}
+.hover:active {
+  background-color: var(--normal2);
+}
+
+.logo {
+  color: var(--text);
+  font-weight: 800;
+  font-size: 1.8rem;
+  text-decoration: none;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+@media screen and (max-width: 500px) {
+  .navbar .user-menu {
+    position: unset;
+  }
+  .navbar .username {
+    display: none;
+  }
+  .navbar .user-menu-list {
+    width: 100vw;
+    z-index: -1;
+  }
+  .user-menu.opened .user-menu-button {
+    box-shadow: none;
+  }
+}

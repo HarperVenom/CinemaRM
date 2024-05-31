@@ -73,13 +73,13 @@ const GlobalState = ({ children }) => {
         }
       );
       const data = response.data;
-
       let user = await getData(`${backendUrl}/api/users/${data.sub}`);
       if (!user) {
         const newUser = {
           id: data.sub,
           name: data.given_name,
           email: data.email,
+          picture: data.picture,
           completed: completed,
         };
         user = await postData(`${backendUrl}/api/users`, newUser);

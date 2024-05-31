@@ -20,6 +20,7 @@
   box-sizing: border-box;
   scale: 1.05;
   overflow: hidden;
+  transition: filter 0.3s ease, border-color 0.3s ease;
 }
 .element .element-background {
   pointer-events: none;
@@ -54,7 +55,6 @@
   display: flex;
   padding: 10%;
   z-index: 1;
-  /* text-shadow: 0 0 5px black; */
 }
 .element.filler {
   box-shadow: none;
@@ -75,6 +75,7 @@
 
 .trail {
   stroke: var(--border);
+  transition: stroke 0.3s ease, filter 0.3s ease;
 }
 
 .element.selected {

@@ -16,6 +16,8 @@ import useApi from "@/utils/useApi";
 import { useLoaderData } from "react-router-dom";
 import { backendUrl } from "@/config";
 import { GlobalContext } from "@/GlobalState";
+import MenuButton from "@/assets/menuButton.svg";
+import NavBar from "@/components/common/NavBar/NavBar";
 
 export const UniverseContext = createContext();
 
@@ -30,18 +32,16 @@ const FranchisePage = () => {
   );
 
   const { user, completed, updateUser, loading } = useContext(GlobalContext);
-  // console.log(completed);
   const completedUniverse = completed.find(
     (universe) => universe.universeId === universeId
   );
-  // console.log(completedUniverse);
+
   const completedIds = completedUniverse?.titles;
-  // console.log(completedIds);
   const [elements, setElements] = useState([]);
   const [activeFilters, setActiveFilters] = useState([]);
-
   const [layout, setLayout] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [menuOpened, setMenuOpened] = useState(false);
 
   const pageRef = useRef();
   const listRef = useRef();
@@ -150,14 +150,25 @@ const FranchisePage = () => {
             selected: { id: selectedId, set: setSelectedId },
           }}
         >
+          <div className={`menu${menuOpened ? " opened" : ""}`}>
+            <NavBar forceClose={menuOpened ? false : true}></NavBar>
+            <div className="current-universe">
+              <p>Currently viewing:</p>
+              <p className="title">{universe.title}</p>
+            </div>
+            <div className="cover" onClick={() => setMenuOpened(false)}></div>
+          </div>
+
           <div className={`overlay${layout != null ? " " + layout : ""}`}>
             <FilterBar filters={getAllFilters()}></FilterBar>
             <List ref={listRef}></List>
             <TitleOverview
-              className={layout ? layout : ""}
               title={elements.find((element) => element.id === selectedId)}
               ref={overviewRef}
             />
+            <button className="menu-button" onClick={() => setMenuOpened(true)}>
+              <img className="interactive-element" src={MenuButton} alt="" />
+            </button>
           </div>
           <Map></Map>
         </UniverseContext.Provider>

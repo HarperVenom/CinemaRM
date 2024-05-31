@@ -3,21 +3,20 @@
   backdrop-filter: none;
   background-color: rgba(255, 255, 255, 0);
   grid-area: filters;
-  height: max-content;
+  /* height: 5rem; */
   padding: 0 0.5rem;
   display: flex;
   overflow: hidden;
   width: 100%;
   box-sizing: border-box;
 }
-.filter-bar ::-webkit-scrollbar-track {
-  margin-block: 0.5rem;
-}
+
 .filters {
   position: relative;
   width: 100%;
   overflow: auto;
   display: flex;
+  /* justify-content: center; */
   padding-left: 0.5rem;
 }
 .filter {
@@ -28,8 +27,7 @@
   font-weight: 500;
   background-color: var(--element);
   border-radius: 5px;
-  margin: 0.8rem 0.8rem 0.8rem 0;
-  /* box-sizing: border-box; */
+  margin: 0.6rem 0.8rem 0.6rem 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,6 +37,7 @@
   padding: 0.5rem 3rem 0.5rem 1rem;
   cursor: pointer;
 }
+
 .filter input {
   position: relative;
   display: none;
