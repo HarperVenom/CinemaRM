@@ -80,6 +80,7 @@ export class MapFunctionality {
 
     const mapWidth = parseInt(this.map.style.width);
     const mapHeight = parseInt(this.map.style.minHeight);
+
     const heightDifference = oldZoom.mapPadding
       ? parseInt(this.map.style.paddingTop) - parseInt(oldZoom.mapPadding)
       : 0;
