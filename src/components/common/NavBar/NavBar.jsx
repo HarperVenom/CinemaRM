@@ -23,39 +23,40 @@ const NavBar = ({ forceClose }) => {
   function handleMenuButtonClick() {
     setMenuOpen((prev) => !prev);
   }
-  console.log(user && user.picture);
   return (
-    <nav className="navbar">
-      <div className="wrapper">
-        <div className="nav-cover"></div>
-        <Link to={"/"} className="logo">
-          FRANCHISER
-        </Link>
-        {user ? (
-          <div className={`user-menu${menuOpen ? " opened" : ""}`}>
-            <div className="user-menu-button" onClick={handleMenuButtonClick}>
-              <p className="username">{user.name}</p>
-              <img className="user-icon" src={user.picture} alt="" />
+    <>
+      <div
+        className={`screen-cover${menuOpen ? " visible" : ""}`}
+        onClick={() => setMenuOpen(false)}
+      ></div>
+      <nav className="navbar">
+        <div className="wrapper">
+          <div className="nav-cover"></div>
+          <Link to={"/"} className="logo">
+            FRANCHISER
+          </Link>
+          {user ? (
+            <div className={`user-menu${menuOpen ? " opened" : ""}`}>
+              <div className="user-menu-button" onClick={handleMenuButtonClick}>
+                <p className="username">{user.name}</p>
+                <img className="user-icon" src={user.picture} alt="" />
+              </div>
+              <div
+                className="user-menu-list"
+                style={{ transform: menuOpen ? "" : "translate(0, -100%)" }}
+              >
+                <Link className="button hover">Profile</Link>
+                <p className="button hover" onClick={() => logout()}>
+                  Sign Out
+                </p>
+              </div>
             </div>
-            <div
-              className="user-menu-list"
-              style={{ transform: menuOpen ? "" : "translate(0, -100%)" }}
-            >
-              <Link className="button hover">Profile</Link>
-              <p className="button hover" onClick={() => logout()}>
-                Sign Out
-              </p>
-            </div>
-          </div>
-        ) : (
-          <SignInButton></SignInButton>
-        )}
-        <div
-          className={`screen-cover${menuOpen ? " visible" : ""}`}
-          onClick={() => setMenuOpen(false)}
-        ></div>
-      </div>
-    </nav>
+          ) : (
+            <SignInButton></SignInButton>
+          )}
+        </div>
+      </nav>
+    </>
   );
 };
 

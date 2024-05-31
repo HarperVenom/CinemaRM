@@ -54,9 +54,12 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background-color: var(--normal);
+
   margin-left: 0.6rem;
   border-radius: 5px;
+}
+.overview.small .info-action {
+  background-color: var(--normal);
 }
 
 .overview .info {
