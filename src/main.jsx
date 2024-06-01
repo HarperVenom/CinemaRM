@@ -8,6 +8,7 @@ import FranchisePage, {
   loader as franchisePageLoader,
 } from "@/routes/FranchisePage/FranchisePage";
 import Root from "@/routes/root";
+import ProfilePage from "@/routes/ProfilePage/ProfilePage";
 
 const clientId =
   "41982569166-nkim7lc1na132p34k9fg7bfnac3rnio3.apps.googleusercontent.com";
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
     element: <Root></Root>,
     children: [
       { index: true, element: <HomePage></HomePage> },
+      { path: "/profile", element: <ProfilePage></ProfilePage> },
       {
         path: "/:universeId",
         element: <FranchisePage></FranchisePage>,
