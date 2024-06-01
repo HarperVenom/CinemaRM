@@ -1,15 +1,12 @@
 .universe-link {
-  /* width: 100%; */
   position: relative;
-  background-color: var(--text);
+  background-color: var(--dark);
   height: 200px;
   width: 100%;
   max-width: 800px;
   color: var(--element);
   display: flex;
   flex-direction: column;
-  /* justify-content: center;
-  align-items: center; */
   margin: 1rem;
   border-radius: 5px;
   overflow: hidden;

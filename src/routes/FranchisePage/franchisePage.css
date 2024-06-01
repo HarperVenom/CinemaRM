@@ -142,6 +142,7 @@
 .menu .current-universe .title {
   font-weight: 500;
   font-size: 2rem;
+  padding: 1rem;
 }
 .menu .cover {
   width: 100vw;

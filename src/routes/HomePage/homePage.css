@@ -27,8 +27,7 @@ main {
 }
 
 .content-list {
-  /* width: 100%; */
-  min-height: 200px;
+  min-height: 80vh;
   margin: 1rem;
   padding-top: 2rem;
   border-top: 2px solid var(--normal);
