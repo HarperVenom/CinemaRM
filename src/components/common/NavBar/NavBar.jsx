@@ -45,7 +45,9 @@ const NavBar = ({ forceClose }) => {
                 className="user-menu-list"
                 style={{ transform: menuOpen ? "" : "translate(0, -100%)" }}
               >
-                <Link className="button hover">Profile</Link>
+                <Link to={`/profile`} className="button hover">
+                  Profile
+                </Link>
                 <p className="button hover" onClick={() => logout()}>
                   Sign Out
                 </p>
