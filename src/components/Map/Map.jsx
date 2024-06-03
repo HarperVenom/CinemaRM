@@ -16,7 +16,7 @@ import "./map.css";
 import { GlobalContext } from "@/GlobalState";
 
 const Map = () => {
-  const { completed } = useContext(GlobalContext);
+  const { user, completed } = useContext(GlobalContext);
   const {
     universe,
     elements,
@@ -26,6 +26,7 @@ const Map = () => {
     completedIds,
     layout,
     selected,
+    filtersApplied,
   } = useContext(UniverseContext);
 
   const [mapStyle, setMapStyle] = useState(null);
@@ -44,8 +45,8 @@ const Map = () => {
 
   const elementStyle = {
     width: 230,
-    height: 60,
-    marginRight: 250,
+    height: 70,
+    marginRight: 300,
     marginBot: 80,
   };
 
@@ -79,7 +80,6 @@ const Map = () => {
         selected.set(elements[0].id);
         return;
       }
-      // selected.set(prevElement.id);
     }
   }, [elements, mapContainerRef.current]);
 
@@ -90,7 +90,6 @@ const Map = () => {
       mapContainerRef.current.scrollTop === 0 &&
       (offset.x !== 0 || offset.y !== 0)
     ) {
-      // console.log(prevMapStyle.current);
       map.scrollToElement("mapRoot", false, offset);
     } else {
       if (selected.id && mapStyle && mapStyle.resized) {

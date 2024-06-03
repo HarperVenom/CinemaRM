@@ -64,11 +64,14 @@ export function getMapElements(oldTitles, filters) {
     }
     const previousLevel = getElementsByXLevel()[index - 1];
     const previousHeight = getLevelHeight(previousLevel);
-
     const sortedLevel = sortTitles(level);
+    const shift = getLevelHeightShift(sortedLevel);
     sortedLevel.forEach((title, index) => {
       title.yLevel =
-        index - levelHeight / 2 + (previousLevel.length - previousHeight) / 2;
+        index -
+        levelHeight / 2 +
+        (previousLevel.length - previousHeight) / 2 +
+        shift;
     });
   });
 
@@ -78,8 +81,6 @@ export function getMapElements(oldTitles, filters) {
     if (!filters) return;
     elements.forEach((element) => {
       let needCheck = true;
-      // let standalone = true;
-
       while (needCheck) {
         const newWatchAfter = [];
         needCheck = false;
@@ -91,11 +92,12 @@ export function getMapElements(oldTitles, filters) {
           } else {
             newWatchAfter.push(element.id);
           }
-          // if (!element.standAlone) standalone = false;
         });
         element.watchAfter = newWatchAfter;
+        if (element.watchAfter.length === 0 && element.standAlone) {
+          element.standAlone = false;
+        }
       }
-      // element.standAlone = standalone;
     });
     const filtered = elements.filter(
       (element) => element.id === "mapRoot" || filters.includes(element.branch)
@@ -124,6 +126,22 @@ export function getMapElements(oldTitles, filters) {
         });
       });
     });
+  }
+
+  function getLevelHeightShift(level) {
+    let standAloneTop = 0;
+    let standAloneBot = 0;
+    level.forEach((element, index) => {
+      if (!element.standAlone) return;
+
+      if (index > level.length / 2) {
+        standAloneBot++;
+      } else {
+        standAloneTop++;
+      }
+    });
+    if (standAloneTop > standAloneBot) return standAloneBot - standAloneTop;
+    else return 0;
   }
 
   function getLevelHeight(level) {

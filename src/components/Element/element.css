@@ -8,7 +8,7 @@
   width: 100%;
   height: 100%;
   position: relative;
-  border: 5px solid var(--border);
+  border: 7px solid var(--border);
   background-color: black;
   box-shadow: 0px 0px 5px black;
   cursor: pointer;
@@ -27,7 +27,7 @@
   position: absolute;
   object-position: center center;
   width: 100%;
-  filter: blur(20px) contrast(150%) brightness(150%);
+  filter: blur(10px) contrast(130%);
 }
 .element .cover {
   pointer-events: none;
@@ -39,22 +39,22 @@
 .element p {
   background: linear-gradient(
     to right,
-    var(--text-bright) 90%,
+    /* white 90%, */ var(--text-bright) 80%,
     transparent 100%
   );
   background-clip: text;
   pointer-events: none;
   color: transparent;
-  /* color: var(--text-bright); */
   font-weight: 800;
   font-size: 1.4rem;
   overflow: hidden;
   text-wrap: nowrap;
-  max-width: 80%;
+  max-width: 90%;
   box-sizing: border-box;
   display: flex;
-  padding: 10%;
+  padding: 7%;
   z-index: 1;
+  filter: drop-shadow(0 0 4px black);
 }
 .element.filler {
   box-shadow: none;
@@ -75,6 +75,7 @@
 
 .trail {
   stroke: var(--border);
+  stroke-width: 7px;
   transition: stroke 0.3s ease, filter 0.3s ease;
 }
 

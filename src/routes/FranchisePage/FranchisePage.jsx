@@ -31,7 +31,8 @@ const FranchisePage = () => {
     `${backendUrl}/api/universes/${universeId}`
   );
 
-  const { user, completed, updateUser, loading } = useContext(GlobalContext);
+  const { user, userLoading, completed, updateUser, loading } =
+    useContext(GlobalContext);
   const completedUniverse = completed.find(
     (universe) => universe.universeId === universeId
   );
@@ -39,6 +40,7 @@ const FranchisePage = () => {
   const completedIds = completedUniverse?.titles;
   const [elements, setElements] = useState([]);
   const [activeFilters, setActiveFilters] = useState([]);
+  const [filtersApplied, setFiltersApplied] = useState(false);
   const [layout, setLayout] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [menuOpened, setMenuOpened] = useState(false);
@@ -48,15 +50,7 @@ const FranchisePage = () => {
   const overviewRef = useRef();
 
   useEffect(() => {
-    if (
-      (!completed ||
-        (completedUniverse &&
-          activeFilters.length !== 0 &&
-          completedUniverse.filters &&
-          completedUniverse.filters.length === activeFilters.length)) &&
-      activeFilters.length > 0
-    )
-      return;
+    if (!completedChanged()) return;
 
     if (
       completedUniverse &&
@@ -70,23 +64,53 @@ const FranchisePage = () => {
   }, [completed, universe]);
 
   useEffect(() => {
+    if (!user || !completedUniverse || !completedUniverse.filters) return;
+    if (
+      completedUniverse.filters.length === 0 ||
+      completedUniverse.filters.length === activeFilters.length
+    )
+      setFiltersApplied(true);
+  }, [completed]);
+
+  useEffect(() => {
     updateElements();
-    if (!completedUniverse) return;
-    updateUser({
-      completed: [
-        ...completed.filter((universe) => universe.universeId !== universeId),
-        {
-          ...completedUniverse,
-          filters: activeFilters,
-        },
-      ],
-    });
   }, [activeFilters, universe]);
+
+  useEffect(() => {
+    if (!completedUniverse || !completedUniverse.filters) {
+      return;
+    }
+    updateFilters();
+  }, [activeFilters]);
 
   useEffect(() => {
     if (user) return;
     updateElements();
   }, [completed]);
+
+  function updateFilters(newFilters = activeFilters) {
+    const newCompleted = [
+      ...completed.filter((universe) => universe.universeId !== universeId),
+      {
+        ...completedUniverse,
+        filters: newFilters,
+      },
+    ];
+    updateUser({
+      completed: newCompleted,
+    });
+  }
+
+  function completedChanged() {
+    return !(
+      (!completed ||
+        (completedUniverse &&
+          activeFilters.length !== 0 &&
+          completedUniverse.filters &&
+          completedUniverse.filters.length === activeFilters.length)) &&
+      activeFilters.length > 0
+    );
+  }
 
   function updateElements() {
     if (!universe) return;
@@ -103,6 +127,7 @@ const FranchisePage = () => {
     if (!titles || !activeFilters || activeFilters.length === 0) return;
     const mapElements = getMapElements(titles, activeFilters);
     setElements(mapElements);
+    if (user) setFiltersApplied(true);
   }
 
   function getAllFilters() {
@@ -130,48 +155,84 @@ const FranchisePage = () => {
     }
     return false;
   };
+
+  function filterByRelease() {
+    if (!elements) return;
+    let unfilteredArray = elements.map((element) => ({ ...element }));
+    const filteredArray = [];
+    while (unfilteredArray.length !== 0) {
+      let first = unfilteredArray[0];
+      unfilteredArray.forEach((element) => {
+        if (element.releaseDate < first.releaseDate) first = element;
+      });
+      filteredArray.push(first);
+      unfilteredArray = unfilteredArray.filter(
+        (element) => element.id !== first.id
+      );
+    }
+    return filteredArray;
+  }
+
+  let draw = false;
+  if (!userLoading) {
+    if (user) {
+      if (!completedUniverse || filtersApplied) {
+        draw = true;
+      }
+    } else {
+      draw = true;
+    }
+  }
+
   return (
     <div className="franchise-page" ref={pageRef}>
       {!universe ? <div className="map-hide"></div> : null}
       {loading ? <div className="loading-screen"></div> : null}
-      {elements && elements.length > 0 ? (
-        <UniverseContext.Provider
-          value={{
-            universe,
-            elements,
-            pageRef,
-            listRef,
-            overviewRef,
-            isCompleted,
-            completedIds,
-            activeFilters,
-            setActiveFilters,
-            layout: { value: layout, set: setLayout },
-            selected: { id: selectedId, set: setSelectedId },
-          }}
-        >
-          <div className={`menu${menuOpened ? " opened" : ""}`}>
-            <NavBar forceClose={menuOpened ? false : true}></NavBar>
-            <div className="current-universe">
-              <p>Currently viewing:</p>
-              <p className="title">{universe.title}</p>
+      {draw ? (
+        elements && elements.length > 0 ? (
+          <UniverseContext.Provider
+            value={{
+              universe,
+              elements: filterByRelease(elements),
+              pageRef,
+              listRef,
+              overviewRef,
+              isCompleted,
+              completedIds,
+              activeFilters,
+              setActiveFilters,
+              updateFilters,
+              filtersApplied,
+              layout: { value: layout, set: setLayout },
+              selected: { id: selectedId, set: setSelectedId },
+            }}
+          >
+            <div className={`menu${menuOpened ? " opened" : ""}`}>
+              <NavBar forceClose={menuOpened ? false : true}></NavBar>
+              <div className="current-universe">
+                <p>Currently viewing:</p>
+                <p className="title">{universe.title}</p>
+              </div>
+              <div className="cover" onClick={() => setMenuOpened(false)}></div>
             </div>
-            <div className="cover" onClick={() => setMenuOpened(false)}></div>
-          </div>
 
-          <div className={`overlay${layout != null ? " " + layout : ""}`}>
-            <FilterBar filters={getAllFilters()}></FilterBar>
-            <List ref={listRef}></List>
-            <TitleOverview
-              title={elements.find((element) => element.id === selectedId)}
-              ref={overviewRef}
-            />
-            <button className="menu-button" onClick={() => setMenuOpened(true)}>
-              <img className="interactive-element" src={MenuButton} alt="" />
-            </button>
-          </div>
-          <Map></Map>
-        </UniverseContext.Provider>
+            <div className={`overlay${layout != null ? " " + layout : ""}`}>
+              <FilterBar filters={getAllFilters()}></FilterBar>
+              <List ref={listRef}></List>
+              <TitleOverview
+                title={elements.find((element) => element.id === selectedId)}
+                ref={overviewRef}
+              />
+              <button
+                className="menu-button"
+                onClick={() => setMenuOpened(true)}
+              >
+                <img className="interactive-element" src={MenuButton} alt="" />
+              </button>
+            </div>
+            <Map></Map>
+          </UniverseContext.Provider>
+        ) : null
       ) : null}
     </div>
   );

@@ -10,7 +10,6 @@
 .overview ::-webkit-scrollbar-track {
   margin-block: 0.5rem;
 }
-
 .overview.big {
   height: 100%;
   width: 300px;
@@ -23,12 +22,9 @@
   width: 100%;
   margin-top: auto;
   padding: 0.6rem;
-
   display: flex;
   flex-direction: row;
-  /* grid-template-rows: 1fr auto; */
 }
-
 .overview .poster {
   grid-area: img;
   width: 100%;
@@ -39,10 +35,8 @@
 }
 .overview.small .poster {
   height: 100%;
-  width: 30vw;
+  width: 40vw;
   max-width: 40%;
-  /* margin: auto; */
-  /* size: fit-content; */
   object-fit: cover;
   border-radius: 5px;
   object-position: center center;
@@ -50,15 +44,17 @@
 }
 
 .overview .info-action {
+  height: 100%;
   max-height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
-  margin-left: 0.6rem;
   border-radius: 5px;
 }
 .overview.small .info-action {
+  margin-left: 0.6rem;
   background-color: var(--normal);
 }
 
@@ -69,7 +65,6 @@
   padding: 0 3vh;
   overflow: auto;
   z-index: 1;
-  /* height: 100%; */
 }
 .overview.small .info {
   transform: none;

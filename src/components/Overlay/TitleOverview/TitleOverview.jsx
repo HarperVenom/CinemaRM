@@ -14,7 +14,7 @@ import { GlobalContext } from "@/GlobalState";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
   const { completed, setCompleted } = useContext(GlobalContext);
-  const { universe, elements, isCompleted, layout } =
+  const { universe, isCompleted, layout, activeFilters, setActiveFilters } =
     useContext(UniverseContext);
   const { title } = props;
   const [watchAfter, setWatchAfter] = useState([]);
@@ -46,14 +46,16 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
     const totalMinutes = title.duration;
     const hours = parseInt(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    return `${hours}h ${minutes}m`;
+    return `${hours > 0 ? hours + "h " : ""}${minutes}m`;
   }
 
   function getFontSize() {
     if (!title || !title.title) return;
     const length = title.title.length;
     const newSize = 5 - parseInt(length / 8) / 2;
-    return (layout.value === "small" ? 0.6 * newSize : newSize) + "vh";
+    return (
+      (layout.value === "small" ? Math.max(0.6 * newSize, 2) : newSize) + "vh"
+    );
   }
 
   function handleCompleteButton() {
@@ -94,7 +96,8 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
     } else {
       newCompleted.push({ universeId: universe.id, titles: [title.id] });
     }
-
+    // console.log(activeFilters);
+    // setActiveFilters(activeFilters);
     setCompleted(newCompleted);
   }
 

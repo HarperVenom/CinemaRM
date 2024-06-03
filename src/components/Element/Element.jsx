@@ -157,7 +157,12 @@ const MapElement = ({ item, style, onClick, isActive, isCompleted }) => {
           >
             {item.branch !== "line-filler" && (
               <div className="cover">
-                <img className="element-background" src={item.imgUrl} alt="" />
+                <img
+                  className="element-background"
+                  src={item.imgUrl}
+                  alt=""
+                  loading="lazy"
+                />
                 <p className="title">{item.title}</p>
               </div>
             )}
@@ -178,7 +183,6 @@ const MapElement = ({ item, style, onClick, isActive, isCompleted }) => {
                   ${isCompleted ? " completed" : ""}`}
                   d={trail.d}
                   stroke="rgba(255, 255, 255, 0.5)"
-                  strokeWidth="5px"
                   fill="none"
                 ></path>
               ) : (
@@ -191,7 +195,6 @@ const MapElement = ({ item, style, onClick, isActive, isCompleted }) => {
                   x2={trail.x2}
                   y2={trail.y2}
                   stroke="rgba(255, 255, 255, 0.5)"
-                  strokeWidth="5px"
                   fill="none"
                 ></line>
               )

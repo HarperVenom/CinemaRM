@@ -75,7 +75,12 @@ const List = forwardRef(function (props, listContainerRef) {
             onClick={() => selected.set(title.id)}
           >
             {title.imgUrl ? (
-              <img className="list-image" src={title.imgUrl} alt="" />
+              <img
+                className="list-image"
+                src={title.imgUrl}
+                alt=""
+                loading="lazy"
+              />
             ) : null}
             <h1 className="index">{index}</h1>
           </div>

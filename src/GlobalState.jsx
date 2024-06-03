@@ -12,6 +12,7 @@ const CLIENT_SECRET = "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";
 
 const GlobalState = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(true);
   const { getData, postData, updateData, loading } = useApi();
   const [completed, setCompleted] = useState([]);
 
@@ -21,7 +22,9 @@ const GlobalState = ({ children }) => {
 
     if (access_token && refresh_token) {
       login({ access_token: access_token, refresh_token: refresh_token });
+      return;
     }
+    setUserLoading(false);
   }, []);
 
   useEffect(() => {
@@ -35,6 +38,7 @@ const GlobalState = ({ children }) => {
       return;
     }
     setCompleted(user.completed);
+    setUserLoading(false);
   }, [user]);
 
   async function refreshToken() {
@@ -121,6 +125,7 @@ const GlobalState = ({ children }) => {
     <GlobalContext.Provider
       value={{
         user,
+        userLoading,
         completed,
         setCompleted,
         login,
