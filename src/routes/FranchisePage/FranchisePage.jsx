@@ -208,7 +208,10 @@ const FranchisePage = () => {
             }}
           >
             <div className={`menu${menuOpened ? " opened" : ""}`}>
-              <NavBar forceClose={menuOpened ? false : true}></NavBar>
+              <NavBar
+                forceClose={menuOpened ? false : true}
+                position={"relative"}
+              ></NavBar>
               <div className="current-universe">
                 <p>Currently viewing:</p>
                 <p className="title">{universe.title}</p>

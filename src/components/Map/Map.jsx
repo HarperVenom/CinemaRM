@@ -47,7 +47,7 @@ const Map = () => {
     width: 230,
     height: 70,
     marginRight: 300,
-    marginBot: 80,
+    marginBot: 50,
   };
 
   const map = new MapFunctionality(
@@ -271,7 +271,7 @@ const Map = () => {
     e.preventDefault();
     const delta = Math.sign(e.deltaY);
 
-    if ((scale < 0.6 && delta > 0) || (scale > 2 && delta < 0)) return;
+    if ((scale < 0.5 && delta > 0) || (scale > 2 && delta < 0)) return;
     const newScale = scale + (delta > 0 ? -0.1 : 0.1);
 
     setOldZoom({

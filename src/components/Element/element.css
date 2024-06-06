@@ -9,7 +9,7 @@
   height: 100%;
   position: relative;
   border: 7px solid var(--border);
-  background-color: black;
+  background-color: var(--element);
   box-shadow: 0px 0px 5px black;
   cursor: pointer;
   user-select: none;
@@ -37,6 +37,7 @@
   height: 100%;
 }
 .element p {
+  /* margin: auto; */
   background: linear-gradient(
     to right,
     /* white 90%, */ var(--text-bright) 80%,
@@ -46,13 +47,13 @@
   pointer-events: none;
   color: transparent;
   font-weight: 800;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   overflow: hidden;
   text-wrap: nowrap;
   max-width: 90%;
   box-sizing: border-box;
   display: flex;
-  padding: 7%;
+  padding: 0 7%;
   z-index: 1;
   filter: drop-shadow(0 0 4px black);
 }

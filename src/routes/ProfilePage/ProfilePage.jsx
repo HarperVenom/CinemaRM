@@ -37,7 +37,7 @@ const ProfilePage = () => {
   return (
     <>
       <div className="profile-page">
-        <NavBar></NavBar>
+        <NavBar position={"relative"}></NavBar>
 
         <div className="profile">
           <div className="wrapper">

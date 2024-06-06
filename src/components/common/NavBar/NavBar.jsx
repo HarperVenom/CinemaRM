@@ -5,9 +5,10 @@ import { Link } from "react-router-dom";
 import SignInButton from "../SignInButton";
 import "./navbar.css";
 
-const NavBar = ({ forceClose }) => {
+const NavBar = ({ position, forceClose }) => {
   const { user, logout } = useContext(GlobalContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState();
 
   useEffect(() => {
     if (user) return;
@@ -23,17 +24,29 @@ const NavBar = ({ forceClose }) => {
   function handleMenuButtonClick() {
     setMenuOpen((prev) => !prev);
   }
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", () => {
+      setWindowWidth(window.innerWidth);
+    });
+  }, []);
+
   return (
     <>
       <div
         className={`screen-cover${menuOpen ? " visible" : ""}`}
         onClick={() => setMenuOpen(false)}
       ></div>
-      <nav className="navbar">
+      <nav
+        className={`navbar${position ? " " + position : ""}${
+          menuOpen ? " opened" : ""
+        }${windowWidth < 500 ? " small" : ""}`}
+      >
         <div className="wrapper">
           <div className="nav-cover"></div>
-          <Link to={"/"} className="logo">
-            FRANCHISER
+          <Link to={"/"} className="logo anton-regular">
+            <p>FRANCHISER</p>
           </Link>
           {user ? (
             <div className={`user-menu${menuOpen ? " opened" : ""}`}>
@@ -43,7 +56,10 @@ const NavBar = ({ forceClose }) => {
               </div>
               <div
                 className="user-menu-list"
-                style={{ transform: menuOpen ? "" : "translate(0, -100%)" }}
+                style={{
+                  opacity: menuOpen ? 1 : 0,
+                  pointerEvents: menuOpen ? "all" : "none",
+                }}
               >
                 <Link to={`/profile`} className="button hover">
                   Profile

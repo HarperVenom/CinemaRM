@@ -16,16 +16,31 @@
 }
 
 .navbar {
-  position: relative;
-  height: 60px;
+  width: 100%;
+  height: 70px;
   display: flex;
   align-items: center;
-  background-color: var(--normal);
+
   justify-content: space-between;
   z-index: 2;
+  transition: background-color 0.3s ease;
+}
+.navbar.small.opened {
+  background-color: var(--normal);
+}
+
+.navbar.relative {
+  position: relative;
+  background-color: var(--normal);
+}
+.navbar.absolute {
+  padding-top: 1rem;
+  position: absolute;
+  background: linear-gradient(to bottom, var(--dark), transparent);
 }
 .navbar .wrapper {
-  padding: 0 2vw;
+  background-color: transparent;
+  padding: 0 5vw;
   transition: none;
 }
 .navbar .nav-cover {
@@ -33,7 +48,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: var(--normal);
+  /* background-color: var(--normal); */
 }
 .navbar .sign-in-button {
   font-size: 1rem;
@@ -60,11 +75,16 @@
 .navbar .sign-in-button:active {
   scale: 0.98;
 }
+
 .navbar .user-menu {
   position: relative;
-  height: 100%;
+  height: 70%;
   color: var(--text);
 }
+.navbar.small .user-menu {
+  position: unset;
+}
+
 .navbar .user-menu-button {
   cursor: pointer;
   z-index: 1;
@@ -75,20 +95,24 @@
   font-weight: 500;
   user-select: none;
   height: 100%;
-  background-color: var(--normal);
+  background-color: rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 0 black;
   transition: box-shadow 0.2s ease;
   border-radius: 5px;
 }
-.navbar .user-menu-button:hover {
-  background-color: var(--normal1);
+.navbar.small .user-menu .user-menu-button {
+  background-color: transparent;
 }
-.navbar .user-menu-button:active {
-  background-color: var(--normal2);
+.navbar .user-menu-button:hover {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 .user-menu.opened .user-menu-button {
   box-shadow: 0 0 10px black;
 }
+.navbar.small .user-menu.opened .user-menu-button {
+  box-shadow: none;
+}
+
 .navbar .user-icon {
   border-radius: 5px;
   border: 2px solid var(--text);
@@ -96,28 +120,41 @@
   height: 36px;
   z-index: 1;
 }
+.navbar .user-icon:hover {
+  box-shadow: 0 0 10px white;
+}
+
 .navbar .username {
   margin: 0 0.5rem;
   font-size: 1.1rem;
   z-index: 1;
 }
+.navbar.small .username {
+  display: none;
+  background-color: transparent;
+}
+
 .navbar .user-menu-list {
   position: absolute;
   right: 0;
   width: 100%;
   background-color: var(--normal);
   top: 100%;
-  /* z-index: 1; */
   border-radius: 0 0 5px 5px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
   padding: 1rem 0;
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 0 black;
 }
-.user-menu.opened .user-menu-list {
-  box-shadow: 0 0 10px black;
+.navbar.small .user-menu-list {
+  width: 100vw;
+  z-index: -1;
 }
+.user-menu.opened .user-menu-list {
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.5);
+}
+
 .navbar .button {
   position: relative;
   text-align: center;
@@ -136,30 +173,9 @@
 .hover:active {
   background-color: var(--normal2);
 }
-
 .logo {
-  color: var(--text);
-  font-weight: 800;
-  font-size: 1.8rem;
   text-decoration: none;
-  height: 100%;
-  display: flex;
-  align-items: center;
+  font-size: 2rem;
+  color: var(--text);
   z-index: 1;
-}
-
-@media screen and (max-width: 500px) {
-  .navbar .user-menu {
-    position: unset;
-  }
-  .navbar .username {
-    display: none;
-  }
-  .navbar .user-menu-list {
-    width: 100vw;
-    z-index: -1;
-  }
-  .user-menu.opened .user-menu-button {
-    box-shadow: none;
-  }
 }

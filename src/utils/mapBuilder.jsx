@@ -55,23 +55,21 @@ export function getMapElements(oldTitles, filters) {
   });
 
   getElementsByXLevel().forEach((level, index) => {
-    let levelHeight = getLevelHeight(level);
+    let levelHeight = getLevelHeight(level, true);
     if (index === 0) {
       level.forEach((title, index) => {
         title.yLevel = index - levelHeight / 2;
       });
       return;
     }
+
     const previousLevel = getElementsByXLevel()[index - 1];
-    const previousHeight = getLevelHeight(previousLevel);
-    const sortedLevel = sortTitles(level);
-    const shift = getLevelHeightShift(sortedLevel);
+    const previousHeight = getLevelHeight(previousLevel, true);
+    const sortedLevel = level.length > 2 ? sortTitles(level) : level;
+
     sortedLevel.forEach((title, index) => {
       title.yLevel =
-        index -
-        levelHeight / 2 +
-        (previousLevel.length - previousHeight) / 2 +
-        shift;
+        index - levelHeight / 2 + (previousLevel.length - previousHeight) / 2;
     });
   });
 
@@ -128,30 +126,14 @@ export function getMapElements(oldTitles, filters) {
     });
   }
 
-  function getLevelHeightShift(level) {
-    let standAloneTop = 0;
-    let standAloneBot = 0;
-    level.forEach((element, index) => {
-      if (!element.standAlone) return;
-
-      if (index > level.length / 2) {
-        standAloneBot++;
-      } else {
-        standAloneTop++;
-      }
-    });
-    if (standAloneTop > standAloneBot) return standAloneBot - standAloneTop;
-    else return 0;
-  }
-
-  function getLevelHeight(level) {
+  function getLevelHeight(level, countAll) {
     let height = 0;
     level.forEach((title) => {
       if (title.xLevel === 0) {
         height++;
         return;
       }
-      if (!title.standAlone) height++;
+      if (countAll || !title.standAlone) height++;
     });
     return height;
   }
@@ -220,19 +202,38 @@ export function getMapElements(oldTitles, filters) {
       initialArray = initialArray.filter((title) => title != highestTitle);
     }
     const savedArray = sortedArray;
-    savedArray.forEach((title, index) => {
-      if (title.standAlone) {
-        const length = sortedArray.length;
-        sortedArray = sortedArray.filter((element) => element != title);
-        if (index >= length / 2) {
-          sortedArray.push(title);
-        } else {
-          sortedArray.unshift(title);
-        }
-      }
-    });
 
-    return sortedArray;
+    const midPoint = Math.floor(savedArray.length / 2);
+
+    let firstHalf = savedArray.slice(0, midPoint);
+    let secondHalf = savedArray.slice(midPoint);
+
+    const firstHalfSorted = [];
+    const secondHalfSorted = [];
+
+    while (firstHalf.length !== 0) {
+      let leastDeep = firstHalf[0];
+      firstHalf.forEach((element) => {
+        if (getDepth(element) < getDepth(leastDeep)) {
+          leastDeep = element;
+        }
+      });
+      firstHalfSorted.push(leastDeep);
+      firstHalf = firstHalf.filter((element) => element.id !== leastDeep.id);
+    }
+
+    while (secondHalf.length !== 0) {
+      let mostDeep = secondHalf[0];
+      secondHalf.forEach((element) => {
+        if (getDepth(element) > getDepth(mostDeep)) {
+          mostDeep = element;
+        }
+      });
+      secondHalfSorted.push(mostDeep);
+      secondHalf = secondHalf.filter((element) => element.id !== mostDeep.id);
+    }
+
+    return [...firstHalfSorted, ...secondHalfSorted];
 
     function getParentsYLevel(title) {
       return title.watchAfter.reduce((acc, parentId) => {
@@ -240,6 +241,23 @@ export function getMapElements(oldTitles, filters) {
         acc += parent.yLevel;
         return acc;
       }, 0);
+    }
+
+    function getDepth(element) {
+      const xLevel = element.xLevel;
+      let firstXLevelByParents = xLevel;
+
+      const parents = getAllParentElements(element.id, elements);
+      if (parents.length === 0) return 0;
+      firstXLevelByParents = parents[0].xLevel;
+      parents.forEach((element) => {
+        if (element.xLevel < firstXLevelByParents) {
+          firstXLevelByParents = element.xLevel;
+        }
+      });
+
+      const depth = xLevel - firstXLevelByParents;
+      return depth;
     }
   }
 }

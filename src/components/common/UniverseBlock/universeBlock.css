@@ -1,36 +1,104 @@
 .universe-link {
   position: relative;
-  background-color: var(--dark);
-  height: 200px;
+  min-height: 200px;
+  max-height: 300px;
+  height: 50vw;
+  height: minmax();
   width: 100%;
-  max-width: 800px;
   color: var(--element);
-  display: flex;
-  flex-direction: column;
-  margin: 1rem;
-  border-radius: 5px;
   overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  scale: 1;
+  transition: scale 0.3s ease;
+  box-shadow: 0 10px 10px var(--dark);
 }
-.universe-link img {
-  margin: 0;
+.universe-link .back-color {
+  position: absolute;
+  z-index: -1;
   width: 100%;
+  filter: blur(50px);
+  scale: 1.5;
+}
+/* .universe-link:active {
+  scale: 0.99;
+} */
+.universe-link .image {
+  margin: auto;
+  position: absolute;
+  width: 100%;
+  max-width: 1000px;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
+  object-position: center 60%;
+  scale: 1;
+  transition: scale 0.5s cubic-bezier(0.35, 0.01, 0, 1.03);
+
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255) 20%,
+    rgba(255, 255, 255) 80%,
+    transparent 100%
+  );
+}
+.universe-link:hover .image {
+  scale: 1.05;
+}
+.universe-link .info-shade {
+  position: absolute;
+  width: 100vw;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.7) 70%,
+    black 100%
+  );
 }
 .universe-link .info {
   position: absolute;
   width: 100%;
-  height: 100%;
+  max-width: 800px;
+  height: fit-content;
   display: flex;
-  align-items: end;
-  padding: 1rem;
+  bottom: 0;
+  /* flex-direction: column; */
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.5rem;
+  /* padding-left: 10%; */
   box-sizing: border-box;
-  background: linear-gradient(to bottom, transparent 50%, var(--dark) 95%);
+  flex-wrap: wrap;
 }
 .universe-link h2 {
+  width: 100%;
+  text-align: center;
   color: var(--text-bright);
   font-weight: 500;
-  font-size: 1.6rem;
+  font-size: clamp(1rem, 5vw, 3rem);
   margin: 0;
+  /* margin-right: 2rem; */
+}
+
+.universe-link .info p {
+  margin: 0;
+  font-size: clamp(0.6rem, 3.5vw, 1rem);
+  white-space: nowrap;
+}
+.universe-link .info .details {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+.universe-link .details .duration {
+  border-right: 1px solid var(--text);
+  padding-right: 0.5rem;
+  margin-right: 0.5rem;
+}
+.universe-link .info .details p {
+  color: var(--text);
+  /* margin-right: 0.5rem;
+  padding-right: 0.5rem; */
 }

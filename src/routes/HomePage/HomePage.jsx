@@ -16,37 +16,48 @@ const HomePage = () => {
         id: universe.id,
         title: universe.title,
         imgUrl: universe.imgUrl,
+        duration: universe.duration,
+        number: universe.number,
       }))
     );
   }, [data]);
 
   return (
     <div className="home-page">
-      <header>
-        <NavBar></NavBar>
-        <div className="wrapper">
+      <div className="page-container">
+        <header>
+          <NavBar position={"absolute"}></NavBar>
           <section className="hero">
-            <h1>Explore Spectacular New Worlds</h1>
+            <div className="back-grid"></div>
+            <div className="wrapper">
+              <h1 className="anton-regular">
+                <span className="stick">Explore Spectacular</span>{" "}
+                <span className="stick">New Worlds</span>
+              </h1>
+              <h5 className="merriweather-light">
+                Track your progress with interactive roadmaps
+              </h5>
+            </div>
           </section>
-        </div>
-      </header>
-      <main>
-        <div className="wrapper">
+        </header>
+        <main>
           <section className="content-list">
+            <h3>CHOOSE A UNIVERSE</h3>
             {universes.map((universe) => (
               <UniverseBlock
                 key={universe.id}
                 universe={universe}
               ></UniverseBlock>
             ))}
+            <h4>More are coming...</h4>
           </section>
-        </div>
-      </main>
-      <footer className="footer">
-        <div className="wrapper">
-          <p>&copy; 2024 HarperVenom</p>
-        </div>
-      </footer>
+        </main>
+        <footer className="footer">
+          <div className="wrapper">
+            <p>&copy; 2024 HarperVenom</p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };
