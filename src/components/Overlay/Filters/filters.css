@@ -36,12 +36,12 @@
   justify-content: center;
   white-space: nowrap;
 }
-.filter.interactive-element:hover {
+/* .filter.interactive-element:hover {
   background-color: rgba(0, 0, 0, 0.3);
 }
 .filter.interactive-element:active {
   background-color: rgba(0, 0, 0, 0.5);
-}
+} */
 .filter .glowing {
   filter: blur(50px) brightness(1%) saturate(110%);
   scale: 5;
@@ -52,6 +52,11 @@
   cursor: pointer;
   overflow: hidden;
   border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.4);
+  transition: background-color 0.2s ease;
+}
+.filter label:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .filter input {

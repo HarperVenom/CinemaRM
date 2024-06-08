@@ -1,9 +1,3 @@
-@media screen and (max-width: 450px) {
-  .list-container {
-    display: none;
-  }
-}
-
 .list-container {
   position: relative;
   grid-area: sidebar;
@@ -83,4 +77,20 @@
 }
 .list-element.completed h1 {
   filter: grayscale(100%) brightness(50%);
+}
+
+@media screen and (max-width: 450px) {
+  .list-container {
+    width: min-content;
+  }
+  .block {
+    min-height: 30px;
+    min-width: 30px;
+    max-width: 30px;
+    max-height: 30px;
+    margin: 0.4rem 0.3rem 0 0.3rem;
+  }
+  .list-element .index {
+    font-size: 0.8rem;
+  }
 }

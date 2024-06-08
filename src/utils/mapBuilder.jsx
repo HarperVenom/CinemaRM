@@ -22,6 +22,7 @@ export function getMapElements(oldTitles, filters) {
     });
 
     let lastParent = null;
+    if (title.standAlone) return;
     parents.forEach((parent) => {
       if (parent === undefined) return;
 
@@ -33,7 +34,6 @@ export function getMapElements(oldTitles, filters) {
       const xDifference = rightCorner - leftCorner;
 
       if (xDifference === 1) return;
-
       for (let x = 1; x < xDifference; x++) {
         elements.push({
           id: parent.id + "-" + title.id + "-x" + x,
@@ -47,6 +47,7 @@ export function getMapElements(oldTitles, filters) {
         });
         lastParent = parent;
       }
+
       title.watchAfter = [
         ...title.watchAfter.filter((id) => id !== parent.id),
         elements[elements.length - 1].id,
@@ -55,7 +56,7 @@ export function getMapElements(oldTitles, filters) {
   });
 
   getElementsByXLevel().forEach((level, index) => {
-    let levelHeight = getLevelHeight(level, true);
+    let levelHeight = getLevelHeight(level, true, index);
     if (index === 0) {
       level.forEach((title, index) => {
         title.yLevel = index - levelHeight / 2;
@@ -67,9 +68,11 @@ export function getMapElements(oldTitles, filters) {
     const previousHeight = getLevelHeight(previousLevel, true);
     const sortedLevel = level.length > 2 ? sortTitles(level) : level;
 
-    sortedLevel.forEach((title, index) => {
+    sortedLevel.forEach((title, levelIndex) => {
       title.yLevel =
-        index - levelHeight / 2 + (previousLevel.length - previousHeight) / 2;
+        levelIndex -
+        levelHeight / 2 +
+        (previousLevel.length - previousHeight) / 2;
     });
   });
 
@@ -83,14 +86,21 @@ export function getMapElements(oldTitles, filters) {
         const newWatchAfter = [];
         needCheck = false;
         element.watchAfter.forEach((parentId) => {
-          const element = elements.find((title) => title.id === parentId);
-          if (!filters.includes(element.branch)) {
+          const parentElement = elements.find((title) => title.id === parentId);
+          if (!filters.includes(parentElement.branch)) {
             needCheck = true;
-            newWatchAfter.push(...element.watchAfter);
+            newWatchAfter.push(
+              ...parentElement.watchAfter.filter(
+                (element) => !newWatchAfter.includes(element.id)
+              )
+            );
           } else {
-            newWatchAfter.push(element.id);
+            if (!newWatchAfter.includes(parentElement.id)) {
+              newWatchAfter.push(parentElement.id);
+            }
           }
         });
+
         element.watchAfter = newWatchAfter;
         if (element.watchAfter.length === 0 && element.standAlone) {
           element.standAlone = false;
@@ -128,6 +138,7 @@ export function getMapElements(oldTitles, filters) {
 
   function getLevelHeight(level, countAll) {
     let height = 0;
+
     level.forEach((title) => {
       if (title.xLevel === 0) {
         height++;

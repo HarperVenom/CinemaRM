@@ -28,11 +28,11 @@ const Filter = ({ name }) => {
     >
       <label htmlFor={name}>
         {name}
-        <img
+        {/* <img
           className="glowing"
           src={selectedElement && selectedElement.smallImgUrl}
           alt=""
-        />
+        /> */}
       </label>
       <input
         onChange={handleCheck}

@@ -26,7 +26,7 @@ const Map = () => {
     completedIds,
     layout,
     selected,
-    filtersApplied,
+    pendingZoom,
   } = useContext(UniverseContext);
 
   const [mapStyle, setMapStyle] = useState(null);
@@ -199,6 +199,11 @@ const Map = () => {
     layout.set(newStyle.overlayLayout);
   }
 
+  useEffect(() => {
+    if (!pendingZoom) return;
+    zoom(pendingZoom.zoomIn);
+  }, [pendingZoom]);
+
   function handleElementClick(selectedTitle) {
     if (selectedTitle.branch === "line-filler") return;
     if (
@@ -267,12 +272,9 @@ const Map = () => {
     mapContainerRef.current.style.cursor = "unset";
   }
 
-  function handleScroll(e) {
-    e.preventDefault();
-    const delta = Math.sign(e.deltaY);
-
-    if ((scale < 0.5 && delta > 0) || (scale > 2 && delta < 0)) return;
-    const newScale = scale + (delta > 0 ? -0.1 : 0.1);
+  function zoom(zoomIn) {
+    if ((scale < 0.4 && !zoomIn) || (scale > 2 && zoomIn)) return;
+    const newScale = scale + (!zoomIn ? -0.1 : 0.1);
 
     setOldZoom({
       scale: scale,
@@ -285,6 +287,12 @@ const Map = () => {
     });
     setScale(newScale);
     updateMapStyle(newScale, elements);
+  }
+
+  function handleScroll(e) {
+    e.preventDefault();
+    const delta = Math.sign(e.deltaY);
+    zoom(delta < 0);
   }
 
   function getElement(id) {

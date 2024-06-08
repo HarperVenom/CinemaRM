@@ -11,6 +11,8 @@ import { GlobalContext } from "@/GlobalState";
 import MenuButton from "@/assets/menuButton.svg";
 import NavBar from "@/components/common/NavBar/NavBar";
 import { Helmet } from "react-helmet";
+import Plus from "@/assets/plus.svg";
+import Minus from "@/assets/minus.svg";
 
 const apiURL = process.env.API_URL;
 
@@ -37,6 +39,7 @@ const FranchisePage = () => {
   const [layout, setLayout] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [menuOpened, setMenuOpened] = useState(false);
+  const [pendingZoom, setPendingZoom] = useState(null);
 
   const pageRef = useRef();
   const listRef = useRef();
@@ -204,6 +207,7 @@ const FranchisePage = () => {
               filtersApplied,
               layout: { value: layout, set: setLayout },
               selected: { id: selectedId, set: setSelectedId },
+              pendingZoom,
             }}
           >
             <div className={`menu${menuOpened ? " opened" : ""}`}>
@@ -237,6 +241,20 @@ const FranchisePage = () => {
                 <div className="hover"></div>
                 <img className="svg" src={MenuButton} alt="" />
               </button>
+              <div className="zoom">
+                <button
+                  className="zoom-in-button"
+                  onClick={() => setPendingZoom({ zoomIn: true })}
+                >
+                  <img src={Plus} alt="" />
+                </button>
+                <button
+                  className="zoom-out-button"
+                  onClick={() => setPendingZoom({ zoomIn: false })}
+                >
+                  <img src={Minus} alt="" />
+                </button>
+              </div>
             </div>
             <Map></Map>
           </UniverseContext.Provider>

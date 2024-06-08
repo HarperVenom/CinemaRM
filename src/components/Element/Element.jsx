@@ -38,6 +38,12 @@ const MapElement = ({ item, style, onClick, isActive, isCompleted }) => {
     connectToParents();
   }, [parents]);
 
+  useEffect(() => {
+    if (item.standAlone) {
+      setTrails([]);
+    }
+  }, [item.standAlone]);
+
   function connectToParents() {
     let trailsCount = 0;
 
