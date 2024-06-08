@@ -18,6 +18,7 @@ import { backendUrl } from "@/config";
 import { GlobalContext } from "@/GlobalState";
 import MenuButton from "@/assets/menuButton.svg";
 import NavBar from "@/components/common/NavBar/NavBar";
+import { Helmet } from "react-helmet";
 
 export const UniverseContext = createContext();
 
@@ -120,6 +121,7 @@ const FranchisePage = () => {
         watchAfter: [],
         title: universe.title,
         imgUrl: universe.imgUrl,
+        smallImgUrl: universe.imgUrl,
         description: universe.description,
       },
       ...universe.titles,
@@ -173,6 +175,8 @@ const FranchisePage = () => {
     return filteredArray;
   }
 
+  const selectedElement = elements.find((element) => element.id === selectedId);
+
   let draw = false;
   if (!userLoading) {
     if (user) {
@@ -186,6 +190,9 @@ const FranchisePage = () => {
 
   return (
     <div className="franchise-page" ref={pageRef}>
+      <Helmet>
+        <title>{universe && universe.title}</title>
+      </Helmet>
       {!universe ? <div className="map-hide"></div> : null}
       {loading ? <div className="loading-screen"></div> : null}
       {draw ? (
@@ -230,7 +237,13 @@ const FranchisePage = () => {
                 className="menu-button"
                 onClick={() => setMenuOpened(true)}
               >
-                <img className="interactive-element" src={MenuButton} alt="" />
+                <img
+                  className="glowing"
+                  src={selectedElement && selectedElement.smallImgUrl}
+                  alt=""
+                />
+                <div className="hover"></div>
+                <img className="svg" src={MenuButton} alt="" />
               </button>
             </div>
             <Map></Map>

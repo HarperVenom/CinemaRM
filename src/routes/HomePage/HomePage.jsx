@@ -4,6 +4,7 @@ import "./homePage.css";
 import UniverseBlock from "@/components/common/UniverseBlock/UniverseBlock";
 import { backendUrl } from "@/config";
 import NavBar from "@/components/common/NavBar/NavBar";
+import { Helmet } from "react-helmet";
 
 const HomePage = () => {
   const { data } = useApi(`${backendUrl}/api/universes`);
@@ -24,6 +25,17 @@ const HomePage = () => {
 
   return (
     <div className="home-page">
+      <Helmet>
+        <title>CinemaRM</title>
+        <meta
+          name="description"
+          content="Explore cinematic universes and franchises and track your progress with interactive roadmaps"
+        />
+        <meta
+          name="keywords"
+          content="movie release order, cinematic universe guide, franchise release roadmap, film release timeline, interactive movie roadmap, movie series guide, film franchise order, cinematic universe release order, movie release tracker, film franchise timeline, movie franchise list, film series roadmap, cinematic universe tracker, movie viewing order, film franchise guide, movie series release dates, movie universe timeline, film series release order, cinematic universe list, movie release schedule"
+        />
+      </Helmet>
       <div className="page-container">
         <header>
           <NavBar position={"absolute"}></NavBar>

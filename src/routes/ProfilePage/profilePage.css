@@ -28,6 +28,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.2s ease;
 }
 .profile .universe-bar:hover {
   background-color: var(--element1);

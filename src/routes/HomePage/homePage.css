@@ -1,6 +1,5 @@
 .home-page {
   height: 100vh;
-  /* width: 100vw; */
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -18,8 +17,8 @@
   box-shadow: 0 0 10px var(--dark);
   background: linear-gradient(
     160deg,
-    rgb(29, 37, 77),
-    rgb(37, 24, 75),
+    rgb(23, 32, 79),
+    rgb(30, 15, 77),
     var(--dark)
   );
 }
@@ -84,18 +83,8 @@
   margin: 0;
   margin-bottom: 3rem;
   color: var(--text);
-  /* font-size: clamp(1rem, 3vh, 2rem); */
   font-weight: 500;
   transform: translate(0, -100%);
-  /* background-color: var(--normal); */
-  /* background: linear-gradient(to bottom, var(--normal), transparent); */
-  /* mask-image: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(255, 255, 255) 20%,
-    rgba(255, 255, 255) 80%,
-    transparent 100%
-  ); */
   width: 100%;
   text-align: center;
   padding: 0.5rem;

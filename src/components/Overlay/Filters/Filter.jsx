@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 
 const Filter = ({ name }) => {
-  const { activeFilters, setActiveFilters } = useContext(UniverseContext);
+  const { elements, selected, activeFilters, setActiveFilters } =
+    useContext(UniverseContext);
   const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
@@ -16,12 +17,23 @@ const Filter = ({ name }) => {
     );
   }
 
+  const selectedElement = elements.find(
+    (element) => element.id === selected.id
+  );
+
   return (
     <div
       className="filter interactive-element"
       style={{ opacity: isChecked ? null : "0.6" }}
     >
-      <label htmlFor={name}>{name}</label>
+      <label htmlFor={name}>
+        {name}
+        <img
+          className="glowing"
+          src={selectedElement && selectedElement.smallImgUrl}
+          alt=""
+        />
+      </label>
       <input
         onChange={handleCheck}
         type="checkbox"

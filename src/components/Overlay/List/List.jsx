@@ -59,14 +59,23 @@ const List = forwardRef(function (props, listContainerRef) {
     }
   }, [selected.id]);
 
+  const selectedElement = elements.find(
+    (element) => element.id === selected.id
+  );
+
   return (
     <div
       className={`list-container${expanded ? " expanded" : ""}`}
       ref={listContainerRef}
     >
+      <img
+        className="glowing"
+        src={selectedElement && selectedElement.smallImgUrl}
+        alt=""
+      />
       <div className="list" ref={listRef}>
         {titles.map((title, index) => (
-          <div
+          <button
             key={title.id}
             className={`list-element block${
               selected.id === title.id ? " selected" : ""
@@ -77,13 +86,13 @@ const List = forwardRef(function (props, listContainerRef) {
             {title.imgUrl ? (
               <img
                 className="list-image"
-                src={title.imgUrl}
+                src={title.smallImgUrl}
                 alt=""
                 loading="lazy"
               />
             ) : null}
             <h1 className="index">{index}</h1>
-          </div>
+          </button>
         ))}
       </div>
     </div>

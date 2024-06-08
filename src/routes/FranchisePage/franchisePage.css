@@ -2,9 +2,11 @@
   user-select: none;
 }
 .franchise-page ::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
 }
 .franchise-page ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
 }
 
@@ -83,14 +85,31 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  overflow: hidden;
 }
-.menu-button img {
+.menu-button .svg {
   display: block;
   width: 3rem;
   box-sizing: border-box;
-  background-color: var(--element);
   border-radius: 5px;
-  padding: 0.5rem;
+  padding: 0.3rem;
+}
+.menu-button .glowing {
+  filter: blur(20px) brightness(150%);
+}
+.menu-button .hover {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: -1;
+  transition: background-color 0.2s ease;
+}
+.menu-button:hover .hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.menu-button:active .hover {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .menu {
@@ -154,8 +173,21 @@
   transition: background-color 0.2s ease;
 }
 .interactive-element:hover {
-  background-color: var(--element1);
+  background-color: rgba(0, 0, 0, 0.2);
 }
 .interactive-element:active {
-  background-color: var(--element2);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.glowing {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  object-position: center center;
+  z-index: -2;
+  filter: blur(100px) saturate(110%) brightness(120%);
+  scale: 2;
+  opacity: 0.5;
 }

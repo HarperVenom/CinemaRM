@@ -46,7 +46,7 @@ const NavBar = ({ position, forceClose }) => {
         <div className="wrapper">
           <div className="nav-cover"></div>
           <Link to={"/"} className="logo anton-regular">
-            <p>FRANCHISER</p>
+            <p>CinemaRM</p>
           </Link>
           {user ? (
             <div className={`user-menu${menuOpen ? " opened" : ""}`}>

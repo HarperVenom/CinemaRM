@@ -1,23 +1,13 @@
-import {
-  forwardRef,
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useContext, useEffect, useRef } from "react";
 import CheckMark from "@/assets/checkMark.svg";
 import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
-import { getAllParentElements } from "@/utils/mapFunctionality";
 import "./overview.css";
 import { GlobalContext } from "@/GlobalState";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
   const { completed, setCompleted } = useContext(GlobalContext);
-  const { universe, isCompleted, layout, activeFilters, setActiveFilters } =
-    useContext(UniverseContext);
+  const { universe, isCompleted, layout } = useContext(UniverseContext);
   const { title } = props;
-  const [watchAfter, setWatchAfter] = useState([]);
 
   const infoRef = useRef(null);
 
@@ -27,12 +17,6 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
     if (infoRef.current) {
       infoRef.current.scrollTop = 0;
     }
-
-    // setWatchAfter(
-    //   getAllParentElements(title.id, elements).filter(
-    //     (element) => element.branch !== "line-filler" && element.id !== -1
-    //   )
-    // );
   }, [title]);
 
   function getYear() {
@@ -96,17 +80,24 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
     } else {
       newCompleted.push({ universeId: universe.id, titles: [title.id] });
     }
-    // console.log(activeFilters);
-    // setActiveFilters(activeFilters);
     setCompleted(newCompleted);
   }
 
   return title ? (
     <div className={`overview${" " + layout.value}`} ref={overviewRef}>
       {title && title.imgUrl && (
-        <img className="poster" src={title.imgUrl} alt="" />
+        <>
+          <img className="poster" src={title.imgUrl} alt="" />
+
+          {layout.value === "big" ? (
+            <img className="glowing" src={title.smallImgUrl} alt="" />
+          ) : null}
+        </>
       )}
       <div className="info-action">
+        {layout.value === "small" ? (
+          <img className="glowing" src={title.smallImgUrl} alt="" />
+        ) : null}
         <div className="info" ref={infoRef}>
           <div className="title" style={{ fontSize: getFontSize() }}>
             {title.title}
@@ -115,25 +106,6 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
           <div className="description">{title.description}</div>
         </div>
         <div className="action-bar">
-          {/* <div className="watch-after">
-          {watchAfter.length > 0 && !title.standAlone && <h5>WATCH FIRST: </h5>}
-          <div className="watch-after-list">
-            {!title.standAlone &&
-              watchAfter.map((element) => {
-                return (
-                  <div
-                    key={element.id}
-                    className={`watch-after-title${
-                      directParents.includes(element) ? " important" : ""
-                    }`}
-                    onClick={() => focusElement(element.id, true)}
-                  >
-                    {element.title}
-                  </div>
-                );
-              })}
-          </div>
-        </div> */}
           {isCompleted(title.id) ? (
             <button
               className="complete-button completed"

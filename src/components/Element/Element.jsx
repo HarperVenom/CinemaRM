@@ -159,11 +159,11 @@ const MapElement = ({ item, style, onClick, isActive, isCompleted }) => {
               <div className="cover">
                 <img
                   className="element-background"
-                  src={item.imgUrl}
+                  src={item.smallImgUrl}
                   alt=""
                   loading="lazy"
                 />
-                <p className="title">{item.title}</p>
+                <p className="title archivo-black">{item.title}</p>
               </div>
             )}
           </div>

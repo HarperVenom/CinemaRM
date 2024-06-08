@@ -10,15 +10,15 @@
   --text: rgb(201, 204, 255);
 
   --back: #151536;
-  --overlay: rgba(31, 26, 63, 0.7);
+  --overlay: rgba(13, 9, 54, 0.7);
   --map-back: #0b0b25;
 
   --text-bright: rgb(225, 226, 255);
-  --element: #333363;
+  --element: #282864;
   --element1: #42427b;
   --element2: #505090;
   --active: rgba(255, 255, 255);
-  --border: rgb(119, 126, 191);
+  --border: rgb(79, 86, 156);
   --active-trail: white;
   --active-glowing: rgb(127, 229, 255);
 }
@@ -30,6 +30,10 @@
 .merriweather-light {
   font-family: "Merriweather", serif;
   font-weight: 300;
+  font-style: normal;
+}
+.archivo-black {
+  font-family: "Archivo Black", sans-serif;
   font-style: normal;
 }
 
