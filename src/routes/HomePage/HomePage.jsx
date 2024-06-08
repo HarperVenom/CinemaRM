@@ -1,13 +1,14 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useApi from "@/utils/useApi";
 import "./homePage.css";
 import UniverseBlock from "@/components/common/UniverseBlock/UniverseBlock";
-import { backendUrl } from "@/config";
 import NavBar from "@/components/common/NavBar/NavBar";
 import { Helmet } from "react-helmet";
 
+const apiURL = process.env.API_URL;
+
 const HomePage = () => {
-  const { data } = useApi(`${backendUrl}/api/universes`);
+  const { data } = useApi(`${apiURL}/api/universes`);
   const [universes, setUniverses] = useState([]);
 
   useEffect(() => {

@@ -1,14 +1,13 @@
 import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import useApi from "./utils/useApi";
-import { backendUrl } from "./config";
 import Cookies from "js-cookie";
 
 export const GlobalContext = createContext();
 
-const CLIENT_ID =
-  "41982569166-nkim7lc1na132p34k9fg7bfnac3rnio3.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
+const apiURL = process.env.API_URL;
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 const GlobalState = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -77,7 +76,7 @@ const GlobalState = ({ children }) => {
         }
       );
       const data = response.data;
-      let user = await getData(`${backendUrl}/api/users/${data.sub}`);
+      let user = await getData(`${apiURL}/api/users/${data.sub}`);
       if (!user) {
         const newUser = {
           id: data.sub,
@@ -86,7 +85,7 @@ const GlobalState = ({ children }) => {
           picture: data.picture,
           completed: completed,
         };
-        user = await postData(`${backendUrl}/api/users`, newUser);
+        user = await postData(`${apiURL}/api/users`, newUser);
         setUser(newUser);
         Cookies.set("accessToken", tokens.access_token);
         Cookies.set("refreshToken", tokens.refresh_token);
@@ -109,7 +108,7 @@ const GlobalState = ({ children }) => {
   async function updateUser(userUpdate) {
     if (!user) return;
     const response = await updateData(
-      `${backendUrl}/api/users/${user.id}`,
+      `${apiURL}/api/users/${user.id}`,
       userUpdate
     );
     setUser(response.data);

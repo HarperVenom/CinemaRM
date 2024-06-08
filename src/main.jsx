@@ -13,8 +13,7 @@ import { disableReactDevTools } from "@fvilers/disable-react-devtools";
 
 if (process.env.NODE_ENV === "production") disableReactDevTools();
 
-const clientId =
-  "41982569166-nkim7lc1na132p34k9fg7bfnac3rnio3.apps.googleusercontent.com";
+const clientId = process.env.CLIENT_ID;
 
 const router = createBrowserRouter([
   {

@@ -3,13 +3,14 @@ import "./profilePage.css";
 import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "@/GlobalState";
 import useApi from "@/utils/useApi";
-import { backendUrl } from "@/config";
 import { Link } from "react-router-dom";
+
+const apiURL = process.env.API_URL;
 
 const ProfilePage = () => {
   const { user, completed } = useContext(GlobalContext);
   const [completedUniverses, setCompletedUniverses] = useState([]);
-  const { data: universes } = useApi(`${backendUrl}/api/universes`);
+  const { data: universes } = useApi(`${apiURL}/api/universes`);
 
   useEffect(() => {
     if (!user || !completed || !universes) return;

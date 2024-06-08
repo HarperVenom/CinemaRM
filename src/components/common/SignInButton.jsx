@@ -1,16 +1,10 @@
-import {
-  GoogleLogin,
-  useGoogleLogin,
-  useGoogleOneTapLogin,
-} from "@react-oauth/google";
-import { useContext, useEffect, useState } from "react";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useContext } from "react";
 import { GlobalContext } from "@/GlobalState";
-import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
-const CLIENT_ID =
-  "41982569166-nkim7lc1na132p34k9fg7bfnac3rnio3.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
 const SignInButton = () => {
   const { login } = useContext(GlobalContext);

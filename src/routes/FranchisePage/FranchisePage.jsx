@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import Map from "@/components/Map/Map";
 import { getMapElements } from "@/utils/mapBuilder";
 import FilterBar from "@/components/Overlay/Filters/FilterBar";
@@ -14,11 +7,12 @@ import TitleOverview from "@/components/Overlay/TitleOverview/TitleOverview";
 import "./franchisePage.css";
 import useApi from "@/utils/useApi";
 import { useLoaderData } from "react-router-dom";
-import { backendUrl } from "@/config";
 import { GlobalContext } from "@/GlobalState";
 import MenuButton from "@/assets/menuButton.svg";
 import NavBar from "@/components/common/NavBar/NavBar";
 import { Helmet } from "react-helmet";
+
+const apiURL = process.env.API_URL;
 
 export const UniverseContext = createContext();
 
@@ -28,9 +22,7 @@ export async function loader({ params }) {
 
 const FranchisePage = () => {
   const universeId = useLoaderData();
-  const { data: universe } = useApi(
-    `${backendUrl}/api/universes/${universeId}`
-  );
+  const { data: universe } = useApi(`${apiURL}/api/universes/${universeId}`);
 
   const { user, userLoading, completed, updateUser, loading } =
     useContext(GlobalContext);
