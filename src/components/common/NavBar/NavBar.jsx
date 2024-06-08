@@ -1,6 +1,5 @@
 import { GlobalContext } from "@/GlobalState";
 import { useContext, useEffect, useState } from "react";
-import UserIcon from "@/assets/user.svg";
 import { Link } from "react-router-dom";
 import SignInButton from "../SignInButton";
 import "./navbar.css";
