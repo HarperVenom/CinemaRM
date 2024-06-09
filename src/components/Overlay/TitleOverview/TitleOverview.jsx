@@ -3,9 +3,10 @@ import CheckMark from "@/assets/checkMark.svg";
 import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 import "./overview.css";
 import { GlobalContext } from "@/GlobalState";
+import SignInButton from "@/components/common/SignInButton";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
-  const { completed, setCompleted } = useContext(GlobalContext);
+  const { user, completed, setCompleted } = useContext(GlobalContext);
   const { universe, isCompleted, layout } = useContext(UniverseContext);
   const { title } = props;
 
@@ -106,6 +107,12 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
           <div className="description">{title.description}</div>
         </div>
         <div className="action-bar">
+          {!user ? (
+            <SignInButton className={"overview-login"}>
+              Log in to save the progress
+            </SignInButton>
+          ) : null}
+
           {isCompleted(title.id) ? (
             <button
               className="complete-button completed"

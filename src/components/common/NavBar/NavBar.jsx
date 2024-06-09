@@ -69,7 +69,7 @@ const NavBar = ({ position, forceClose }) => {
               </div>
             </div>
           ) : (
-            <SignInButton></SignInButton>
+            <SignInButton showButton={true}></SignInButton>
           )}
         </div>
       </nav>

@@ -6,7 +6,7 @@ import axios from "axios";
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 
-const SignInButton = () => {
+const SignInButton = ({ className, showButton, children }) => {
   const { login } = useContext(GlobalContext);
 
   const googleLogin = useGoogleLogin({
@@ -36,8 +36,16 @@ const SignInButton = () => {
   });
 
   return (
-    <div onClick={() => googleLogin()} className="sign-in-button">
-      Google Login
+    <div
+      onClick={() => googleLogin()}
+      className={(
+        (showButton ? "sign-in-button" : "") +
+        " " +
+        className
+      ).trim()}
+    >
+      {showButton ? "Google Login" : null}
+      {children}
     </div>
   );
 };
