@@ -22,6 +22,10 @@
   --active-trail: white;
   --active-glowing: rgb(127, 229, 255);
 }
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 .anton-regular {
   font-family: "Anton", sans-serif;
   font-weight: 400;

@@ -46,7 +46,7 @@
   box-sizing: border-box;
   gap: 0.4rem;
 }
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 600px) {
   .overlay {
     grid-template-areas:
       "filters filters menu-button"

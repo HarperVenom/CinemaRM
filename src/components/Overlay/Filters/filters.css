@@ -36,12 +36,6 @@
   justify-content: center;
   white-space: nowrap;
 }
-/* .filter.interactive-element:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-.filter.interactive-element:active {
-  background-color: rgba(0, 0, 0, 0.5);
-} */
 .filter .glowing {
   filter: blur(50px) brightness(1%) saturate(110%);
   scale: 5;
@@ -80,4 +74,19 @@
   opacity: 0.7;
   outline: 2px solid var(--text-bright);
   background-color: var(--text-bright);
+}
+
+@media screen and (max-width: 600px) {
+  .filter {
+    font-size: 0.8rem;
+    margin: 0.3rem 0.4rem 0.3rem 0;
+  }
+  .filter label {
+    position: relative;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+  }
+  .filter .custom-checkbox {
+    width: 10px;
+    height: 10px;
+  }
 }

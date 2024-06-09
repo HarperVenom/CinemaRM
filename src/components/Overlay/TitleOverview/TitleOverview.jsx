@@ -4,10 +4,12 @@ import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 import "./overview.css";
 import { GlobalContext } from "@/GlobalState";
 import SignInButton from "@/components/common/SignInButton";
+import { configureStore } from "@reduxjs/toolkit";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
   const { user, completed, setCompleted } = useContext(GlobalContext);
-  const { universe, isCompleted, layout } = useContext(UniverseContext);
+  const { elements, universe, isCompleted, layout } =
+    useContext(UniverseContext);
   const { title } = props;
 
   const infoRef = useRef(null);
@@ -27,11 +29,21 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
   }
 
   function getDuration() {
-    if (!title || !title.duration) return "";
-    const totalMinutes = title.duration;
+    let duration = title?.duration;
+    if (title && title.id === "mapRoot") {
+      duration = elements.reduce((acc, element) => {
+        if (element.duration) {
+          acc += element.duration;
+        }
+        return acc;
+      }, 0);
+    } else if (!title || !title.duration) return "";
+    const totalMinutes = duration;
     const hours = parseInt(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    return `${hours > 0 ? hours + "h " : ""}${minutes}m`;
+    return `${
+      hours > 0 ? hours + "h " : ""
+    }${minutes === 0 ? "" : minutes + "m"}`;
   }
 
   function getFontSize() {
@@ -103,7 +115,11 @@ const TitleOverview = forwardRef(function (props, overviewRef) {
           <div className="title" style={{ fontSize: getFontSize() }}>
             {title.title}
           </div>
-          <div className="specifics">{`${getYear()} · ${getDuration()}`}</div>
+          <div className="specifics">
+            {title.id === "mapRoot"
+              ? getDuration()
+              : `${getYear()} · ${getDuration()}`}
+          </div>
           <div className="description">{title.description}</div>
         </div>
         <div className="action-bar">

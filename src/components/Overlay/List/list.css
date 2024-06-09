@@ -79,18 +79,18 @@
   filter: grayscale(100%) brightness(50%);
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 600px) {
   .list-container {
     width: min-content;
   }
   .block {
-    min-height: 30px;
-    min-width: 30px;
-    max-width: 30px;
-    max-height: 30px;
+    min-height: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    max-height: 40px;
     margin: 0.4rem 0.3rem 0 0.3rem;
   }
   .list-element .index {
-    font-size: 0.8rem;
+    font-size: 1.3rem;
   }
 }

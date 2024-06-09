@@ -187,7 +187,7 @@
 .overview .overview-login {
   white-space: nowrap;
   color: var(--text);
-  font-size: 0.8rem;
+  font-size: clamp(0.5rem, 2vh, 0.8rem);
   margin-bottom: 0.5rem;
   cursor: pointer;
 }
