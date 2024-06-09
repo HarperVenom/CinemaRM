@@ -104,7 +104,7 @@
   justify-content: space-between;
   margin-top: auto;
   height: 50px;
-  padding: 1rem;
+  padding: 1rem 2rem;
 }
 .footer p {
   color: var(--text);
