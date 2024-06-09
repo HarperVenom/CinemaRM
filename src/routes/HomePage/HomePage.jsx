@@ -68,6 +68,10 @@ const HomePage = () => {
         <footer className="footer">
           <div className="wrapper">
             <p>&copy; 2024 HarperVenom</p>
+            <a href="mailto:harpervenom@gmail.com">
+              {" "}
+              Contact: harpervenom@gmail.com{" "}
+            </a>
           </div>
         </footer>
       </div>

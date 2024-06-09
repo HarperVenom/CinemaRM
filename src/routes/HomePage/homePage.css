@@ -101,7 +101,7 @@
 .footer {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   margin-top: auto;
   height: 50px;
   padding: 1rem;
@@ -109,6 +109,10 @@
 .footer p {
   color: var(--text);
   text-align: center;
+}
+.footer a {
+  color: var(--text);
+  text-decoration: none;
 }
 
 .home-page .nav-cover {
