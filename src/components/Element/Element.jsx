@@ -169,7 +169,11 @@ const MapElement = ({ item, style, onClick, isActive, isCompleted }) => {
                   alt=""
                   loading="lazy"
                 />
-                <p className="title archivo-black">{item.title}</p>
+                {item.logoUrl ? (
+                  <img src={item.logoUrl} className="logo" alt="" />
+                ) : (
+                  <p className="title archivo-black">{item.title}</p>
+                )}
               </div>
             )}
           </div>

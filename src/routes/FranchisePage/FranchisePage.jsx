@@ -117,6 +117,7 @@ const FranchisePage = () => {
         title: universe.title,
         imgUrl: universe.imgUrl,
         smallImgUrl: universe.imgUrl,
+        logoUrl: universe.logoUrl,
         description: universe.description,
       },
       ...universe.titles,
