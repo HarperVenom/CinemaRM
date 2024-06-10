@@ -24,7 +24,8 @@ Example map for the Marvel Studios universe.
 ![Screenshot 2024-06-09 181442](https://github.com/HarperVenom/MovieFranchiseHub/assets/162710380/80f97a0e-dbb8-49e9-bb2a-5dad6429af0d)
 
 An example of the data for building a map:
-```{
+```
+{
   "id": "marvel_studios",
   "title": "Marvel Studios",
   "description": "Marvel Studios, LLC is an American film and television production company. Marvel Studios is the creator of the Marvel Cinematic Universe, a media franchise and shared universe of films and television series produced by the studio, based on characters that appear in Marvel Comics publications.",
@@ -46,31 +47,48 @@ An example of the data for building a map:
       "logoUrl": "https://i.postimg.cc/cCW7Z67q/iron-man.png"
     },
     {
-      "id": "wandavision",
-      "branch": "Avengers Series",
-      "watchAfter": ["avengers_endgame"],
-      "standAlone": false,
-      "title": "WandaVision",
-      "description": "Vision and Wanda live a normal life in Westview and conceal their superpowers. However, as decades pass by, they start doubting that everything is not what it seems.",
-      "releaseDate": "2021-01-15",
-      "duration": 360,
-      "imgUrl": "https://i.postimg.cc/QxhySJVs/wandavision-s1.jpg",
-      "smallImgUrl": "https://i.postimg.cc/W3SXHQdv/wandavision-s1-small.jpg",
-      "logoUrl": "https://i.postimg.cc/Gh83rz2C/wandavision.png"
-    },
-    {
-      "id": "spider-man",
-      "branch": "Spider-Man",
+      "id": "thor",
+      "branch": "Avengers",
       "watchAfter": [],
       "standAlone": false,
-      "title": "Spider-Man",
-      "description": "Peter Parker, a shy and awkward high school student, is often bullied by people, including his best friend. His life changes when he is bitten by a genetically altered spider and gains superpowers.",
-      "releaseDate": "2002-06-07",
-      "duration": 121,
-      "imgUrl": "https://i.postimg.cc/XY34f56y/spider-man.jpg",
-      "smallImgUrl": "https://i.postimg.cc/qvSfm69L/spider-man-small.jpg",
-      "logoUrl": "https://i.postimg.cc/6QRG3tpB/spider-man.png"
+      "title": "Thor",
+      "description": "Thor is exiled by his father, Odin, the King of Asgard, to the Earth to live among mortals. When he lands on Earth, his trusted weapon Mjolnir is discovered and captured by S.H.I.E.L.D.",
+      "releaseDate": "2011-05-02",
+      "duration": 114,
+      "storyDate": "2011",
+      "imgUrl": "https://i.postimg.cc/5t6GL9yC/thor.jpg",
+      "smallImgUrl": "https://i.postimg.cc/N0qJ963W/thor-small.jpg",
+      "logoUrl": "https://i.postimg.cc/yNXYtdN3/thor.png"
     },
+    {
+      "id": "iron_man_2",
+      "branch": "Avengers",
+      "watchAfter": ["iron_man"],
+      "standAlone": false,
+      "title": "Iron Man 2",
+      "description": "Tony Stark is under pressure from various sources, including the government, to share his technology with the world. He must find a way to fight them while also tackling his other enemies.",
+      "releaseDate": "2010-05-07",
+      "duration": 125,
+      "storyDate": "2010",
+      "imgUrl": "https://i.postimg.cc/NGzczVqY/iron-man-2.jpg",
+      "smallImgUrl": "https://i.postimg.cc/W4z3ZZ0w/iron-man-2-small.jpg",
+      "logoUrl": "https://i.postimg.cc/PJMWqhKC/iron-man-2.png"
+    },
+    {
+      "id": "a_funny_thing_happened_on_the_way_to_thors_hammer",
+      "branch": "One-Shot",
+      "watchAfter": ["iron_man_2", "thor"],
+      "standAlone": false,
+      "title": "A Funny Thing Happened on the Way to Thor's Hammer",
+      "description": "Agents Coulson and Sitwell plan to derail General Thaddeus \"Thunderbolt\" Ross from interfering with S.H.I.E.L.D. affairs with a special person.",
+      "releaseDate": "2011-10-25",
+      "duration": 4,
+      "storyDate": "2011",
+      "imgUrl": "https://i.postimg.cc/7P7VFGj6/a-funny-thing-happened-on-the-way-to-thors-hammer.jpg",
+      "smallImgUrl": "https://i.postimg.cc/k5KQkLhH/a-funny-thing-happened-on-the-way-to-thors-hammer-small.jpg",
+      "logoUrl": "https://i.postimg.cc/rpqfGnRX/a-funny-thing-happened-on-the-way-to-thors-hammer.png"
+    },
+}
 ```
 where 
 "branch" - is the name of a filter to which the title belongs, 
