@@ -4,7 +4,6 @@ import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 import "./overview.css";
 import { GlobalContext } from "@/GlobalState";
 import SignInButton from "@/components/common/SignInButton";
-import { configureStore } from "@reduxjs/toolkit";
 
 const TitleOverview = forwardRef(function (props, overviewRef) {
   const { user, completed, setCompleted } = useContext(GlobalContext);

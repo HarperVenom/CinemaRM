@@ -47,7 +47,7 @@
 .element p {
   background: linear-gradient(
     to right,
-    /* white 90%, */ var(--text-bright) 80%,
+    var(--text-bright) 80%,
     transparent 100%
   );
   background-clip: text;

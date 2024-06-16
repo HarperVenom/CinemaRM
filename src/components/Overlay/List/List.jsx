@@ -1,7 +1,6 @@
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { UniverseContext } from "@/routes/FranchisePage/FranchisePage";
 import "./list.css";
-import { GlobalContext } from "@/GlobalState";
 
 const List = forwardRef(function (props, listContainerRef) {
   const { elements, isCompleted, selected } = useContext(UniverseContext);

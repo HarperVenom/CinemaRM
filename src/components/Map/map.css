@@ -4,11 +4,6 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
-  /* mask-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.7) 0%,
-    transparent 100%
-  ); */
   opacity: 0.3;
   filter: contrast(120%) brightness(150%) blur(1px);
   animation-name: fade-in;
