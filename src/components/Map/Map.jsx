@@ -44,7 +44,7 @@ const Map = () => {
 
   const elementStyle = {
     width: 230,
-    height: 70,
+    height: 85,
     marginRight: 300,
     marginBot: 50,
   };
@@ -272,7 +272,7 @@ const Map = () => {
   }
 
   function zoom(zoomIn) {
-    if ((scale < 0.4 && !zoomIn) || (scale > 2 && zoomIn)) return;
+    if ((scale < 0.6 && !zoomIn) || (scale > 2 && zoomIn)) return;
     const newScale = scale + (!zoomIn ? -0.1 : 0.1);
 
     setOldZoom({
